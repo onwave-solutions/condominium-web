@@ -1,12 +1,34 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import React, { ComponentType } from 'react';
+import LocaleProvider from 'antd/lib/locale-provider';
+import { ThemeProvider } from 'styled-components';
+import locale from 'antd/lib/locale-provider/es_ES';
+import { render } from 'react-dom';
+
+import theme from './shared-ui/settings/themes';
+
 import * as serviceWorker from './serviceWorker';
+import App from './app';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+function renderApp(AppComponent: ComponentType<any>): void {
+  render(
+    <LocaleProvider locale={locale}>
+      <ThemeProvider theme={theme}>
+        <AppComponent />
+      </ThemeProvider>
+    </LocaleProvider>,
+    document.getElementById('root')
+  );
+}
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
+renderApp(App);
+
+declare const module: any;
+
+if (module.hot) {
+  module.hot.accept('./app', () => {
+    const NextApp = require('./app').default;
+    renderApp(NextApp);
+  });
+}
+
 serviceWorker.unregister();
