@@ -15,9 +15,10 @@
   updated_by integer
  */
 export class User {
-  id?: string;
+  _id?: string;
   roleId?: string;
   username?: string;
+  state?: string;
   password?: string;
   disabled?: boolean;
   firstName?: string;

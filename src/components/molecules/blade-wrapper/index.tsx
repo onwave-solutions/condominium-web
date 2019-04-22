@@ -8,9 +8,7 @@ const { Header, Footer, Content } = Layout;
 const Wrapper = styled(Layout)`
   min-width: 60%;
   max-width: 60%;
-  min-height: 99%
   height: 99%;
-  max-height: 99%;
   margin-bottom: 3px;
   overflow: hidden;
   overflow-y: hidden;

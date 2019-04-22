@@ -17,8 +17,8 @@ export default function Shell() {
       return;
     }
     setBlades([
-      ...blades,
-      { blade: mod.id, id: mod.id, route: mod.route, title: mod.title }
+      { blade: mod.id, id: mod.id, route: mod.route, title: mod.title },
+      ...blades
     ]);
   };
   const collapse = () => {

@@ -7,28 +7,43 @@ import { User } from "../../../shared-ui/models/user";
 
 export interface IUserForm {
   user?: Partial<User>;
+  userChanged?(user: User): void;
 }
 
+const changeHandler = (user: User, userChange: Function) => {
+  return (event: any) => {
+    const { name, value } = event.target;
+    userChange({ ...user, [name]: value });
+  };
+};
+
 export default function UserForm(props: IUserForm) {
+  const { user, userChanged } = props;
+  const changer = changeHandler(user!, userChanged as any);
   return (
     <>
       <FormItem label={"Usuario"}>
-        <Input />
+        <Input name="username" onChange={changer} value={user!.username} />
       </FormItem>
       <FormItem label="Estado">
-        <Input />
+        <Input name="state" disabled={true} value={user!.state} />
       </FormItem>
       <FormItem label="Nombre">
-        <Input />
+        <Input name="firstName" onChange={changer} value={user!.firstName} />
       </FormItem>
       <FormItem label="Apellido">
-        <Input />
+        <Input name="lastName" onChange={changer} value={user!.lastName} />
       </FormItem>
       <FormItem label="Tipo de documento">
-        <Input />
+        <Input
+          name="documentType"
+          onChange={changer}
+          disabled={true}
+          value="Cédula"
+        />
       </FormItem>
       <FormItem label="Documento">
-        <Input />
+        <Input name="document" onChange={changer} />
       </FormItem>
       <FormItem label="Fecha de creación">
         <Input disabled={true} />
