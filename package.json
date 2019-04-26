@@ -12,6 +12,7 @@
     "antd": "^3.16.2",
     "axios": "^0.18.0",
     "history": "^4.9.0",
+    "http-proxy-middleware": "^0.19.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
@@ -32,7 +33,6 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "proxy": "https://592bc7a1.ngrok.io",
   "browserslist": [
     ">0.2%",
     "not dead",
