@@ -9,7 +9,7 @@ import BladeTemplate from "../../components/templates/blade-template";
 import { User } from "../../shared-ui/models/user";
 import { getUsers, createUser } from "../../shared-ui/services/users";
 
-export interface ITenant {}
+export interface IManager {}
 
 const columns: ColDef[] = [
   {
@@ -38,7 +38,7 @@ const columns: ColDef[] = [
   }
 ];
 
-export default function Tenant(props: ITenant) {
+export default function Manager(props: IManager) {
   const [users, setUsers] = useState<User[]>([]);
   const [user, setUser] = useState<User>({});
   const loadUsers = () => getUsers().then(setUsers);
