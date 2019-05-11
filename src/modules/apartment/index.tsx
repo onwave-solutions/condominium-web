@@ -69,7 +69,8 @@ export default function Apartment(props: IModule) {
 
   const clear = () => {
     closeChildBlades(props.id);
-    setApartment({});
+    const payload = { buildingId: building.id };
+    setApartment(payload);
   };
 
   useEffect(() => {
