@@ -19,4 +19,4 @@ app.get("*", function(req, res) {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
-app.listen(parseInt(NODE_PORT || "8080", 10));
+app.listen(parseInt(NODE_PORT || "3000", 10));

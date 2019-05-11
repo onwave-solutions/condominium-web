@@ -5,7 +5,7 @@ const ShellContentWrapper = styled.div`
   padding: 5px;
   display: flex;
   height: 100%;
-  width: 100%;
+  width: 99.85%;
   overflow: hidden;
   overflow-x: scroll;
 
@@ -24,6 +24,7 @@ export interface IShellWrapper {
 }
 export default function ShellWrapper(props: IShellWrapper) {
   const { children, className } = props;
-  const cs = `${className || ""} isolayoutContentWrapper`;
+  const cs = `${className ||
+    ""} isolayoutContentWrapper blade-scroll-container`;
   return <ShellContentWrapper className={cs}>{children}</ShellContentWrapper>;
 }

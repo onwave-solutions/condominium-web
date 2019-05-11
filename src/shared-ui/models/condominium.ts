@@ -1,11 +1,18 @@
+import { Field } from "@rijudev/parseus";
+
 export class Condominium {
-  _id?: string;
+  @Field()
+  id?: number;
+  @Field()
   name?: string;
+  @Field()
   address?: string;
+  @Field()
   latitude?: number;
+  @Field()
   longitude?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-  createdBy?: string;
-  updatedBy?: string;
+  @Field()
+  createdAt?: string;
+  @Field()
+  updatedAt?: string;
 }

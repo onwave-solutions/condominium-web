@@ -6,12 +6,9 @@ import Row from "../../atoms/row";
 export const Wrapper = styled(Row)`
   padding: 10px;
   margin: 0;
-  display: flex;
+  flex-grow: 1;
   overflow: hidden;
   overflow-y: auto;
-  flex-direction: column;
-  flex-grow: 1;
-  flex: 1;
 `;
 
 export const HeaderWrapper = styled.header`

@@ -6,13 +6,13 @@ import { palette } from "styled-theme";
 const { Header, Footer, Content } = Layout;
 
 const Wrapper = styled(Layout)`
-  min-width: 60%;
-  max-width: 60%;
+  min-width: 45%;
+  max-width: 45%;
   height: 99%;
   margin-bottom: 3px;
   overflow: hidden;
   overflow-y: hidden;
-  margin-right: 10px;
+  margin-right: 5px;
   margin-left: 2.5px;
   background: white;
   border-style: solid;

@@ -7,15 +7,5 @@ export default {
   title: "Condominios",
   id: "condominium-parent",
   iconType: "lock",
-  children: [
-    {
-      title: "Condominios",
-      id: "condominium",
-      iconType: "lock",
-      route: "condominium"
-    },
-    building,
-    apartment,
-    parking
-  ]
+  route: "condominium"
 } as IModule;

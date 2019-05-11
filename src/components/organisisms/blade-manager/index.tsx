@@ -2,16 +2,16 @@ import React, { Suspense, lazy } from "react";
 
 import BladeWrapper from "../../molecules/blade-wrapper";
 import BladeHeader from "../../molecules/blade-header";
-import { IBlade } from "../../../shared-ui/models/blade";
+import { IModule } from "../../../shared-ui/models/module";
 
 export interface IBladeManager {
-  blades: IBlade[];
+  blades: IModule[];
   onBladeClose?(id: string): void;
 }
 
 function renderBlade(props: IBladeManager) {
   const { onBladeClose } = props;
-  return (blade: IBlade) => {
+  return (blade: IModule) => {
     const Blade = lazy(() => import(`../../../modules/${blade.route}`));
     return (
       <BladeWrapper

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { ColDef } from "ag-grid-community/dist/lib/entities/colDef";
 import { AgGridReact } from "ag-grid-react";
 
@@ -6,11 +6,23 @@ import Col from "../../components/atoms/col";
 import Button from "../../components/atoms/button";
 import CondominiumForm from "../../components/organisisms/condominium-form";
 import BladeTemplate from "../../components/templates/blade-template";
-import { Condominium } from "../../shared-ui/models/condominium";
+
+import { select } from "../../shared-ui/store/selectors";
+import { useReduxState, useReduxAction } from "../../shared-ui/store/hooks";
+import { condominiumSelector } from "../../shared-ui/store/selectors/condominium";
 import {
-  createCondominium,
-  getCondominium
-} from "../../shared-ui/services/condominiums";
+  setCondominiumAction,
+  createCondominiumAction,
+  updateCondominiumAction,
+  refreshCondominiumsAction
+} from "../../shared-ui/store/actions/condominium";
+
+import buildingModule from "../building/module";
+import {
+  addChildBlade,
+  closeChildBladeAction
+} from "../../shared-ui/store/actions/app";
+import { IModule } from "../../shared-ui/models/module";
 
 const columns: ColDef[] = [
   {
@@ -20,27 +32,34 @@ const columns: ColDef[] = [
   {
     field: "address",
     headerName: "Dirección"
-  },
-  {
-    field: "longitude",
-    headerName: "Longitud"
-  },
-  {
-    field: "latitude",
-    headerName: "Latitud"
   }
+  //  {
+  //    field: "longitude",
+  //    headerName: "Longitud"
+  //  },
+  //  {
+  //    field: "latitude",
+  //    headerName: "Latitud"
+  //  }
 ];
 
-export default function CondominiumBlade() {
-  const [condominium, setCondominium] = useState<Condominium>({});
-  const [condominiums, setCondominiums] = useState<Condominium[]>([]);
+const condominiumState = select(condominiumSelector);
 
-  const loadCondominium = () => getCondominium().then(setCondominiums);
-  const clear = () => setCondominium({});
-  const create = async () => {
-    await createCondominium(condominium);
-    clear();
-    await loadCondominium();
+export default function CondominiumBlade(props: IModule) {
+  const condominium = useReduxState(condominiumState("condominium"));
+  const condominiums = useReduxState(condominiumState("condominiums"));
+
+  const setCondominium = useReduxAction(setCondominiumAction);
+  const create = useReduxAction(createCondominiumAction());
+  const update = useReduxAction(updateCondominiumAction());
+  const loadCondominium = useReduxAction(refreshCondominiumsAction());
+
+  const handleAddBlade = useReduxAction(addChildBlade(props.id));
+  const closeChildBlades = useReduxAction(closeChildBladeAction);
+
+  const clear = () => {
+    closeChildBlades(props.id);
+    setCondominium({});
   };
 
   useEffect(() => {
@@ -49,15 +68,31 @@ export default function CondominiumBlade() {
 
   return (
     <BladeTemplate
+      header={
+        <>
+          {condominium.id && (
+            <Button
+              size={"small"}
+              onClick={() => handleAddBlade(buildingModule.id)}
+            >
+              Edificios
+            </Button>
+          )}
+        </>
+      }
       footer={
         <>
-          {!condominium._id && (
-            <Button size={"small"} onClick={create}>
+          {!condominium.id && (
+            <Button size={"small"} onClick={() => create(condominium)}>
               Crear
             </Button>
           )}
 
-          {condominium._id && <Button size={"small"}>Guardar</Button>}
+          {condominium.id && (
+            <Button size={"small"} onClick={() => update(condominium)}>
+              Guardar
+            </Button>
+          )}
 
           <Button size={"small"} style={{ marginLeft: 5 }} onClick={clear}>
             Limpiar
