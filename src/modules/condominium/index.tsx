@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { ColDef } from "ag-grid-community/dist/lib/entities/colDef";
 import { AgGridReact } from "ag-grid-react";
 
+import condominiumManagerModule from "../condominium-manager/module";
+
 import Col from "../../components/atoms/col";
 import Button from "../../components/atoms/button";
 import CondominiumForm from "../../components/organisisms/condominium-form";
@@ -15,9 +17,8 @@ import {
   createCondominiumAction,
   updateCondominiumAction,
   refreshCondominiumsAction
-} from "../../shared-ui/store/actions/condominium";
+} from "../../shared-ui/store/actions/condominium.action";
 
-import buildingModule from "../building/module";
 import {
   addChildBlade,
   closeChildBladeAction
@@ -64,6 +65,9 @@ export default function CondominiumBlade(props: IModule) {
 
   useEffect(() => {
     loadCondominium();
+    return () => {
+      clear();
+    };
   }, []);
 
   return (
@@ -73,9 +77,9 @@ export default function CondominiumBlade(props: IModule) {
           {condominium.id && (
             <Button
               size={"small"}
-              onClick={() => handleAddBlade(buildingModule.id)}
+              onClick={() => handleAddBlade(condominiumManagerModule.id)}
             >
-              Edificios
+              Lista de Managers
             </Button>
           )}
         </>

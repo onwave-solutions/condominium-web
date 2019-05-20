@@ -1,39 +1,43 @@
 import React from "react";
 
 import Input from "../../atoms/input";
+import Select from "../../atoms/select";
 import FormItem from "../../molecules/form-item";
+import { Company } from "../../../shared-ui/models/company.model";
+import { changeHandler } from "../../../shared-ui/utils/input";
+import { Keylist } from "../../../shared-ui/models/keylist";
 
-export interface ICompanyForm {}
+export interface ICompanyForm {
+  company: Partial<Company>;
+  keylist?: Keylist;
+  companyChange?(company: Company): void;
+}
 
 export default function CompanyForm(props: ICompanyForm) {
+  const { company, companyChange, keylist } = props;
+  const changer = changeHandler(company, companyChange!);
+  const onItemSelect = (name: string, value: any) => {
+    companyChange!({ ...company, [name]: value });
+  };
+
   return (
     <>
       <FormItem label="Nombre" sm={24} md={24}>
-        <Input />
-      </FormItem>
-      <FormItem label="Estado">
-        <Input />
+        <Input name="name" value={company.name} onChange={changer} />
       </FormItem>
       <FormItem label="Tipo de documento">
-        <Input />
+        <Select
+          name="documentId"
+          onChangeItem={onItemSelect}
+          value={company!.documentId}
+          data={keylist!.documentTypes}
+        />
       </FormItem>
       <FormItem label="Documento">
-        <Input />
+        <Input name="document" onChange={changer} value={company!.document} />
       </FormItem>
       <FormItem label="Teléfono">
-        <Input />
-      </FormItem>
-      <FormItem label="Fecha de creación">
-        <Input disabled={true} />
-      </FormItem>
-      <FormItem label="Creado por">
-        <Input disabled={true} />
-      </FormItem>
-      <FormItem label="Fecha de modificación">
-        <Input disabled={true} />
-      </FormItem>
-      <FormItem label="Modificado por">
-        <Input disabled={true} />
+        <Input name="phone" onChange={changer} value={company!.phone} />
       </FormItem>
     </>
   );

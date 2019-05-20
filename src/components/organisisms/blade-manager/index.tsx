@@ -17,6 +17,7 @@ function renderBlade(props: IBladeManager) {
       <BladeWrapper
         key={blade.id!}
         id={blade.id!}
+        size={blade.size}
         header={
           <BladeHeader
             title={blade.title}

@@ -16,3 +16,11 @@ export class Condominium {
   @Field()
   updatedAt?: string;
 }
+
+export class CondominiumManager {
+  @Field()
+  condominiumId?: number;
+
+  @Field()
+  managerId?: number;
+}

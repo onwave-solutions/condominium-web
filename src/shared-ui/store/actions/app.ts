@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import { createAction } from "../../utils/redux";
 //import { User, IAuthorization } from '../../models/user'
 import { getErrorResponse } from "../../utils/objects";
+import { Keylist } from "../../models/keylist";
+import { UserService } from "../../services/users";
 // import {
 //   signIn,
 //   validateUser,
@@ -12,7 +14,8 @@ import { getErrorResponse } from "../../utils/objects";
 //   sendChangePassword,
 //   restoreSession,
 // } from '../../http/user'
-// import { setAuthorization } from '../../http'
+import { setAuthorization } from "../../services/axios";
+import { IAuthorization, User } from "../../models/user";
 
 export enum ApplicationActions {
   SetPath = "APPLICATION_SET_PATH",
@@ -25,11 +28,27 @@ export enum ApplicationActions {
   FocusBlade = "APPLICATION_FOCUS_BLADE",
   SetSideBarVisibility = "APPLICATION_SET_SIDE_BAR_VISIBILITY",
   SetIsMobile = "APPLICATION_SET_IS_MOBILE",
-  SetUser = "APPLICATION_SET_USER"
+  SetUser = "APPLICATION_SET_USER",
+  SetKeyList = "APPLICATION_SET_KEYLIST"
 }
+
+const service = new UserService();
 
 export function closeChildBladeAction(id: string) {
   return createAction(ApplicationActions.CloseChildBlades, id);
+}
+
+export function setKeylistAction(keylist: Keylist) {
+  return createAction(ApplicationActions.SetKeyList, keylist);
+}
+
+export function loadKeylistAction() {
+  return async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      const data = await service.keylist();
+      dispatch(setKeylistAction(data));
+    } catch (e) {}
+  };
 }
 
 // export function logout() {
@@ -37,22 +56,20 @@ export function closeChildBladeAction(id: string) {
 //   return setUser({})
 // }
 
-// export function onRestoreSession() {
-//   return async (dispatch: ThunkDispatch<any, any, any>) => {
-//     const token = sessionStorage.getItem('token')
-//     if (!token) return
-//     dispatch(setUser({ loading: true }))
-//     try {
-//       setAuthorization(token)
-//       const user = await restoreSession()
-//       user.token = token
-//       dispatch(setUser(user))
-//     } catch (e) {
-//       sessionStorage.removeItem('token')
-//       dispatch(setUser({ loading: false }))
-//     }
-//   }
-// }
+export function restoreSessionAction() {
+  return async (dispatch: ThunkDispatch<any, any, any>) => {
+    const token = sessionStorage.getItem("token");
+    if (!token) return;
+    try {
+      setAuthorization(token);
+      const user = await service.restoreSession();
+      user.token = token;
+      dispatch(setUser(user));
+    } catch (e) {
+      sessionStorage.removeItem("token");
+    }
+  };
+}
 
 // export function onSendChangePassword(auth: IAuthorization) {
 //   return async (dispatch: ThunkDispatch<any, any, any>) => {
@@ -84,51 +101,49 @@ export function closeChildBladeAction(id: string) {
 //   }
 // }
 
-// export function onValidateCode(auth: IAuthorization) {
-//   return async (dispatch: ThunkDispatch<any, any, any>) => {
-//     dispatch(setUser({ loading: true, showCode: true }))
-//     try {
-//       await validateUser(auth)
-//       toast.success('Usuario validado exitosamente. Favor iniciar sesión.')
-//       dispatch(setUser({ loading: false }))
-//     } catch (e) {
-//       const error = getErrorResponse(e)
-//       toast.error(error.message)
-//       dispatch(setUser({ loading: false, showCode: true }))
-//     }
-//   }
-// }
+export function validateCodeAction(auth: IAuthorization) {
+  return async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      await service.confirmUser(auth);
+      dispatch(setUser({}));
+      toast.success("Usuario validado exitosamente. Favor iniciar sesión.");
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  };
+}
 
-// export function onLogin(auth: IAuthorization) {
-//   return async (dispatch: ThunkDispatch<any, any, any>) => {
-//     dispatch(setUser({ loading: true }))
-//     try {
-//       const data = await signIn(auth)
-//       if (!data) {
-//         toast.info(
-//           'Usuario inactivo, favor buscar el código de verificación enviado a su correo y activar su usuario.'
-//         )
-//         return dispatch(setUser({ showCode: true }))
-//       }
-//       sessionStorage.setItem('email', data.email!)
-//       sessionStorage.setItem('token', data.token!)
-//       setAuthorization(data.token!)
-//       dispatch(setUser(data))
-//     } catch (e) {
-//       const error = getErrorResponse(e)
-//       toast.error(error.message)
-//       dispatch(setUser({ loading: false }))
-//     }
-//   }
-// }
+export function loginAction(auth: IAuthorization) {
+  return async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      const data = await service.signIn(auth);
+
+      if (data.status === "P") {
+        dispatch(setUser(data));
+        toast.warn("Favor confirmar su usuario.");
+        return;
+      }
+
+      sessionStorage.setItem("username", data.username!);
+      sessionStorage.setItem("token", data.token!);
+      setAuthorization(data.token!);
+      dispatch(setUser(data));
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+      // dispatch(setUser({ loading: false }))
+    }
+  };
+}
 
 // export function setPath(payload: string) {
 //   return createAction(ApplicationActions.SetPath, payload)
 // }
 
-// export function setUser(user: Partial<User>) {
-//   return createAction(ApplicationActions.SetUser, user)
-// }
+export function setUser(user: Partial<User>) {
+  return createAction(ApplicationActions.SetUser, user);
+}
 
 // export function setIsMobile(payload: boolean) {
 //   return createAction(ApplicationActions.SetIsMobile, payload)

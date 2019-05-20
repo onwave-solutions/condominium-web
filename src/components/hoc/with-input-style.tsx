@@ -3,12 +3,13 @@ import styled from "styled-components";
 import { palette } from "styled-theme";
 import { borderRadius, transition } from "../../shared-ui/settings/style/utils";
 
-function withInputStyle<T extends object>(ComponentName: ComponentType<T>) {
+function withInputStyle<T extends object>(
+  ComponentName: ComponentType<T>
+): ComponentType<T> {
   return styled(ComponentName)`
+    width: 100% !important;
+    height: 25px;
     &.ant-input {
-      padding: 4px 10px;
-      width: 100% !important;
-      height: 25px;
       cursor: text;
       text-align: ${(props: T) =>
         (props as any)["data-rtl"] === "rtl" ? "right" : "left"};
@@ -18,7 +19,6 @@ function withInputStyle<T extends object>(ComponentName: ComponentType<T>) {
       background-color: #fff;
       background-image: none;
       border: 1px solid ${palette("border", 0)};
-      ${borderRadius("1px")};
       ${transition()};
 
       &:focus {
@@ -58,7 +58,7 @@ function withInputStyle<T extends object>(ComponentName: ComponentType<T>) {
         color: ${palette("grayscale", 0)};
       }
     }
-  `;
+  ` as any;
 }
 
 export default withInputStyle;

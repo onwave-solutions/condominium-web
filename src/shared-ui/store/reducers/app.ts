@@ -7,6 +7,7 @@ import { createBlade, scrollIntoBlade } from "../../utils/blade";
 import { Normalize } from "../../utils/objects";
 import { User } from "../../models/user";
 import { IModule } from "../../models/module";
+import { Keylist } from "../../models/keylist";
 
 export interface IApplicationState {
   path: string;
@@ -16,12 +17,14 @@ export interface IApplicationState {
   isMobile: boolean;
   token: string;
   user: User;
+  keylist: Keylist;
 }
 
 const initialState: Readonly<IApplicationState> = {
   path: "",
   token: "",
   user: {},
+  keylist: {},
   visibility: true,
   blades: {},
   isMobile: false
@@ -64,7 +67,6 @@ function addBladeReducer(draft: IApplicationState, id: string) {
   }
 
   const newBlade: IModule = modules.find(x => x.id === id)!;
-  console.log(newBlade);
   if (!newBlade) {
     return;
   }
@@ -136,7 +138,10 @@ function reducer(action: Action<ApplicationActions, any>) {
         break;
       case ApplicationActions.SetUser:
         draft.user = action.payload;
-        // draft.token = draft.user.token || "";
+        draft.token = draft.user.token || "";
+        break;
+      case ApplicationActions.SetKeyList:
+        draft.keylist = action.payload;
         break;
     }
   };

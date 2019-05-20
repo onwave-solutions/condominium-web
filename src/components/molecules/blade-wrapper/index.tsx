@@ -6,8 +6,10 @@ import { palette } from "styled-theme";
 const { Header, Footer, Content } = Layout;
 
 const Wrapper = styled(Layout)`
-  min-width: 45%;
-  max-width: 45%;
+  min-width: ${(props: { size: string }) =>
+    props.size === "large" ? "90%" : "45%"};
+  max-width: ${(props: { size: string }) =>
+    props.size === "large" ? "90%" : "45%"};
   height: 99%;
   margin-bottom: 3px;
   overflow: hidden;
@@ -61,12 +63,13 @@ export interface IBladeProps {
   id?: string;
   header?: React.ReactNode;
   children?: React.ReactNode;
+  size?: "large" | "normal";
 }
 
 export default function BladeWrapper(props: IBladeProps) {
-  const { children, header, id } = props;
+  const { children, header, id, size } = props;
   return (
-    <Wrapper id={id}>
+    <Wrapper id={id} size={size!}>
       <HeaderWrapper>{header}</HeaderWrapper>
       <InnerWrapper>{children}</InnerWrapper>
     </Wrapper>

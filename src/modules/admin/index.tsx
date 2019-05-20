@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef } from "ag-grid-community";
 
@@ -6,10 +6,17 @@ import Col from "../../components/atoms/col";
 import Button from "../../components/atoms/button";
 import UserForm from "../../components/organisisms/user-form";
 import BladeTemplate from "../../components/templates/blade-template";
-import { User } from "../../shared-ui/models/user";
-import { getUsers, createUser } from "../../shared-ui/services/users";
-
-export interface IAdmin {}
+import { adminSelector } from "../../shared-ui/store/selectors/admin.selector";
+import { select } from "../../shared-ui/store/selectors";
+import { useReduxState, useReduxAction } from "../../shared-ui/store/hooks";
+import {
+  loadAdminAction,
+  setAdminAction,
+  signUpAdminAction,
+  updateAdminAction
+} from "../../shared-ui/store/actions/admin.action";
+import { IModule } from "../../shared-ui/models/module";
+import { appSelector } from "../../shared-ui/store/selectors/app";
 
 const columns: ColDef[] = [
   {
@@ -17,11 +24,11 @@ const columns: ColDef[] = [
     headerName: "Usuario"
   },
   {
-    field: "state",
+    field: "statusRaw.name",
     headerName: "Estado"
   },
   {
-    field: "firstName",
+    field: "name",
     headerName: "Nombre"
   },
   {
@@ -29,7 +36,7 @@ const columns: ColDef[] = [
     headerName: "Apellido"
   },
   {
-    field: "documentType",
+    field: "documentRaw.name",
     headerName: "Tipo de documento"
   },
   {
@@ -38,40 +45,47 @@ const columns: ColDef[] = [
   }
 ];
 
-export default function Admin(props: IAdmin) {
-  const [users, setUsers] = useState<User[]>([]);
-  const [user, setUser] = useState<User>({});
-  const loadUsers = () => getUsers().then(setUsers);
-  const clear = () => setUser({});
-  const create = async () => {
-    await createUser(user);
-    clear();
-    await loadUsers();
-  };
+const adminState = select(adminSelector);
+const appState = select(appSelector);
+
+export default function Admin(props: IModule) {
+  const keylist = useReduxState(appState("keylist"));
+  const admin = useReduxState(adminState("admin"));
+  const admins = useReduxState(adminState("admins"));
+  const loadUsers = useReduxAction(loadAdminAction(props.id));
+  const setAdmin = useReduxAction(setAdminAction);
+  const create = useReduxAction(signUpAdminAction(props.id));
+  const update = useReduxAction(updateAdminAction(props.id));
+  const clear = () => setAdmin({});
 
   useEffect(() => {
     loadUsers();
+    return () => {
+      clear();
+    };
   }, []);
 
   return (
     <BladeTemplate
       footer={
         <>
-          {!user._id && (
-            <Button size={"small"} onClick={create}>
+          {!admin.id && (
+            <Button size={"small"} onClick={() => create(admin)}>
               Crear
             </Button>
           )}
-
-          {user._id && <Button size={"small"}>Guardar</Button>}
-
+          {admin.id && (
+            <Button size={"small"} onClick={() => update(admin)}>
+              Guardar
+            </Button>
+          )}
           <Button size={"small"} onClick={clear} style={{ marginLeft: 5 }}>
             Limpiar
           </Button>
         </>
       }
     >
-      <UserForm user={user} userChanged={setUser} />
+      <UserForm user={admin} userChanged={setAdmin} keylist={keylist} />
       <Col sm={24} md={24}>
         <div
           className="ag-theme-balham"
@@ -82,9 +96,9 @@ export default function Admin(props: IAdmin) {
           }}
         >
           <AgGridReact
-            rowData={users}
+            rowData={admins}
             columnDefs={columns}
-            onRowClicked={event => setUser(event.data)}
+            onRowClicked={event => setAdmin(event.data)}
           />
         </div>
       </Col>

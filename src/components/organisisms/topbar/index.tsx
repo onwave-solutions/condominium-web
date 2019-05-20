@@ -11,10 +11,11 @@ const { Header } = Layout;
 export interface ITopbar {
   collapsed?: boolean;
   onCollapsedChange?(value: boolean): void;
+  children?: React.ReactNode;
 }
 
 export default function Topbar(props: ITopbar) {
-  const { collapsed, onCollapsedChange } = props;
+  const { collapsed, onCollapsedChange, children } = props;
   const styling = {
     // background: customizedTheme.backgroundColor,
     position: "fixed" as any,
@@ -35,16 +36,7 @@ export default function Topbar(props: ITopbar) {
             style={{ fontSize: "1.5rem", marginRight: "0.7rem" }}
             onClick={() => onCollapsedChange && onCollapsedChange(!collapsed)}
           />
-          <Popover
-            trigger="click"
-            arrowPointAtCenter={true}
-            placement="bottomLeft"
-          >
-            <Button type="ghost">
-              <span>Seleccione un condominio</span>
-              <Icon type="down" />
-            </Button>
-          </Popover>
+          {children}
         </div>
       </Header>
     </>

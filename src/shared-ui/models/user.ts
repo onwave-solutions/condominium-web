@@ -1,33 +1,55 @@
-/**
-  id integer [pk]
-  role_id varchar(2) [ref: > roles.type]
-  username varchar [not null, unique]
-  password varchar [not null]
-  disabled boolean
-  first_name varchar
-  last_name varchar
-  document_id varchar(2) [ref: > document_types.type]
-  document varchar
-  last_login timestamp
-  created_at timestamp
-  updated_at timestamp
-  created_by integer
-  updated_by integer
- */
+import { Field } from "@rijudev/parseus";
+import { Apartment } from "./apartment";
+import { Company } from "./company.model";
+import { KeylistType } from "./keylist";
+
 export class User {
-  _id?: string;
+  @Field()
+  id?: number;
+  @Field()
   roleId?: string;
+  @Field()
   username?: string;
-  state?: string;
+  @Field()
+  status?: string;
+  @Field()
   password?: string;
-  disabled?: boolean;
-  firstName?: string;
+  @Field()
+  name?: string;
+  @Field()
   lastName?: string;
+  @Field()
   documentId?: string;
+  @Field()
   document?: string;
+  @Field()
   lastLogin?: Date;
+  @Field()
   createdAt?: Date;
+  @Field()
   updatedAt?: Date;
-  createdBy?: string;
-  updatedBy?: string;
+
+  @Field()
+  companyId?: number;
+
+  @Field()
+  token?: string;
+
+  @Field({ type: "array", factory: Apartment })
+  apartments?: Apartment[];
+
+  @Field({ type: "object", factory: Company })
+  company?: Company;
+
+  @Field({ type: "object", factory: KeylistType })
+  documentRaw?: KeylistType;
+
+  @Field({ type: "object", factory: KeylistType })
+  statusRaw?: KeylistType;
+}
+
+export interface IAuthorization {
+  username?: string;
+  password?: string;
+  code?: string;
 }
