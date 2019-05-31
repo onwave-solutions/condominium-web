@@ -1,5 +1,6 @@
 import axiosInstance from "./axios";
 import Parseus from "@rijudev/parseus";
+import { AbstractService } from "./abstract-service";
 import { Building } from "../models/building";
 
 export async function createBuilding(building: Building): Promise<Building> {
@@ -26,4 +27,10 @@ export async function updateBuilding(
     Parseus.encode(patch, Building)
   );
   return Parseus.decode(data).to(Building);
+}
+
+export class BuildingService extends AbstractService<Building> {
+  constructor() {
+    super(Building, "building");
+  }
 }

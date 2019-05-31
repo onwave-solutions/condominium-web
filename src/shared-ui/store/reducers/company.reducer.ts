@@ -20,7 +20,7 @@ function reducer(action: Action<CompanyActions, any>) {
       case CompanyActions.SetCompany:
         draft.company = action.payload;
         break;
-      case CompanyActions.SetCompanys:
+      case CompanyActions.SetCompanies:
         draft.companies = action.payload;
         break;
       default:

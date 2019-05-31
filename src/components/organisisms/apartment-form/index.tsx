@@ -1,29 +1,28 @@
 import React from "react";
 
 import Input from "../../atoms/input";
+import Select from "../../atoms/select";
 import Switch from "../../atoms/switch";
 import FormItem from "../../molecules/form-item";
 import { Apartment } from "../../../shared-ui/models/apartment";
 import { changeHandler } from "../../../shared-ui/utils/input";
+import { Service } from "../../../shared-ui/models/service.model";
 
 export interface IApartmentForm {
   apartment: Apartment;
+  services: Service[];
   apartmentChange(apartment: Apartment): void;
 }
 
 export default function ApartmentForm(props: IApartmentForm) {
-  const { apartment, apartmentChange } = props;
+  const { apartment, services, apartmentChange } = props;
   const changer = changeHandler(apartment, apartmentChange);
+  const onItemSelect = (name: string, value: any) => {
+    apartmentChange && apartmentChange!({ ...apartment, [name]: value });
+  };
+
   return (
     <>
-      <FormItem label="Edificio" sm={24} md={24}>
-        <Input
-          disabled={true}
-          name="buildingId"
-          value={apartment.buildingId}
-          onChange={changer}
-        />
-      </FormItem>
       <FormItem label="Nombre" sm={24} md={24}>
         <Input name="name" value={apartment.name} onChange={changer} />
       </FormItem>
@@ -38,22 +37,17 @@ export default function ApartmentForm(props: IApartmentForm) {
           onChange={changer}
         />
       </FormItem>
-      <FormItem label="Disponible">
-        <br />
-        <Switch
-          checked={apartment.vacancy!}
-          onChange={checked => {
-            console.log("vacancy", checked);
-            changer({ target: { name: "vacancy", value: checked } });
+      <FormItem label="Servicio" md={24} sm={24}>
+        <Select
+          name="serviceId"
+          typeName="id"
+          labelName="name"
+          onChangeItem={onItemSelect}
+          value={apartment.serviceId}
+          data={services}
+          renderNode={(item: Service) => {
+            return <>{`${item.name} [$${item.amount}]`}</>;
           }}
-        />
-      </FormItem>
-      <FormItem label="Costo Mantenimiento">
-        <Input
-          name="maintenanceRate"
-          type="number"
-          value={apartment.maintenanceRate}
-          onChange={changer}
         />
       </FormItem>
     </>

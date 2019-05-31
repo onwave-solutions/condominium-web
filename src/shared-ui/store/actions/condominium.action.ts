@@ -27,6 +27,7 @@ export function addCondominiumManagerAction(id?: string) {
       dispatch(
         getCondominiumManagerAction(id)(condominiumMananger.condominiumId!)
       );
+      toast.success("Condominio Agregado a Manager Correctamente");
     } catch (e) {}
   };
 }

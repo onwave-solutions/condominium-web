@@ -6,7 +6,7 @@ import { CompanyService } from "../../services/company.service";
 
 export enum CompanyActions {
   SetCompany = "SET_COMPANY",
-  SetCompanys = "SET_COMPANYS"
+  SetCompanies = "SET_COMPANIES"
 }
 
 const service = new CompanyService();
@@ -16,7 +16,7 @@ export function setCompanyAction(payload: Partial<Company>) {
 }
 
 export function setCompanysAction(payload: Company[]) {
-  return createAction(CompanyActions.SetCompanys, payload);
+  return createAction(CompanyActions.SetCompanies, payload);
 }
 
 export function loadCompaniesAction(id?: string) {
@@ -49,7 +49,6 @@ export function updateCompanyAction(id?: string) {
     try {
       const data = await service.update(payload.id!, payload);
       dispatch(setCompanyAction(data));
-      dispatch(loadCompaniesAction(id)());
       dispatch(loadCompaniesAction(id)());
       toast.success("Compañia Actualizada Correctamente.");
     } catch (e) {}

@@ -3,13 +3,53 @@ import { toast } from "react-toastify";
 import { createAction } from "../../utils/redux";
 import { User } from "../../models/user";
 import { UserService } from "../../services/users";
+import { Condominium, CondominiumManager } from "../../models/condominium";
+import { CondominumService } from "../../services/condominium.service";
 
 export enum ManagerActions {
-  SetManager = "SET_MANAGER",
-  SetManagers = "SET_MANAGERS"
+  SetManager = "MANAGER_SET_MANAGER",
+  SetManagers = "MANAGER_SET_MANAGERS",
+  SetCondominiums = "MANAGER_SET_CONDOMINIUMS",
+  SetCondominium = "MANAGER_SET_CONDOMINIUM"
 }
 
 const service = new UserService();
+const condominiumService = new CondominumService();
+
+export function setDefaultCondominiumAction(id?: string) {
+  return (payload: CondominiumManager) => async (
+    dispatch: ThunkDispatch<any, any, any>
+  ) => {
+    try {
+      await service.setDefaultCondominiumToManager(payload);
+    } catch (e) {}
+  };
+}
+
+export function getCondominiumsByManagerIdAction(id?: string) {
+  return (managerId: number) => async (
+    dispatch: ThunkDispatch<any, any, any>
+  ) => {
+    try {
+      const condominiums = await condominiumService.findCondominiumsByManagerId(
+        managerId
+      );
+      dispatch(setCondominiumsToManagerAction(condominiums));
+      const condominium = await condominiumService.getDefaultCondominiumByManagerId(
+        managerId
+      );
+      dispatch(setCondominiumToManagerAction({ ...condominium }));
+    } catch (e) {}
+  };
+}
+
+export function setCondominiumToManagerAction(payload: Condominium) {
+  return createAction(ManagerActions.SetCondominium, payload);
+}
+
+export function setCondominiumsToManagerAction(payload: Condominium[]) {
+  return createAction(ManagerActions.SetCondominiums, payload);
+}
 
 export function setManagerAction(payload: Partial<User>) {
   return createAction(ManagerActions.SetManager, payload);

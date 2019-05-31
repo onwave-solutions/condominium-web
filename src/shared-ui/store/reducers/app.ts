@@ -3,7 +3,11 @@ import { Action } from "../../models/redux";
 
 import { ApplicationActions } from "../actions/app";
 import { modules } from "../../../modules/module";
-import { createBlade, scrollIntoBlade } from "../../utils/blade";
+import {
+  createBlade,
+  scrollIntoBlade,
+  deepSearchInModule
+} from "../../utils/blade";
 import { Normalize } from "../../utils/objects";
 import { User } from "../../models/user";
 import { IModule } from "../../models/module";
@@ -25,10 +29,12 @@ const initialState: Readonly<IApplicationState> = {
   token: "",
   user: {},
   keylist: {},
-  visibility: true,
+  visibility: false,
   blades: {},
   isMobile: false
 };
+
+const deepSearch = deepSearchInModule(modules);
 
 function addChildBladeReducer(
   draft: IApplicationState,
@@ -46,7 +52,7 @@ function addChildBladeReducer(
     return;
   }
 
-  const newBlade: IModule = modules.find(x => x.id === id)!;
+  const newBlade = deepSearch(id);
   if (!newBlade) {
     return;
   }
@@ -66,7 +72,7 @@ function addBladeReducer(draft: IApplicationState, id: string) {
     return;
   }
 
-  const newBlade: IModule = modules.find(x => x.id === id)!;
+  const newBlade = deepSearch(id);
   if (!newBlade) {
     return;
   }

@@ -9,4 +9,6 @@ Input.defaultProps = {
   size: "small"
 } as InputProps;
 
+export const InputArea = AntdInput.TextArea;
+
 export default Input;

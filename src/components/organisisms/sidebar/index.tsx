@@ -14,19 +14,13 @@ const { Sider } = Layout;
 export interface ISidebar {
   modules: IModule[];
   collapsed?: boolean;
-  onBladePress?(mod: IModule): void;
+  onBladePress?(key: string): void;
 }
 
-const SideContext = createContext<Partial<ISidebar>>({});
-
 export default function Sidebar(props: ISidebar) {
-  const { modules, collapsed } = props;
+  const { modules, collapsed, onBladePress } = props;
   const styling = {
     // backgroundcolor: customizedtheme.backgroundcolor
-  };
-  const submenustyle = {
-    backgroundcolor: "rgba(0,0,0,0.3)"
-    // color: customizedtheme.textcolor
   };
   const submenucolor = {
     // color: customizedtheme.textcolor
@@ -36,7 +30,7 @@ export default function Sidebar(props: ISidebar) {
       trigger={null}
       collapsible={true}
       collapsed={collapsed}
-      width={210}
+      width={240}
       className="isomorphicSidebar"
       // onMouseEnter={onMouseEnter}
       // onMouseLeave={onMouseLeave}
@@ -44,11 +38,14 @@ export default function Sidebar(props: ISidebar) {
     >
       <Logo collapsed={collapsed!} />
       <Scrollbar style={{ height: "calc(100vh - 70px)" }}>
-        <SideContext.Provider value={props}>
-          <Menu theme="dark" className="isoDashboardMenu">
-            {modules.map(MenuItem)}
-          </Menu>
-        </SideContext.Provider>
+        <Menu
+          theme="dark"
+          className="isoDashboardMenu"
+          mode="inline"
+          onClick={params => onBladePress && onBladePress(params.key)}
+        >
+          {modules.map(MenuItem)}
+        </Menu>
       </Scrollbar>
     </Sider>
   );
@@ -56,15 +53,9 @@ export default function Sidebar(props: ISidebar) {
 
 function MenuTitle(props: IModule) {
   const { iconType, title, children } = props;
-  const { onBladePress } = useContext(SideContext);
   return (
-    <span
-      className="isoMenuHolder"
-      onClick={() =>
-        (!children || !children.length) && onBladePress && onBladePress(props)
-      }
-    >
-      {iconType && <Icon type={iconType} />}
+    <span className="isoMenuHolder">
+      <i className="ion-android-options" />
       <span className="nav-text">{title}</span>
     </span>
   );
@@ -72,19 +63,33 @@ function MenuTitle(props: IModule) {
 
 function MenuItem(props: IModule) {
   const { children, iconType, id, route, title, ...otherProps } = props;
-  if (children && children.length) return <SubMenuItem {...props} />;
+  if (children && children.length) return <SubMenuItem key={id} {...props} />;
   return (
     <Item {...otherProps} key={id} title={title}>
-      <MenuTitle {...props} />
+      <span className="isoMenuHolder">
+        <i className={iconType} />
+        <span className="nav-text">{title}</span>
+      </span>
     </Item>
   );
 }
 
 function SubMenuItem(props: IModule) {
+  const submenuStyle = {
+    backgroundColor: "rgba(0,0,0,0.3)"
+    // color: customizedtheme.textcolor
+  };
   const { children, iconType, id, route, title, ...otherProps } = props;
+
   return (
     <SubMenu {...otherProps} key={id} title={<MenuTitle {...props} />}>
-      {children.map(MenuItem)}
+      {children.map(item => {
+        return (
+          <Item style={submenuStyle} key={item.id}>
+            {item.title}
+          </Item>
+        );
+      })}
     </SubMenu>
   );
 }

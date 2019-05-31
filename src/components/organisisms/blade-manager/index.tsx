@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useMemo } from "react";
 
 import BladeWrapper from "../../molecules/blade-wrapper";
 import BladeHeader from "../../molecules/blade-header";
@@ -9,10 +9,21 @@ export interface IBladeManager {
   onBladeClose?(id: string): void;
 }
 
+const blades: any = {};
+
 function renderBlade(props: IBladeManager) {
   const { onBladeClose } = props;
   return (blade: IModule) => {
-    const Blade = lazy(() => import(`../../../modules/${blade.route}`));
+    let Blade: any;
+
+    if (blades[blade.route!]) {
+      Blade = blades[blade.route!];
+    } else {
+      Blade = blades[blade.route!] = lazy(() =>
+        import(`../../../modules/${blade.route}`)
+      );
+    }
+
     return (
       <BladeWrapper
         key={blade.id!}

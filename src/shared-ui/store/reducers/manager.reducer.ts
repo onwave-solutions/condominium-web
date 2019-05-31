@@ -3,15 +3,20 @@ import { produce } from "immer";
 import { Action } from "../../models/redux";
 import { User } from "../../models/user";
 import { ManagerActions } from "../actions/manager.action";
+import { Condominium } from "../../models/condominium";
 
 export type IManagerState = {
   manager: Partial<User>;
   managers: User[];
+  condominium: Partial<Condominium>;
+  condominiums: Condominium[];
 };
 
 const initialState: Readonly<IManagerState> = {
   manager: {},
-  managers: []
+  managers: [],
+  condominium: {},
+  condominiums: []
 };
 
 function reducer(action: Action<ManagerActions, any>) {
@@ -22,6 +27,12 @@ function reducer(action: Action<ManagerActions, any>) {
         break;
       case ManagerActions.SetManagers:
         draft.managers = action.payload;
+        break;
+      case ManagerActions.SetCondominium:
+        draft.condominium = action.payload;
+        break;
+      case ManagerActions.SetCondominiums:
+        draft.condominiums = action.payload;
         break;
       default:
     }

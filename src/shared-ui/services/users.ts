@@ -1,6 +1,7 @@
 import { User, IAuthorization } from "../models/user";
 import Parseus from "@rijudev/parseus";
 import { AbstractService } from "./abstract-service";
+import { CondominiumManager } from "../models/condominium";
 
 export class UserService extends AbstractService<User> {
   constructor() {
@@ -13,6 +14,13 @@ export class UserService extends AbstractService<User> {
     );
 
     return data.map(item => Parseus.decode(item).to(User));
+  }
+
+  async setDefaultCondominiumToManager(payload: CondominiumManager) {
+    await this.service.post<void>(
+      `${this.prefix}/condominium/default`,
+      Parseus.encode(payload, CondominiumManager)
+    );
   }
 
   async signUp(payload: Partial<User>): Promise<User> {

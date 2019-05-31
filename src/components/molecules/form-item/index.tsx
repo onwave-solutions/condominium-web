@@ -19,7 +19,7 @@ const Wrapper = styled(Col)`
 export default function FormItem(props: IFormItem) {
   const { sm, md, label, children } = props;
   return (
-    <Wrapper sm={sm} md={md}>
+    <Wrapper xs={sm} sm={sm} md={md}>
       <label style={{ width: "100%" }}>{label}:</label>
       {children}
     </Wrapper>

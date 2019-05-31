@@ -7,13 +7,12 @@ const { Header, Footer, Content } = Layout;
 
 const Wrapper = styled(Layout)`
   min-width: ${(props: { size: string }) =>
-    props.size === "large" ? "90%" : "45%"};
+    props.size === "large" ? "99%" : "45%"};
   max-width: ${(props: { size: string }) =>
-    props.size === "large" ? "90%" : "45%"};
+    props.size === "large" ? "99%" : "45%"};
   height: 99%;
+  min-height: 99%;
   margin-bottom: 3px;
-  overflow: hidden;
-  overflow-y: hidden;
   margin-right: 5px;
   margin-left: 2.5px;
   background: white;
@@ -27,8 +26,9 @@ const Wrapper = styled(Layout)`
   flex-direction: column;
 
   @media (max-width: 800px) {
-    min-width: 93%;
-    max-width: 93%;
+    min-width: 99%;
+    max-width: 99%;
+    min-height: 99%;
   }
 `;
 

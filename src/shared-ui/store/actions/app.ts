@@ -145,17 +145,17 @@ export function setUser(user: Partial<User>) {
   return createAction(ApplicationActions.SetUser, user);
 }
 
-// export function setIsMobile(payload: boolean) {
-//   return createAction(ApplicationActions.SetIsMobile, payload)
-// }
+export function setIsMobile(payload: boolean) {
+  return createAction(ApplicationActions.SetIsMobile, payload);
+}
 
 // export function focusBlade(payload: string) {
 //   return createAction(ApplicationActions.FocusBlade, payload)
 // }
 
-// export function setSideBarVisibility(payload: boolean) {
-//   return createAction(ApplicationActions.SetSideBarVisibility, payload)
-// }
+export function setSideBarVisibility(payload: boolean) {
+  return createAction(ApplicationActions.SetSideBarVisibility, payload);
+}
 
 export function addBlade(payload: string) {
   return createAction(ApplicationActions.AddBlade, payload);

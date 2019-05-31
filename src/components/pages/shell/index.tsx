@@ -8,7 +8,7 @@ import BladeManager from "../../organisisms/blade-manager";
 import Icon from "../../atoms/icon";
 import Popover from "../../atoms/popover";
 import Button from "../../atoms/button";
-import TopbarDropdown from "../../molecules/topbar-dropdown";
+import Dropdown from "../../atoms/dropdown";
 
 import { modulesByPermissions } from "../../../modules/module";
 import { appSelector } from "../../../shared-ui/store/selectors/app";
@@ -17,8 +17,11 @@ import { useReduxState, useReduxAction } from "../../../shared-ui/store/hooks";
 import {
   closeBlade,
   addBlade,
-  loadKeylistAction
+  loadKeylistAction,
+  setSideBarVisibility
 } from "../../../shared-ui/store/actions/app";
+import useManagerCondominium from "../../hooks/use-manager-condominium";
+import CondominiumMenuDropdown from "../../molecules/condominium-menu";
 
 const appState = select(appSelector);
 
@@ -33,20 +36,19 @@ function subscribe(subscriber: any) {
 export default function Shell() {
   const blades = useReduxState(appState("blades", {}));
   const user = useReduxState(appState("user"));
+  const visivility = useReduxState(appState("visibility"));
   const modules = modulesByPermissions[user.roleId!];
 
   const handleCloseBlade = useReduxAction(closeBlade);
   const handleAddBlade = useReduxAction(addBlade);
   const loadKeylist = useReduxAction(loadKeylistAction);
-  //const addBlade = (mod: IModule) => {
-  //  if (blades.some(blade => mod.id === blade.id)) {
-  //    return;
-  //  }
-  //  setBlades([
-  //    { blade: mod.id, id: mod.id, route: mod.route, title: mod.title },
-  //    ...blades
-  //  ]);
-  //};
+  const handleSetVisibility = useReduxAction(setSideBarVisibility);
+
+  const [
+    condominiumsManager,
+    condominiumSelected,
+    changeCondominium
+  ] = useManagerCondominium(user);
   const handleWindowResize = () => {
     if (window.innerWidth > 800) {
       //setCollapsed(false);
@@ -66,28 +68,44 @@ export default function Shell() {
   return (
     <ShellTemplate
       topBar={
-        <Topbar
-        //collapsed={collapsed}
-        //onCollapsedChange={setCollapsed}
-        >
-          {user.roleId === "MA" && (
+        <Topbar collapsed={visivility} onCollapsedChange={handleSetVisibility}>
+          {user.roleId === "TE" && (
             <Popover
               trigger="click"
               arrowPointAtCenter={true}
               placement="bottomLeft"
             >
               <Button type="ghost">
-                <span>Seleccione un condominio</span>
+                <span>Seleccione un Apartamento</span>
                 <Icon type="down" />
               </Button>
             </Popover>
+          )}
+
+          {user.roleId === "MA" && (
+            <Dropdown
+              overlay={() => (
+                <CondominiumMenuDropdown
+                  condominiums={condominiumsManager}
+                  onChange={changeCondominium}
+                />
+              )}
+            >
+              <Button type="ghost">
+                <span>
+                  {condominiumSelected.name || "Seleccione un condominio"}{" "}
+                </span>
+                <Icon type="down" />
+              </Button>
+            </Dropdown>
           )}
         </Topbar>
       }
       sideBar={
         <Sidebar
           modules={modules}
-          onBladePress={mod => handleAddBlade(mod.id)}
+          onBladePress={mod => handleAddBlade(mod)}
+          collapsed={visivility}
           //onBladePress={addBlade}
           //collapsed={collapsed}
         />

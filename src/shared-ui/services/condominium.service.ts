@@ -7,6 +7,14 @@ export class CondominumService extends AbstractService<Condominium> {
     super(Condominium, "condominium");
   }
 
+  async getDefaultCondominiumByManagerId(id: number): Promise<Condominium> {
+    const { data } = await this.service.get<Condominium>(
+      `${this.prefix}/manager/default/${id}`
+    );
+
+    return Parseus.decode(data).to(Condominium);
+  }
+
   async findCondominiumsByManagerId(id: number) {
     const { data } = await this.service.get<Condominium[]>(
       `${this.prefix}/manager/${id}`

@@ -10,7 +10,6 @@ import apartmentModule from "../apartment/module";
 
 import { select } from "../../shared-ui/store/selectors";
 import { useReduxState, useReduxAction } from "../../shared-ui/store/hooks";
-import { condominiumSelector } from "../../shared-ui/store/selectors/condominium";
 import { buildingSelector } from "../../shared-ui/store/selectors/building";
 import {
   setBuildingAction,
@@ -23,10 +22,11 @@ import {
   closeChildBladeAction,
   addChildBlade
 } from "../../shared-ui/store/actions/app";
+import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
 
 const columns: ColDef[] = [
   {
-    field: "condominiumId",
+    field: "condominium.name",
     width: 250,
     headerName: "Condominio"
   },
@@ -37,11 +37,11 @@ const columns: ColDef[] = [
   }
 ];
 
-const condominiumState = select(condominiumSelector);
+const managerState = select(managerSelector);
 const buildingState = select(buildingSelector);
 
 export default function Building(props: IModule) {
-  const condominium = useReduxState(condominiumState("condominium"));
+  const condominium = useReduxState(managerState("condominium"));
   const building = useReduxState(buildingState("building"));
   const buildings = useReduxState(buildingState("buildings"));
 

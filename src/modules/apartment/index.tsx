@@ -19,43 +19,16 @@ import {
 } from "../../shared-ui/store/actions/apartment";
 import { closeChildBladeAction } from "../../shared-ui/store/actions/app";
 import { IModule } from "../../shared-ui/models/module";
-
-const columns: ColDef[] = [
-  {
-    field: "buildingId",
-    headerName: "Edificio"
-  },
-  {
-    field: "name",
-    headerName: "Nombre"
-  },
-  {
-    field: "floor",
-    headerName: "Piso"
-  },
-  {
-    field: "mt2",
-    headerName: "Metraje"
-  },
-  {
-    field: "vacancy",
-    headerName: "Disponible"
-  },
-  {
-    field: "maintenanceRate",
-    headerName: "Costo de Mantenimiento"
-  },
-  {
-    field: "parkingLots",
-    headerName: "Parqueos"
-  }
-];
+import { serviceSelector } from "../../shared-ui/store/selectors/service.selector";
+import { loadServicesAction } from "../../shared-ui/store/actions/service.action";
 
 const buildingState = select(buildingSelector);
 const apartmentState = select(apartmentSelector);
+const serviceState = select(serviceSelector);
 
 export default function Apartment(props: IModule) {
   const building = useReduxState(buildingState("building"));
+  const services = useReduxState(serviceState("services"));
   const apartment = useReduxState(apartmentState("apartment"));
   const apartments = useReduxState(apartmentState("apartments"));
 
@@ -64,6 +37,7 @@ export default function Apartment(props: IModule) {
   const create = useReduxAction(createApartmentAction());
   const update = useReduxAction(updateApartmentAction());
   const loadApartment = useReduxAction(refreshApartmentsAction());
+  const loadServices = useReduxAction(loadServicesAction(props.id));
 
   const closeChildBlades = useReduxAction(closeChildBladeAction);
 
@@ -72,6 +46,14 @@ export default function Apartment(props: IModule) {
     const payload = { buildingId: building.id };
     setApartment(payload);
   };
+
+  useEffect(() => {
+    const payload = { condominiumId: building.condominiumId };
+    loadServices(payload);
+    return () => {
+      clear();
+    };
+  }, []);
 
   useEffect(() => {
     if (apartment.buildingId === building.id) return;
@@ -102,7 +84,12 @@ export default function Apartment(props: IModule) {
         </>
       }
     >
-      <ApartmentForm apartment={apartment} apartmentChange={setApartment} />
+      <h3>{building.name} </h3>
+      <ApartmentForm
+        apartment={apartment}
+        apartmentChange={setApartment}
+        services={services}
+      />
       <Col sm={24} md={24}>
         <div
           className="ag-theme-balham"
@@ -122,3 +109,30 @@ export default function Apartment(props: IModule) {
     </BladeTemplate>
   );
 }
+
+const columns: ColDef[] = [
+  {
+    field: "building.name",
+    headerName: "Edificio"
+  },
+  {
+    field: "service.name",
+    headerName: "Servicio"
+  },
+  {
+    field: "name",
+    headerName: "Nombre"
+  },
+  {
+    field: "floor",
+    headerName: "Piso"
+  },
+  {
+    field: "mt2",
+    headerName: "Metraje"
+  },
+  {
+    field: "parkingLots",
+    headerName: "Parqueos"
+  }
+];

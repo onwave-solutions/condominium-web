@@ -17,3 +17,31 @@ export function changeHandler<T>(obj: T, onChange: ChangeHandlerType) {
     onChange({ ...obj, [name]: value });
   };
 }
+
+export function stringToInt(value: string, defValue: number = 0) {
+  if (!value) {
+    return 0;
+  } else if (!isNaN(value as any)) {
+    return parseInt(value, 10);
+  }
+  return defValue;
+}
+
+export function stringToDecimal(value: string, defValue: number = 0) {
+  if (!value) {
+    return 0;
+  } else if (!isNaN(value as any)) {
+    return parseFloat(value);
+  }
+  return defValue;
+}
+
+export function stringToPosetiveInt(value: string, defValue: number = 0) {
+  const val = stringToInt(value, defValue);
+  return val > -1 ? val : defValue;
+}
+
+export function stringToPositiveDecimal(value: string, defValue: number = 0) {
+  const val = stringToDecimal(value, defValue);
+  return val > -1 ? val : defValue;
+}

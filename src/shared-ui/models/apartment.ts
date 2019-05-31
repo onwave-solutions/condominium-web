@@ -1,4 +1,6 @@
 import { Field } from "@rijudev/parseus";
+import { Building } from "./building";
+import { Service } from "./service.model";
 
 export class Apartment {
   @Field()
@@ -7,18 +9,22 @@ export class Apartment {
   name?: string;
   @Field()
   buildingId?: number;
+  @Field()
+  serviceId?: number;
   @Field({ type: "number" })
   floor?: number;
   @Field({ type: "decimal", fixed: 2 })
   mt2?: number;
-  @Field({ type: "boolean" })
-  vacancy?: boolean;
-  @Field({ type: "decimal", fixed: 2 })
-  maintenanceRate?: number;
   @Field()
   parkingLots?: string[];
   @Field()
   createdAt?: string;
   @Field()
   updatedAt?: string;
+
+  @Field({ factory: Building, type: "object" })
+  building?: Building;
+
+  @Field({ factory: Service, type: "object" })
+  service?: Service;
 }

@@ -1,4 +1,6 @@
 import { Field } from "@rijudev/parseus";
+import { Condominium } from "./condominium";
+import { Apartment } from "./apartment";
 
 export class Building {
   @Field()
@@ -11,4 +13,10 @@ export class Building {
   createdAt?: string;
   @Field()
   updatedAt?: string;
+
+  @Field({ factory: Condominium, type: "object" })
+  condominium?: Condominium;
+
+  @Field({ isVirtual: true })
+  apartments?: Apartment[];
 }

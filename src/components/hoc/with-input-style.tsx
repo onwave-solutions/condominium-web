@@ -19,6 +19,7 @@ function withInputStyle<T extends object>(
       background-color: #fff;
       background-image: none;
       border: 1px solid ${palette("border", 0)};
+      width: 100% !important;
       ${transition()};
 
       &:focus {

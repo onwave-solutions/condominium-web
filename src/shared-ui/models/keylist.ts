@@ -22,4 +22,13 @@ export class Keylist {
 
   @Field({ type: "array", factory: KeylistType })
   communicationTypes?: KeylistType[];
+
+  @Field({ type: "array", factory: KeylistType })
+  banks?: KeylistType[];
+
+  @Field({ type: "array", factory: KeylistType })
+  paymentMethods?: KeylistType[];
+
+  @Field({ type: "array", factory: KeylistType })
+  transactionStatus?: KeylistType[];
 }
