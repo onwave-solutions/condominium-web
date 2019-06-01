@@ -3,7 +3,10 @@ import { IModule } from "../../../../shared-ui/models/module";
 import BladeTemplate from "../../../../components/templates/blade-template";
 import { ViewTable } from "../../../../components/molecules/edit-table";
 import InvoicePageWrapper from "../invoice-editor/invoice-editor.style";
-import { useReduxState, useReduxAction } from "../../../../shared-ui/store/hooks";
+import {
+  useReduxState,
+  useReduxAction
+} from "../../../../shared-ui/store/hooks";
 import { invoiceSelector } from "../../../../shared-ui/store/selectors/invoice.selector";
 import { select } from "../../../../shared-ui/store/selectors";
 

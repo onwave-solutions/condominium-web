@@ -29,6 +29,7 @@ import {
 
 import invoiceEditorModule from "../invoice-editor/module";
 import invoiceViewModule from "../invoice-view/module";
+import paymentBladeModule from "../../payment/payment-process/module";
 
 const ScrollbarWrapper = styled(Scrollbars)``;
 
@@ -63,6 +64,10 @@ export default function InvoiceModule(props: IModule) {
     handleAddBlade(invoiceEditorModule.id);
     handleCloseBlade(invoiceViewModule.id);
     setInvoice({ ...invoice });
+  };
+
+  const onClickPayInvoice = (invoice: Invoice) => () => {
+    handleAddBlade(paymentBladeModule.id);
   };
 
   const onAddInvoice = () => {
@@ -203,7 +208,9 @@ export default function InvoiceModule(props: IModule) {
                 width={"5%"}
                 render={(_: string, invoice: Invoice) =>
                   ["PE", "MO"].includes(invoice.statusType!) ? (
-                    <Button size="small">Pagar</Button>
+                    <Button size="small" onClick={onClickPayInvoice(invoice)}>
+                      Pagar
+                    </Button>
                   ) : (
                     <span />
                   )

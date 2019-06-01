@@ -28,7 +28,7 @@ function reducer(action: Action<ServiceActions, any>) {
   };
 }
 
-export default function apartmentReducer(
+export default function serviceReducer(
   state: IServiceState = initialState,
   action: any
 ): IServiceState {

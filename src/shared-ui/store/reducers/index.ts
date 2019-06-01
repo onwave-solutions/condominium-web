@@ -11,6 +11,7 @@ import companyReducer from './company.reducer';
 import serviceReducer from './service.reducer';
 import bankAccountReducer from './bank-account.reducer';
 import invoiceReducer from './invoice.reducer';
+import paymentReducer from './payment.reducer';
 
 const reducer = combineReducers({
   app: appReducer,
@@ -19,6 +20,7 @@ const reducer = combineReducers({
   tenant: tenantReducer,
   service: serviceReducer,
   invoice: invoiceReducer,
+  payment: paymentReducer,
   admin: adminReducer,
   company: companyReducer,
   condominium: condominiumReducer,
