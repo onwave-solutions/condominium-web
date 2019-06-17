@@ -59,19 +59,11 @@ export default function Admin(props: IModule) {
 
   return (
     <BladeTemplate
-      footer={
+      header={
         <>
-          {!admin.id && (
-            <Button size={"small"} onClick={() => create(admin)}>
-              Crear
-            </Button>
-          )}
-          {admin.id && (
-            <Button size={"small"} onClick={() => update(admin)}>
-              Guardar
-            </Button>
-          )}
-          <Button size={"small"} onClick={clear} style={{ marginLeft: 5 }}>
+          {!admin.id && <Button onClick={() => create(admin)}>Crear</Button>}
+          {admin.id && <Button onClick={() => update(admin)}>Guardar</Button>}
+          <Button onClick={clear} style={{ marginLeft: 5 }}>
             Limpiar
           </Button>
         </>

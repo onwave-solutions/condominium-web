@@ -42,19 +42,15 @@ export default function Company(props: IModule) {
 
   return (
     <BladeTemplate
-      footer={
+      header={
         <>
           {!company.id && (
-            <Button size={"small"} onClick={() => create(company)}>
-              Crear
-            </Button>
+            <Button onClick={() => create(company)}>Crear</Button>
           )}
           {company.id && (
-            <Button size={"small"} onClick={() => update(company)}>
-              Guardar
-            </Button>
+            <Button onClick={() => update(company)}>Guardar</Button>
           )}
-          <Button size={"small"} onClick={clear} style={{ marginLeft: 5 }}>
+          <Button onClick={clear} style={{ marginLeft: 5 }}>
             Limpiar
           </Button>
         </>

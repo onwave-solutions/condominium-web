@@ -21,6 +21,7 @@ const condominiumState = select(condominiumSelector);
 const managerState = select(managerSelector);
 
 export default function CondominiumManager(props: IModule) {
+  const { match } = props;
   const condominium = useReduxState(condominiumState("condominium"));
   const manager = useReduxState(condominiumState("manager"));
   const condominiumManagers = useReduxState(
@@ -43,16 +44,17 @@ export default function CondominiumManager(props: IModule) {
   }, []);
 
   useEffect(() => {
-    loadCondominiumManagers(condominium.id!);
+    if (match && match.params && match.params.id) {
+      loadCondominiumManagers(match.params.id);
+    }
   }, [condominium.id]);
 
   return (
     <BladeTemplate
-      footer={
+      header={
         <>
           {manager.id && (
             <Button
-              size={"small"}
               onClick={() =>
                 addCondominiumManager({
                   condominiumId: condominium.id,
@@ -64,9 +66,7 @@ export default function CondominiumManager(props: IModule) {
             </Button>
           )}
           {manager.id && (
-            <Button size={"small"} onClick={() => setManager({})}>
-              Limpiar
-            </Button>
+            <Button onClick={() => setManager({})}>Limpiar</Button>
           )}
         </>
       }

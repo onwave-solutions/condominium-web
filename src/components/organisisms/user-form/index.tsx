@@ -45,7 +45,9 @@ export default function UserForm(props: IUserForm) {
           disabled={
             ["P", "C"].includes(user!.status!) || !user!.id || disabledAll
           }
-          data={keylist!.userStatus!.map(disabledPStatus)}
+          data={
+            keylist!.userStatus ? keylist!.userStatus!.map(disabledPStatus) : []
+          }
           value={user!.status}
           onChangeItem={onItemSelect}
         />

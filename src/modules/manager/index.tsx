@@ -56,19 +56,15 @@ export default function Manager(props: IModule) {
 
   return (
     <BladeTemplate
-      footer={
+      header={
         <>
           {!manager.id && (
-            <Button size={"small"} onClick={() => create(manager)}>
-              Crear
-            </Button>
+            <Button onClick={() => create(manager)}>Crear</Button>
           )}
           {manager.id && (
-            <Button size={"small"} onClick={() => update(manager)}>
-              Guardar
-            </Button>
+            <Button onClick={() => update(manager)}>Guardar</Button>
           )}
-          <Button size={"small"} onClick={clear} style={{ marginLeft: 5 }}>
+          <Button onClick={clear} style={{ marginLeft: 5 }}>
             Limpiar
           </Button>
         </>

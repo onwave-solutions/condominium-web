@@ -56,10 +56,8 @@ export default function CondominiumBlade(props: IModule) {
   const loadCondominium = useReduxAction(refreshCondominiumsAction());
 
   const handleAddBlade = useReduxAction(addChildBlade(props.id));
-  const closeChildBlades = useReduxAction(closeChildBladeAction);
 
   const clear = () => {
-    closeChildBlades(props.id);
     setCondominium({});
   };
 
@@ -76,29 +74,23 @@ export default function CondominiumBlade(props: IModule) {
         <>
           {condominium.id && (
             <Button
-              size={"small"}
-              onClick={() => handleAddBlade(condominiumManagerModule.id)}
+              onClick={() =>
+                props.history.push(`condominium-manager/${condominium.id}`)
+              }
             >
               Lista de Managers
             </Button>
           )}
-        </>
-      }
-      footer={
-        <>
+          <div style={{ flex: 1 }} />
           {!condominium.id && (
-            <Button size={"small"} onClick={() => create(condominium)}>
-              Crear
-            </Button>
+            <Button onClick={() => create(condominium)}>Crear</Button>
           )}
 
           {condominium.id && (
-            <Button size={"small"} onClick={() => update(condominium)}>
-              Guardar
-            </Button>
+            <Button onClick={() => update(condominium)}>Guardar</Button>
           )}
 
-          <Button size={"small"} style={{ marginLeft: 5 }} onClick={clear}>
+          <Button style={{ marginLeft: 5 }} onClick={clear}>
             Limpiar
           </Button>
         </>

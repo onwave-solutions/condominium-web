@@ -37,6 +37,8 @@ export function getCondominiumManagerAction(id?: string) {
     dispatch: ThunkDispatch<any, any, any>
   ) => {
     try {
+      const condominium = await service.findOne(condominiumId);
+      dispatch(setCondominiumAction(condominium));
       const data = await userService.findManagersByCondominiumId(condominiumId);
       dispatch(setCondominiumManagersActions(data));
     } catch (e) {}
