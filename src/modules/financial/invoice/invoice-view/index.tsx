@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { IModule } from "../../../../shared-ui/models/module";
 import BladeTemplate from "../../../../components/templates/blade-template";
 import { ViewTable } from "../../../../components/molecules/edit-table";
@@ -9,11 +9,23 @@ import {
 } from "../../../../shared-ui/store/hooks";
 import { invoiceSelector } from "../../../../shared-ui/store/selectors/invoice.selector";
 import { select } from "../../../../shared-ui/store/selectors";
+import { getInvoiceByIdAction } from "../../../../shared-ui/store/actions/invoice.actions";
 
 const invoiceState = select(invoiceSelector);
 
 export default function InvoiceView(props: IModule) {
+  const { match } = props;
   const invoice = useReduxState(invoiceState("invoice"));
+  const getInvoiceById = useReduxAction(getInvoiceByIdAction(props.id));
+
+  useEffect(() => {
+    if (match && match.params && match.params.id) {
+      getInvoiceById(match.params.id);
+    }
+  }, []);
+
+  if (!invoice.id) return <div>loading</div>;
+
   return (
     <BladeTemplate header={<></>}>
       <InvoicePageWrapper className="InvoicePageWrapper">

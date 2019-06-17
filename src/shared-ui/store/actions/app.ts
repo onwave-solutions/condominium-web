@@ -51,10 +51,10 @@ export function loadKeylistAction() {
   };
 }
 
-// export function logout() {
-//   sessionStorage.removeItem('token')
-//   return setUser({})
-// }
+export function logoutAction() {
+  sessionStorage.removeItem("token");
+  return setUser({});
+}
 
 export function restoreSessionAction() {
   return async (dispatch: ThunkDispatch<any, any, any>) => {

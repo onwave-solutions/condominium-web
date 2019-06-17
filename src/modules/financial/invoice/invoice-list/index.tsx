@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import Scrollbars from "../../../../components/atoms/scrollbar";
 import BladeTemplate from "../../../../components/templates/blade-template";
 import Table, { Column } from "../../../../components/atoms/table";
 import Button from "../../../../components/atoms/button";
+import Icon from "../../../../components/atoms/icon";
 import { Wrapper, StatusTag } from "./invoice.style";
 import { invoiceSelector } from "../../../../shared-ui/store/selectors/invoice.selector";
 import { select } from "../../../../shared-ui/store/selectors";
@@ -30,15 +31,20 @@ import {
 import invoiceEditorModule from "../invoice-editor/module";
 import invoiceViewModule from "../invoice-view/module";
 import paymentBladeModule from "../../payment/payment-process/module";
+import ColumnInputFilter from "../../../../components/molecules/column-input-filter";
+import ColumnSelectFilter from "../../../../components/molecules/column-select-filter";
+import { appSelector } from "../../../../shared-ui/store/selectors/app";
 
 const ScrollbarWrapper = styled(Scrollbars)``;
 
 const invoiceState = select(invoiceSelector);
 const managerState = select(managerSelector);
+const appState = select(appSelector);
 
 export default function InvoiceModule(props: IModule) {
   const condominium = useReduxState(managerState("condominium"));
   const invoices = useReduxState(invoiceState("invoices"));
+  const keylist = useReduxState(appState("keylist"));
 
   const getInvoiceList = useReduxAction(getInvoiceListAction(props.id));
   const setInvoice = useReduxAction(setInvoiceAction);
@@ -55,15 +61,15 @@ export default function InvoiceModule(props: IModule) {
   };
 
   const onClickViewInvoice = (invoice: Invoice) => () => {
-    handleAddBlade(invoiceViewModule.id);
-    handleCloseBlade(invoiceEditorModule.id);
-    setInvoice({ ...invoice });
+    //setInvoice({ ...invoice });
+    props.history.push(`/invoice-view/${invoice.id}`);
   };
 
   const onClickEditInvoice = (invoice: Invoice) => () => {
-    handleAddBlade(invoiceEditorModule.id);
-    handleCloseBlade(invoiceViewModule.id);
-    setInvoice({ ...invoice });
+    //handleAddBlade(invoiceEditorModule.id);
+    //handleCloseBlade(invoiceViewModule.id);
+    //setInvoice({ ...invoice });
+    props.history.push(`/invoice-builder-detail/${invoice.id}`);
   };
 
   const onClickPayInvoice = (invoice: Invoice) => () => {
@@ -71,10 +77,27 @@ export default function InvoiceModule(props: IModule) {
   };
 
   const onAddInvoice = () => {
-    handleAddBlade(invoiceEditorModule.id);
-    handleCloseBlade(invoiceViewModule.id);
+    props.history.push(`/invoice-builder`);
     onResetInvoice();
   };
+
+  const [searchText, setSearchText] = useState("");
+
+  const handleSearch = (selectedKeys: string[], confirm: Function) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+  };
+
+  const handleReset = (clearFilters: Function) => {
+    clearFilters();
+    setSearchText("");
+  };
+
+  const onFilter = (fn: (record: any) => any) => (value: any, record: any) =>
+    fn(record)
+      .toString()
+      .toLowerCase()
+      .includes(value.toLowerCase());
 
   useEffect(() => {
     getInvoiceList(condominium.id!);
@@ -84,15 +107,9 @@ export default function InvoiceModule(props: IModule) {
     <BladeTemplate
       header={
         <>
-          <Button
-            icon="sync"
-            size="small"
-            onClick={() => getInvoiceList(condominium.id!)}
-          />
+          <Button icon="sync" onClick={() => getInvoiceList(condominium.id!)} />
           <div style={{ flex: 1 }} />
-          <Button size={"small"} onClick={onAddInvoice}>
-            Agregar Factura
-          </Button>
+          <Button onClick={onAddInvoice}>Agregar Factura</Button>
         </>
       }
     >
@@ -102,7 +119,6 @@ export default function InvoiceModule(props: IModule) {
             <Table
               //rowSelection={rowSelection}
               dataSource={invoices}
-              size="small"
               rowKey="sequence"
               scroll={{ x: 1400 }}
               pagination={false}
@@ -112,6 +128,14 @@ export default function InvoiceModule(props: IModule) {
                 title="Factura No."
                 fixed={"left"}
                 dataIndex="sequence"
+                onFilter={onFilter(record => record.sequence)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 width="80px"
                 render={(text: string) => <span>{text}</span>}
               />
@@ -119,6 +143,17 @@ export default function InvoiceModule(props: IModule) {
                 title={"Apartamento"}
                 dataIndex={"apartment"}
                 width={"22%"}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
+                onFilter={onFilter(
+                  record =>
+                    record.apartment.name + record.apartment.building.name
+                )}
                 render={(_: string, invoice: Invoice) => {
                   return (
                     <strong>{`${invoice.apartment!.name} [${
@@ -131,6 +166,14 @@ export default function InvoiceModule(props: IModule) {
                 title={"Descripción"}
                 dataIndex={"description"}
                 width={"25%"}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
+                onFilter={onFilter(record => record.description || "")}
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
@@ -142,6 +185,15 @@ export default function InvoiceModule(props: IModule) {
               <Column
                 title={"Estado"}
                 dataIndex={"statusType"}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnSelectFilter
+                    {...filterProps}
+                    data={keylist.invoiceStatus}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
+                onFilter={onFilter(record => record.statusType || "")}
                 width={"18%"}
                 render={(text: string, invoice: Invoice) => {
                   let className;

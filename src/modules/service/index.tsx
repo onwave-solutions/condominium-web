@@ -44,19 +44,19 @@ export default function Service(props: IModule) {
 
   return (
     <BladeTemplate
-      footer={
+      header={
         <>
           {!service.id && (
-            <Button size={"small"} onClick={() => create(service)}>
+            <Button type="primary" onClick={() => create(service)}>
               Crear
             </Button>
           )}
           {service.id && (
-            <Button size={"small"} onClick={() => update(service)}>
+            <Button type="primary" onClick={() => update(service)}>
               Guardar
             </Button>
           )}
-          <Button size={"small"} onClick={clear} style={{ marginLeft: 5 }}>
+          <Button onClick={clear} style={{ marginLeft: 5 }}>
             Limpiar
           </Button>
         </>

@@ -3,15 +3,18 @@ import { produce } from "immer";
 import { Action } from "../../models/redux";
 import { Payment } from "../../models/payment.model";
 import { PaymentActions } from "../actions/payment.action";
+import { Invoice } from "../../models/invoice.model";
 
 export type IPaymentState = {
   payment: Partial<Payment>;
   payments: Payment[];
+  invoices: Invoice[];
 };
 
 const initialState: Readonly<IPaymentState> = {
   payment: {},
-  payments: []
+  payments: [],
+  invoices: []
 };
 
 function reducer(action: Action<PaymentActions, any>) {

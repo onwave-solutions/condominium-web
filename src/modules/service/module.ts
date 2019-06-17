@@ -1,7 +1,7 @@
 import { IModule } from "../../shared-ui/models/module";
 
 export default {
-  title: "Servicios",
+  title: "Planes",
   id: "service",
   iconType: "lock",
   route: "service"

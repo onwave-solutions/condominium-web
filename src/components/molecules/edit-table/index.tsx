@@ -147,7 +147,6 @@ const EditTable = ({ invoices, invoiceChange, removeInvoice }: IEditTable) => {
           ""
         ) : (
           <Button
-            size="small"
             type="danger"
             onClick={() => removeInvoice(singleInvoice.key!)}
           >

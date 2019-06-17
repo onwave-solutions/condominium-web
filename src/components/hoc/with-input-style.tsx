@@ -8,13 +8,10 @@ function withInputStyle<T extends object>(
 ): ComponentType<T> {
   return styled(ComponentName)`
     width: 100% !important;
-    height: 25px;
     &.ant-input {
       cursor: text;
       text-align: ${(props: T) =>
         (props as any)["data-rtl"] === "rtl" ? "right" : "left"};
-      font-size: 13px;
-      line-height: 1.5;
       color: ${palette("text", 1)};
       background-color: #fff;
       background-image: none;
@@ -27,13 +24,11 @@ function withInputStyle<T extends object>(
       }
 
       &.ant-input-lg {
-        height: 40px;
         padding: 6px 10px;
       }
 
       &.ant-input-sm {
         padding: 1px 10px;
-        height: 25px;
       }
 
       &::-webkit-input-placeholder {

@@ -37,7 +37,7 @@ export default function ShellTemplate(props: IShellTemplate) {
                 position: "relative"
               }}
             >
-              <ShellWrapper>{children} </ShellWrapper>
+              <ShellWrapper>{children}</ShellWrapper>
             </Content>
           </Layout>
         </Layout>

@@ -40,7 +40,7 @@ export function createServiceAction(id?: string) {
       dispatch(
         loadServicesAction(id)({ condominiumId: payload.condominiumId })
       );
-      toast.success("Servicio Actualizado Correctamente.");
+      toast.success("Servicio creado Correctamente.");
     } catch (e) {}
   };
 }
@@ -55,7 +55,6 @@ export function updateServiceAction(id?: string) {
       dispatch(
         loadServicesAction(id)({ condominiumId: payload.condominiumId })
       );
-      toast.success("Servicio Actualizado Correctamente.");
       toast.success("Servicio Actualizado Correctamente.");
     } catch (e) {}
   };

@@ -3,6 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import { ColDef } from "ag-grid-community";
 
 import Col from "../../components/atoms/col";
+import Input from "../../components/atoms/input";
 import Button from "../../components/atoms/button";
 import UserForm from "../../components/organisisms/user-form";
 import BladeTemplate from "../../components/templates/blade-template";
@@ -74,6 +75,26 @@ export default function Manager(props: IModule) {
       }
     >
       <UserForm user={manager} userChanged={setManager} keylist={keylist} />
+      <FormItem label="Dia de Pago">
+        <Input
+          name="dueDay"
+          type="number"
+          onChange={(event: any) =>
+            onItemSelect(event.target.name, event.target.value)
+          }
+          value={manager!.dueDay}
+        />
+      </FormItem>
+      <FormItem label="Monto">
+        <Input
+          name="monthlyFee"
+          type="number"
+          onChange={(event: any) =>
+            onItemSelect(event.target.name, event.target.value)
+          }
+          value={manager!.monthlyFee}
+        />
+      </FormItem>
       <FormItem label="Compañia" sm={24} md={24}>
         <Select
           name="companyId"
@@ -86,6 +107,7 @@ export default function Manager(props: IModule) {
           onChangeItem={onItemSelect}
         />
       </FormItem>
+
       <Col sm={24} md={24} style={{ paddingTop: 15 }}>
         <ManagerGrid managers={managers} setManager={setManager} />
       </Col>

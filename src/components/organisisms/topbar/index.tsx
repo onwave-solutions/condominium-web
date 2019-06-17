@@ -11,11 +11,12 @@ const { Header } = Layout;
 export interface ITopbar {
   collapsed?: boolean;
   onCollapsedChange?(value: boolean): void;
+  onCloseSession?(): void;
   children?: React.ReactNode;
 }
 
 export default function Topbar(props: ITopbar) {
-  const { collapsed, onCollapsedChange, children } = props;
+  const { collapsed, onCloseSession, onCollapsedChange, children } = props;
   const styling = {
     // background: customizedTheme.backgroundColor,
     position: "fixed" as any,
@@ -37,6 +38,17 @@ export default function Topbar(props: ITopbar) {
             onClick={() => onCollapsedChange && onCollapsedChange(!collapsed)}
           />
           {children}
+        </div>
+
+        <div className="isoRight">
+          <Button
+            type={"ghost"}
+            block={true}
+            size="small"
+            onClick={onCloseSession}
+          >
+            Cerrar Sesión
+          </Button>
         </div>
       </Header>
     </>

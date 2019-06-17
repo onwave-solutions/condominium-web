@@ -18,7 +18,8 @@ import {
   closeBlade,
   addBlade,
   loadKeylistAction,
-  setSideBarVisibility
+  setSideBarVisibility,
+  logoutAction
 } from "../../../shared-ui/store/actions/app";
 import useManagerCondominium from "../../hooks/use-manager-condominium";
 import CondominiumMenuDropdown from "../../molecules/condominium-menu";
@@ -33,16 +34,16 @@ function subscribe(subscriber: any) {
   };
 }
 
-export default function Shell() {
-  const blades = useReduxState(appState("blades", {}));
+export default function Shell(props: any) {
+  const { url } = props.match;
   const user = useReduxState(appState("user"));
   const visivility = useReduxState(appState("visibility"));
   const modules = modulesByPermissions[user.roleId!];
 
-  const handleCloseBlade = useReduxAction(closeBlade);
   const handleAddBlade = useReduxAction(addBlade);
   const loadKeylist = useReduxAction(loadKeylistAction);
   const handleSetVisibility = useReduxAction(setSideBarVisibility);
+  const onLogOut = useReduxAction(logoutAction);
 
   const [
     condominiumsManager,
@@ -52,11 +53,11 @@ export default function Shell() {
   const handleWindowResize = () => {
     if (window.innerWidth > 800) {
       //setCollapsed(false);
+      handleSetVisibility(false);
       return;
     }
     //setCollapsed(true);
   };
-
   useEffect(() => {
     const debouncer = debounce(150)(handleWindowResize);
     const unsubscribe = subscribe(debouncer);
@@ -68,7 +69,11 @@ export default function Shell() {
   return (
     <ShellTemplate
       topBar={
-        <Topbar collapsed={visivility} onCollapsedChange={handleSetVisibility}>
+        <Topbar
+          collapsed={visivility}
+          onCollapsedChange={handleSetVisibility}
+          onCloseSession={onLogOut}
+        >
           {user.roleId === "TE" && (
             <Popover
               trigger="click"
@@ -81,40 +86,49 @@ export default function Shell() {
               </Button>
             </Popover>
           )}
-
           {user.roleId === "MA" && (
-            <Dropdown
-              overlay={() => (
-                <CondominiumMenuDropdown
-                  condominiums={condominiumsManager}
-                  onChange={changeCondominium}
-                />
-              )}
-            >
-              <Button type="ghost">
-                <span>
-                  {condominiumSelected.name || "Seleccione un condominio"}{" "}
-                </span>
-                <Icon type="down" />
-              </Button>
-            </Dropdown>
+            <>
+              <Dropdown
+                overlay={() => (
+                  <CondominiumMenuDropdown
+                    condominiums={condominiumsManager}
+                    onChange={changeCondominium}
+                  />
+                )}
+              >
+                <Button type="ghost">
+                  <span>
+                    {condominiumSelected.name || "Seleccione un condominio"}{" "}
+                  </span>
+                  <Icon type="down" />
+                </Button>
+              </Dropdown>
+              <div style={{ flex: 1 }} />
+              <span
+                style={{
+                  display: "flex",
+                  textAlign: "end",
+                  flexDirection: "column",
+                  lineHeight: 1.1,
+                  marginRight: "1.5rem"
+                }}
+              >
+                <strong>{`${condominiumSelected.name}`}</strong>
+                <span>{`${condominiumSelected.address}`}</span>
+              </span>
+            </>
           )}
         </Topbar>
       }
       sideBar={
         <Sidebar
           modules={modules}
-          onBladePress={mod => handleAddBlade(mod)}
+          onBladePress={mod => props.history.push(`${url}${mod}`)}
           collapsed={visivility}
-          //onBladePress={addBlade}
-          //collapsed={collapsed}
         />
       }
     >
-      <BladeManager
-        blades={Object.values(blades)}
-        onBladeClose={(id: string) => handleCloseBlade(id)}
-      />
+      <BladeManager url={url} />
     </ShellTemplate>
   );
 }

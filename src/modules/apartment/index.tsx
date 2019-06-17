@@ -27,6 +27,7 @@ const apartmentState = select(apartmentSelector);
 const serviceState = select(serviceSelector);
 
 export default function Apartment(props: IModule) {
+  const { match } = props;
   const building = useReduxState(buildingState("building"));
   const services = useReduxState(serviceState("services"));
   const apartment = useReduxState(apartmentState("apartment"));
@@ -50,6 +51,11 @@ export default function Apartment(props: IModule) {
   useEffect(() => {
     const payload = { condominiumId: building.condominiumId };
     loadServices(payload);
+    if (match && match.params && match.params.id) {
+      const payload = { buildingId: match.params.id };
+      setApartment(payload);
+      loadApartment(payload);
+    }
     return () => {
       clear();
     };

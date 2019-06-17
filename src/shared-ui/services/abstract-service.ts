@@ -40,10 +40,12 @@ export abstract class AbstractService<T extends object> {
     return Parseus.decode(data).to(this.model);
   }
 
-  async query(payload: Partial<T>): Promise<T[]> {
+  async query(payload: Partial<T> | Partial<T>[]): Promise<T[]> {
     const { data } = await axiosInstance.post<T[]>(
       `${this.prefix}/find`,
-      Parseus.encode(payload, this.model)
+      Array.isArray(payload)
+        ? payload.map(item => Parseus.encode(item, this.model))
+        : Parseus.encode(payload, this.model)
     );
 
     return data.map(item => Parseus.decode(item).to(this.model));

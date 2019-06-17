@@ -29,6 +29,12 @@ export class User {
   @Field()
   updatedAt?: Date;
 
+  @Field({ type: "decimal" })
+  monthlyFee?: number;
+
+  @Field()
+  dueDay?: number;
+
   @Field()
   companyId?: number;
 

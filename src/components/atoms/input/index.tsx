@@ -5,9 +5,7 @@ import withDirection from "../../hoc/with-direction";
 
 const Input = withDirection(withInputStyle(AntdInput));
 
-Input.defaultProps = {
-  size: "small"
-} as InputProps;
+Input.defaultProps = {} as InputProps;
 
 export const InputArea = AntdInput.TextArea;
 

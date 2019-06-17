@@ -67,10 +67,10 @@ function addChildBladeReducer(
 
 function addBladeReducer(draft: IApplicationState, id: string) {
   const blade = draft.blades[id];
-  if (blade) {
-    scrollIntoBlade(blade.id!);
-    return;
-  }
+  // if (blade) {
+  //   scrollIntoBlade(blade.id!);
+  //   return;
+  // }
 
   const newBlade = deepSearch(id);
   if (!newBlade) {
@@ -78,7 +78,7 @@ function addBladeReducer(draft: IApplicationState, id: string) {
   }
   //newBlade.window = { size: "normal" };
   newBlade.id = id;
-  draft.blades[id] = newBlade;
+  draft.blades = { [id]: newBlade };
   draft.bladeFocused = id;
   scrollIntoBlade(newBlade.id!);
 }

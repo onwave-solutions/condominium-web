@@ -7,4 +7,6 @@ export interface IModule {
   parent?: string;
   size?: "large" | "normal";
   children: IModule[];
+  match?: any;
+  history?: any;
 }

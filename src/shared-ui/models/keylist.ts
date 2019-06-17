@@ -31,4 +31,15 @@ export class Keylist {
 
   @Field({ type: "array", factory: KeylistType })
   transactionStatus?: KeylistType[];
+
+  @Field({ type: "array", factory: KeylistType })
+  invoiceStatus?: KeylistType[];
+
+  @Field({ type: "array", factory: KeylistType })
+  ticketStatus?: KeylistType[];
+}
+
+export interface IQuery {
+  query?: string;
+  state?: string;
 }

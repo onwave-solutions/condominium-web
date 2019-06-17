@@ -46,7 +46,7 @@ export default function Tenant(props: IModule) {
   const clear = () => setTenant({});
 
   useEffect(() => {
-    loadUsers();
+    //loadUsers();
     return () => {
       clear();
     };

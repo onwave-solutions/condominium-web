@@ -14,6 +14,9 @@ const Wrapper = styled(Col)`
   padding-left: 0.2rem !important;
   padding-right: 0.2rem !important;
   margin-bottom: 0.2rem !important;
+  @media screen and (max-width: 768px) {
+    float: unset !important;
+  }
 `;
 
 export default function FormItem(props: IFormItem) {

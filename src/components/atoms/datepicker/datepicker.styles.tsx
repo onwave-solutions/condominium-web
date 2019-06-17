@@ -13,7 +13,6 @@ function withDatepickerStyle<T extends object>(
     .ant-input {
       padding: 4px 10px;
       width: 100%;
-      height: 25px;
       cursor: text;
       font-size: 13px;
       line-height: 1.5;

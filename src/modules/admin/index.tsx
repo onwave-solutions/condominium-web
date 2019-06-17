@@ -34,14 +34,6 @@ const columns: ColDef[] = [
   {
     field: "lastName",
     headerName: "Apellido"
-  },
-  {
-    field: "documentRaw.name",
-    headerName: "Tipo de documento"
-  },
-  {
-    field: "document",
-    headerName: "Documento"
   }
 ];
 
@@ -85,7 +77,12 @@ export default function Admin(props: IModule) {
         </>
       }
     >
-      <UserForm user={admin} userChanged={setAdmin} keylist={keylist} />
+      <UserForm
+        user={admin}
+        userChanged={setAdmin}
+        keylist={keylist}
+        hideDocuments={true}
+      />
       <Col sm={24} md={24}>
         <div
           className="ag-theme-balham"

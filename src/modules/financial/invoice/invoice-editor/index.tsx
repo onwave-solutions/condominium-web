@@ -20,7 +20,8 @@ import {
   setInvoiceDetailsAction,
   editInvoiceDetailAction,
   bulkCreateAction,
-  updateInvoiceServiceAction
+  updateInvoiceServiceAction,
+  getInvoiceByIdAction
 } from "../../../../shared-ui/store/actions/invoice.actions";
 import {
   changeHandler,
@@ -35,6 +36,7 @@ const invoiceEditorState = select(invoiceSelector);
 const managerState = select(managerSelector);
 
 export default function InvoiceEditor(props: IModule) {
+  const { match, history } = props;
   const [apartments, setApartments] = useState<string[]>([]);
   const condominium = useReduxState(managerState("condominium"));
   const invoice = useReduxState(invoiceEditorState("invoice"));
@@ -43,6 +45,7 @@ export default function InvoiceEditor(props: IModule) {
   const setInvoice = useReduxAction(updateInvoiceAction);
   const setInvoiceDetails = useReduxAction(setInvoiceDetailsAction);
   const bulkCreate = useReduxAction(bulkCreateAction(props.id));
+  const getInvoiceById = useReduxAction(getInvoiceByIdAction(props.id));
   const updateInvoice = useReduxAction(updateInvoiceServiceAction(props.id));
   const editInvoiceDetail = useReduxAction(
     editInvoiceDetailAction(invoiceDetails!)
@@ -58,6 +61,9 @@ export default function InvoiceEditor(props: IModule) {
   };
 
   useEffect(() => {
+    if (match && match.params && match.params.id) {
+      getInvoiceById(match.params.id);
+    }
     return () => {
       clear();
     };
@@ -67,41 +73,23 @@ export default function InvoiceEditor(props: IModule) {
     <BladeTemplate
       header={
         <>
-          {invoice.id ? (
-            <span>
-              {`${invoice.apartment!.name} [${
-                invoice.apartment!.building!.name
-              }]`}
-            </span>
-          ) : null}
-          <div style={{ flex: 1 }} />
-          <span>
-            Fecha de Facturación:
-            <strong>
-              {invoice.createdAt || moment().format("DD/MM/YYYY")}
-            </strong>{" "}
-          </span>
-        </>
-      }
-      footer={
-        <>
           {invoice.id && invoice.subTotal! > 0 && invoice.total! >= 0 ? (
-            <Button size="small" type="primary" onClick={onUpdateInvoice}>
+            <Button type="primary" onClick={onUpdateInvoice}>
               Actualizar Factura
             </Button>
           ) : null}
 
           {apartments.length && !invoice.id && invoice.subTotal! > 0 ? (
             <Button
-              size="small"
               type="primary"
-              onClick={() =>
+              onClick={() => {
                 bulkCreate(
                   { creatorKeys: apartments, invoice },
                   invoiceListBlade.id!,
-                  condominium.id!
-                )
-              }
+                  condominium.id!,
+                  () => props.history.push("invoice-list")
+                );
+              }}
             >
               Crear Factura
             </Button>
@@ -111,6 +99,23 @@ export default function InvoiceEditor(props: IModule) {
     >
       <InvoicePageWrapper>
         <div className="PageContent">
+          <>
+            {invoice.id ? (
+              <span>
+                {`${invoice.apartment!.name} [${
+                  invoice.apartment!.building!.name
+                }]`}
+              </span>
+            ) : null}
+            <div style={{ flex: 1 }} />
+            <span>
+              Fecha de Facturación:
+              <strong>
+                {invoice.createdAt || moment().format("DD/MM/YYYY")}
+              </strong>{" "}
+            </span>
+          </>
+
           <OrderDetailInfo invoice={invoice} setInvoice={setInvoice} />
           <div className="BillingInformation">
             <div className="LeftSideContent">
@@ -118,6 +123,7 @@ export default function InvoiceEditor(props: IModule) {
                 <BuildingTree
                   condominiumId={condominium.id!}
                   setSelectedKeys={setApartments}
+                  selectedKeys={apartments}
                 />
               )}
             </div>
@@ -143,7 +149,6 @@ export default function InvoiceEditor(props: IModule) {
             />
             <div className="InvoiceTableBtn">
               <Button
-                size="small"
                 type="primary"
                 onClick={() =>
                   setInvoiceDetails([

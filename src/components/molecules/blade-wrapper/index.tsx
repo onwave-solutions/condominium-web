@@ -3,61 +3,44 @@ import Layout from "antd/lib/layout";
 import styled from "styled-components";
 import { palette } from "styled-theme";
 
-const { Header, Footer, Content } = Layout;
+const { Content } = Layout;
 
 const Wrapper = styled(Layout)`
-  min-width: ${(props: { size: string }) =>
-    props.size === "large" ? "99%" : "45%"};
-  max-width: ${(props: { size: string }) =>
-    props.size === "large" ? "99%" : "45%"};
+  min-width: 100%;
+  max-width: 100%
+  widht: 100%;
   height: 99%;
   min-height: 99%;
-  margin-bottom: 3px;
-  margin-right: 5px;
-  margin-left: 2.5px;
-  background: white;
-  border-style: solid;
-  border-width: 1px;
-  border-color: #fafafa;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
   transition: 0.3s;
-  border-radius: 3px;
   display: flex;
   flex-direction: column;
 
-  @media (max-width: 800px) {
-    min-width: 99%;
-    max-width: 99%;
-    min-height: 99%;
-  }
-`;
+ `;
 
 const InnerWrapper = styled(Content)`
   display: flex;
   width: 100%;
-  background: white;
   flex-grow: 1;
   flex-direction: column;
-  background: white;
 
   & .ps__rail-y {
     z-index: 999999;
   }
 `;
 
-const HeaderWrapper = styled(Header)`
-  color: white !important;
-  height: 3rem !important;
-  display: flex;
-  padding: 0px 0.5rem !important;
-  line-height: 3rem !important;
-  margin: 0 !important;
-  background: #2d3446 !important;
-
-  & h4 {
-    color: white;
-  }
-`;
+//const HeaderWrapper = styled(Header)`
+//  color: white !important;
+//  height: 3rem !important;
+//  display: flex;
+//  padding: 0px 0.5rem !important;
+//  line-height: 3rem !important;
+//  margin: 0 !important;
+//  background: #2d3446 !important;
+//
+//  & h4 {
+//    color: white;
+//  }
+//`;
 
 export interface IBladeProps {
   id?: string;
@@ -67,10 +50,9 @@ export interface IBladeProps {
 }
 
 export default function BladeWrapper(props: IBladeProps) {
-  const { children, header, id, size } = props;
+  const { children, id } = props;
   return (
-    <Wrapper id={id} size={size!}>
-      <HeaderWrapper>{header}</HeaderWrapper>
+    <Wrapper id={id}>
       <InnerWrapper>{children}</InnerWrapper>
     </Wrapper>
   );

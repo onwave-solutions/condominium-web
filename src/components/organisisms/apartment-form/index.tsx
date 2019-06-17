@@ -1,7 +1,7 @@
 import React from "react";
 
 import Input from "../../atoms/input";
-import Select from "../../atoms/select";
+import Select, { Option } from "../../atoms/select";
 import Switch from "../../atoms/switch";
 import FormItem from "../../molecules/form-item";
 import { Apartment } from "../../../shared-ui/models/apartment";
@@ -36,6 +36,21 @@ export default function ApartmentForm(props: IApartmentForm) {
           value={apartment.mt2}
           onChange={changer}
         />
+      </FormItem>
+      <FormItem label="Parqueos" md={24} sm={24}>
+        <Select
+          mode="tags"
+          onChangeItem={onItemSelect}
+          data={apartment.parkingLots}
+        >
+          {apartment.parkingLots
+            ? apartment.parkingLots.map((parking: string, index: number) => (
+                <Option key={index} value={parking}>
+                  {parking}
+                </Option>
+              ))
+            : null}
+        </Select>
       </FormItem>
       <FormItem label="Servicio" md={24} sm={24}>
         <Select

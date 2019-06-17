@@ -3,30 +3,49 @@ import styled from "styled-components";
 
 import Row from "../../atoms/row";
 
+const LayoutContentWrapper = styled(Row)`
+  padding: 40px 20px 0px 20px;
+  display: flex;
+  flex: 1;
+  flex-flow: row wrap;
+  overflow: hidden;
+
+  @media only screen and (max-width: 767px) {
+    padding: 50px 20px 0px 20px;
+  }
+
+  @media (max-width: 580px) {
+    padding: 15px;
+  }
+`;
+
 export const Wrapper = styled(Row)`
   padding: 10px;
-  margin: 0;
   flex-grow: 1;
+  height: 100% !important;
   overflow: hidden;
+  background: white;
+  flex: 1;
   overflow-y: auto;
 `;
 
 export const HeaderWrapper = styled.header`
-  height: 35px;
-  max-height: 35px;
+  height: 70px;
+  background: white;
+  max-height: 70px;
+  min-height: 70px;
   display: flex;
+  overflow: hidden;
+  overflow-x: auto;
+  align-items: center;
   flex-direction: row;
   width: 100%;
-  padding: 2.5px;
-  padding-right: 10px;
-  padding-left: 10px;
+  padding: 10px;
   border-style: solid;
   border-width: 0;
-  position: sticky;
-  top: 0px;
   border-color: #eaeaea;
-  border-bottom-width: 1px;
   background: white;
+  border-bottom-width: 1px;
 `;
 
 export const FooterWrapper = styled.footer`
@@ -38,11 +57,11 @@ export const FooterWrapper = styled.footer`
   padding-right: 10px;
   padding-left: 10px;
   border-style: solid;
+  background: white;
   border-width: 0;
   border-color: #eaeaea;
   border-top-width: 1px;
   margin-top: 5px;
-  background: white;
 `;
 
 export interface IBladeTemplate {
@@ -54,10 +73,10 @@ export interface IBladeTemplate {
 export default function BladeTemplate(props: IBladeTemplate) {
   const { children, header, footer } = props;
   return (
-    <>
-      <HeaderWrapper>{header}</HeaderWrapper>
+    <LayoutContentWrapper className="isoLayoutContentWrapper">
+      {header && <HeaderWrapper>{header}</HeaderWrapper>}
       <Wrapper>{children}</Wrapper>
-      <FooterWrapper>{footer}</FooterWrapper>
-    </>
+      {/* <FooterWrapper>{footer}</FooterWrapper> */}
+    </LayoutContentWrapper>
   );
 }

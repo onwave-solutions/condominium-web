@@ -3,5 +3,4 @@ import styled from "styled-components";
 
 export default styled(Icon)`
   display: block;
-  margin: auto;
 `;

@@ -47,19 +47,19 @@ export default function BankAccount(props: IModule) {
 
   return (
     <BladeTemplate
-      footer={
+      header={
         <>
           {!bankAccount.id && (
-            <Button size={"small"} onClick={() => create(bankAccount)}>
+            <Button type="primary" onClick={() => create(bankAccount)}>
               Crear
             </Button>
           )}
           {bankAccount.id && (
-            <Button size={"small"} onClick={() => update(bankAccount)}>
+            <Button type="primary" onClick={() => update(bankAccount)}>
               Guardar
             </Button>
           )}
-          <Button size={"small"} onClick={clear} style={{ marginLeft: 5 }}>
+          <Button onClick={clear} style={{ marginLeft: 5 }}>
             Limpiar
           </Button>
         </>

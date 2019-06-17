@@ -82,7 +82,7 @@ function SubMenuItem(props: IModule) {
   const { children, iconType, id, route, title, ...otherProps } = props;
 
   return (
-    <SubMenu {...otherProps} key={id} title={<MenuTitle {...props} />}>
+    <SubMenu {...otherProps} key={route} title={<MenuTitle {...props} />}>
       {children.map(item => {
         return (
           <Item style={submenuStyle} key={item.id}>

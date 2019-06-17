@@ -1,7 +1,7 @@
 import Axios from "axios";
 
 const axiosInstance = Axios.create({
-  baseURL: "api"
+  baseURL: "/api"
 });
 
 export function setAuthorization(token: string) {

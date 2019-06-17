@@ -13,7 +13,7 @@ export default function BladeHeader(props: IBladeHeader) {
     <>
       <h4>{title}</h4>
       <div style={{ flex: 1 }} />
-      <Icon type="close" onClick={onClose} />
+      <Icon type="close" onClick={onClose} style={{ marginTop: 10 }} />
     </>
   );
 }

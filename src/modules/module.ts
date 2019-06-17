@@ -1,45 +1,48 @@
-import admin from './admin/module';
-import manager from './manager/module';
-import apartment from './apartment/module';
-import building from './building/module';
-import condominium from './condominium/module';
-import company from './company/module';
-import tenant from './tenant/module';
-import condominumManager from './condominium-manager/module';
-import bankAccount from './bank-account/module';
-import financial from './financial/module';
-import invoiceView from './financial/invoice/invoice-view/module';
-import invoiceEditor from './financial/invoice/invoice-editor/module';
-import service from './service/module';
+import admin from "./admin/module";
+import manager from "./manager/module";
+import apartment from "./apartment/module";
+import tenantList from "./tenant-list/module";
+import building from "./building/module";
+import condominium from "./condominium/module";
+import company from "./company/module";
+import tenant from "./tenant/module";
+import condominumManager from "./condominium-manager/module";
+import bankAccount from "./bank-account/module";
+import financial from "./financial/module";
+import invoiceView from "./financial/invoice/invoice-view/module";
+import invoiceEditor from "./financial/invoice/invoice-editor/module";
+import service from "./service/module";
+import ticket from "./ticket/module";
+import supplier from "./supplier/module";
 
-import { IModule } from '../shared-ui/models/module';
+import { IModule } from "../shared-ui/models/module";
 
 const serviceAndProducts: IModule = {
-  title: 'Servicios y Produc.',
-  id: 'parent-product-service',
-  iconType: 'lock',
-  children: [service]
+  title: "Setup",
+  id: "parent-product-service",
+  iconType: "lock",
+  children: [building, bankAccount, service, supplier]
 };
 
 export const modules = [
   admin,
   manager,
-  apartment,
-  building,
+  ticket,
+  ...apartment.children,
+  tenantList,
   company,
   condominium,
   tenant,
   condominumManager,
-  bankAccount,
-  financial,
-  serviceAndProducts,
+  ...financial.children,
+  ...serviceAndProducts.children,
   invoiceView,
-  invoiceEditor
+  { ...invoiceEditor, id: invoiceEditor.id + "-detail/:id" }
 ];
 
 export const modulesByPermissions: { [id: string]: IModule[] } = {
   SA: modules,
   AD: [admin, company, manager, condominium],
-  MA: [building, bankAccount, serviceAndProducts, financial],
+  MA: [tenantList, ticket, financial, serviceAndProducts],
   TE: []
 };

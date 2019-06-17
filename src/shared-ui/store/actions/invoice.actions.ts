@@ -23,7 +23,8 @@ export function bulkCreateAction(id?: string) {
   return (
     payload: BulkInvoice,
     invoiceListId: string,
-    condominiumId: number
+    condominiumId: number,
+    cb: () => void
   ) => async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
       await service.bulkCreate(payload);
@@ -31,6 +32,7 @@ export function bulkCreateAction(id?: string) {
       dispatch(addBlade(invoiceListId));
       dispatch(getInvoiceListAction(id)(condominiumId));
       toast.success("Factura Creada Correctamente");
+      cb();
     } catch (e) {}
   };
 }
@@ -50,6 +52,15 @@ export function updateInvoiceServiceAction(id?: string) {
 
 export function resetInvoiceAction() {
   return createAction(InvoiceActions.ResetInvoice);
+}
+
+export function getInvoiceByIdAction(id?: string) {
+  return (id: number) => async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      const data = await service.findOne(id);
+      dispatch(setInvoiceAction(data));
+    } catch (e) {}
+  };
 }
 
 export function setInvoicesAction(payload: Invoice[]) {

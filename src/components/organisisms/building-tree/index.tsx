@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import _ from "lodash";
 import Tree from "../../atoms/tree";
 import { Building } from "../../../shared-ui/models/building";
 import { BuildingService } from "../../../shared-ui/services/building";
@@ -8,6 +9,7 @@ import { Apartment } from "../../../shared-ui/models/apartment";
 
 export interface IBuildingTree {
   condominiumId: number;
+  selectedKeys: string[];
   setSelectedKeys: (keys: string[]) => void;
 }
 
@@ -17,7 +19,7 @@ const buildingService = new BuildingService();
 const apartmentService = new ApartmentService();
 
 export default function BuildingTree(props: IBuildingTree) {
-  const { condominiumId, setSelectedKeys } = props;
+  const { condominiumId, setSelectedKeys, selectedKeys } = props;
   const [buildings, setBuildings] = useState<Building[]>([]);
 
   const loadData = async (data: AntTreeNode): Promise<void> => {
@@ -36,12 +38,24 @@ export default function BuildingTree(props: IBuildingTree) {
     buildingService.query({ condominiumId }).then(setBuildings);
   }, [condominiumId]);
 
+  const checkedAll = buildings.map(building => `${building.id}`);
+
+  const handleSelected = (keys: string[]) => {
+    if (keys.includes("all")) {
+      setSelectedKeys(checkedAll);
+      return;
+    }
+    setSelectedKeys(keys);
+  };
+
   return (
     <Tree
       checkable
       loadData={loadData}
-      onCheck={keys => setSelectedKeys(keys as string[])}
+      checkedKeys={selectedKeys}
+      onCheck={handleSelected as any}
     >
+      <TreeNode title={"Todos"} key="all" isLeaf={true} />
       {buildings.map(renderBuildingTree({ isLeaf: false }))}
     </Tree>
   );

@@ -1,7 +1,7 @@
 import axiosInstance from "./axios";
 import Parseus from "@rijudev/parseus";
 import { Apartment } from "../models/apartment";
-import { AbstractService } from './abstract-service';
+import { AbstractService } from "./abstract-service";
 
 export async function createApartment(
   apartment: Apartment
@@ -37,5 +37,12 @@ export async function updateApartment(
 export class ApartmentService extends AbstractService<Apartment> {
   constructor() {
     super(Apartment, "apartment");
+  }
+
+  async addTenant(tenantId: number, apartmentId: number): Promise<void> {
+    await this.service.post<void>(`${this.prefix}/addTenant`, {
+      tenantId,
+      apartmentId
+    });
   }
 }

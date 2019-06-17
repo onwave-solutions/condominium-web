@@ -2,6 +2,8 @@ export function noop() {}
 
 export type KeyOf<T> = keyof T;
 
+export type Query<T> = { [P in keyof T]?: T[P] | T[P][] };
+
 export type Normalize<T> = { [id: string]: T };
 
 export function validateModel<T extends object>(

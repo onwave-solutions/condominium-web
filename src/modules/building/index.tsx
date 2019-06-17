@@ -18,10 +18,7 @@ import {
   refreshBuildingsAction
 } from "../../shared-ui/store/actions/building";
 import { IModule } from "../../shared-ui/models/module";
-import {
-  closeChildBladeAction,
-  addChildBlade
-} from "../../shared-ui/store/actions/app";
+import { closeChildBladeAction } from "../../shared-ui/store/actions/app";
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
 
 const columns: ColDef[] = [
@@ -50,13 +47,16 @@ export default function Building(props: IModule) {
   const loadBuilding = useReduxAction(refreshBuildingsAction());
   const setBuilding = useReduxAction(setBuildingAction);
 
-  const handleAddBlade = useReduxAction(addChildBlade(props.id));
   const closeChildBlades = useReduxAction(closeChildBladeAction);
 
   const clear = () => {
     closeChildBlades(props.id);
     const payload = { condominiumId: condominium.id };
     setBuilding(payload);
+  };
+
+  const onOpenApartment = () => {
+    props.history.push(`/apartments/${building.id}`);
   };
 
   useEffect(() => {
@@ -72,30 +72,23 @@ export default function Building(props: IModule) {
       header={
         <>
           {building.id && (
-            <Button
-              size={"small"}
-              onClick={() => handleAddBlade(apartmentModule.id)}
-            >
-              Apartamentos
-            </Button>
+            <Button onClick={onOpenApartment}>Apartamentos</Button>
           )}
-        </>
-      }
-      footer={
-        <>
+
+          <div style={{ flex: 1 }} />
           {!building.id && (
-            <Button size={"small"} onClick={() => create(building)}>
+            <Button type="primary" onClick={() => create(building)}>
               Crear
             </Button>
           )}
 
           {building.id && (
-            <Button size={"small"} onClick={() => update(building)}>
+            <Button type="primary" onClick={() => update(building)}>
               Guardar
             </Button>
           )}
 
-          <Button size={"small"} style={{ marginLeft: 5 }} onClick={clear}>
+          <Button style={{ marginLeft: 5 }} onClick={clear}>
             Limpiar
           </Button>
         </>
