@@ -7,7 +7,7 @@ import {
 } from "../../../shared-ui/settings/style/utils";
 
 const NoteComponentWrapper = styled.div`
-  padding: 50px 35px;
+  padding: 50px 35px 0px 35px;
   display: flex;
   height: 100%;
   min-height: 300px;

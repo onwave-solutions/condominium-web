@@ -22,6 +22,7 @@ export interface IApplicationState {
   token: string;
   user: User;
   keylist: Keylist;
+  loading: boolean;
 }
 
 const initialState: Readonly<IApplicationState> = {
@@ -29,6 +30,7 @@ const initialState: Readonly<IApplicationState> = {
   token: "",
   user: {},
   keylist: {},
+  loading: false,
   visibility: false,
   blades: {},
   isMobile: false
@@ -87,10 +89,7 @@ function setLoadingReducer(
   draft: IApplicationState,
   { id, loading }: { id: string; loading: boolean }
 ) {
-  const blade = draft.blades[id];
-  if (!blade) return;
-  blade.loading = loading;
-  draft.blades[id] = blade;
+  draft.loading = loading;
 }
 
 function closeChildBlades(draft: IApplicationState, parentId: string) {

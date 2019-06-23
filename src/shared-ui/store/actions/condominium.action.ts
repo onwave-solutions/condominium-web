@@ -6,6 +6,8 @@ import { CondominumService } from "../../services/condominium.service";
 import { setBuildingAction } from "./building";
 import { User } from "../../models/user";
 import { UserService } from "../../services/users";
+import { getErrorResponse } from "../../utils/objects";
+import { loadingWrapper } from "./app";
 
 export enum CondominiumActions {
   SetCondominium = "CONDOMINIUM_SET_CONDOMINIUM",
@@ -18,31 +20,56 @@ const service = new CondominumService();
 const userService = new UserService();
 
 export function addCondominiumManagerAction(id?: string) {
-  return (condominiumMananger: CondominiumManager) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      await service.addManager(condominiumMananger);
-      dispatch(setCondominiumManagerAction({}));
-      dispatch(
-        getCondominiumManagerAction(id)(condominiumMananger.condominiumId!)
-      );
-      toast.success("Condominio Agregado a Manager Correctamente");
-    } catch (e) {}
-  };
+  return (condominiumMananger: CondominiumManager, cb?: () => void) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        await service.addManager(condominiumMananger);
+        dispatch(setCondominiumManagerAction({}));
+        dispatch(
+          getCondominiumManagerAction(id)(condominiumMananger.condominiumId!)
+        );
+        cb && cb();
+        toast.success("Condominio Agregado a Manager Correctamente");
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
+}
+
+export function dropCondominiumManagerAction(id?: string) {
+  return (condominiumMananger: CondominiumManager, cb?: () => void) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        await service.dropManager(condominiumMananger);
+        dispatch(setCondominiumManagerAction({}));
+        dispatch(
+          getCondominiumManagerAction(id)(condominiumMananger.condominiumId!)
+        );
+        cb && cb();
+        toast.success("Condominio desasignado");
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function getCondominiumManagerAction(id?: string) {
-  return (condominiumId: number) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      const condominium = await service.findOne(condominiumId);
-      dispatch(setCondominiumAction(condominium));
-      const data = await userService.findManagersByCondominiumId(condominiumId);
-      dispatch(setCondominiumManagersActions(data));
-    } catch (e) {}
-  };
+  return (condominiumId: number) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const condominium = await service.findOne(condominiumId);
+        dispatch(setCondominiumAction(condominium));
+        const data = await userService.findManagersByCondominiumId(
+          condominiumId
+        );
+        dispatch(setCondominiumManagersActions(data));
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function setCondominiumManagerAction(payload: User) {
@@ -62,36 +89,44 @@ export function setCondominiumsAction(payload: Condominium[]) {
 }
 
 export function updateCondominiumAction(id?: string) {
-  return (condominium: Partial<Condominium>) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      const data = await service.update(condominium.id!, condominium);
-      dispatch(setCondominiumAction(data));
-      toast.success("Condominio Actualizado Correctamente");
-      dispatch(refreshCondominiumsAction(id)());
-    } catch (e) {}
-  };
+  return (condominium: Partial<Condominium>) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const data = await service.update(condominium.id!, condominium);
+        dispatch(setCondominiumAction(data));
+        toast.success("Condominio Actualizado Correctamente");
+        dispatch(refreshCondominiumsAction(id)());
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function createCondominiumAction(id?: string) {
-  return (condominium: Partial<Condominium>) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      const data = await service.create(condominium);
-      dispatch(setCondominiumAction(data));
-      toast.success("Condominio Creado Correctamente");
-      dispatch(refreshCondominiumsAction(id)());
-    } catch (e) {}
-  };
+  return (condominium: Partial<Condominium>) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const data = await service.create(condominium);
+        dispatch(setCondominiumAction({}));
+        toast.success("Condominio Creado Correctamente");
+        dispatch(refreshCondominiumsAction(id)());
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function refreshCondominiumsAction(id?: string) {
-  return () => async (dispatch: ThunkDispatch<any, any, any>) => {
-    try {
-      const data = await service.query({});
-      dispatch(setCondominiumsAction(data));
-    } catch (e) {}
-  };
+  return () =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const data = await service.query({});
+        dispatch(setCondominiumsAction(data));
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }

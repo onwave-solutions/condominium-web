@@ -1,10 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { Layout } from "antd";
 import { ColDef } from "ag-grid-community/dist/lib/entities/colDef";
 import { AgGridReact } from "ag-grid-react";
 
 import Col from "../../components/atoms/col";
+import Row from "../../components/atoms/row";
+import Icon from "../../components/atoms/icon";
 import Button from "../../components/atoms/button";
+import Modal from "../../components/atoms/modal";
+import Scrollbar from "../../components/atoms/scrollbar";
 import BuildingForm from "../../components/organisisms/building-form";
+import BuildingWrapper from "../../components/molecules/ticket-wrapper";
 import BladeTemplate from "../../components/templates/blade-template";
 import apartmentModule from "../apartment/module";
 
@@ -20,99 +26,188 @@ import {
 import { IModule } from "../../shared-ui/models/module";
 import { closeChildBladeAction } from "../../shared-ui/store/actions/app";
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
-
-const columns: ColDef[] = [
-  {
-    field: "condominium.name",
-    width: 250,
-    headerName: "Condominio"
-  },
-  {
-    field: "name",
-    width: 250,
-    headerName: "Nombre"
-  }
-];
+import SideList from "../../components/organisisms/side-list";
+import { Building } from "../../shared-ui/models/building";
+import ApartmentView from "../apartment";
+import ApartmentModal from "../../components/organisisms/apartment-modal";
+import { apartmentSelector } from "../../shared-ui/store/selectors/apartment";
+import { loadServicesAction } from "../../shared-ui/store/actions/service.action";
+import { serviceSelector } from "../../shared-ui/store/selectors/service.selector";
+import {
+  setApartmentAction,
+  createApartmentAction,
+  updateApartmentAction
+} from "../../shared-ui/store/actions/apartment";
+import { Apartment } from "../../shared-ui/models/apartment";
+import WrapperTemplate from "../../components/templates/wrapper-template";
 
 const managerState = select(managerSelector);
 const buildingState = select(buildingSelector);
+const apartmentState = select(apartmentSelector);
+const serviceState = select(serviceSelector);
 
-export default function Building(props: IModule) {
+export default function BuildingView(props: IModule) {
+  const [building, setBuilding] = useState<Building>({});
+  const [apartmentModal, setApartmentModal] = useState<boolean>(false);
+  const [buildingModal, setBuildingModal] = useState<boolean>(false);
   const condominium = useReduxState(managerState("condominium"));
-  const building = useReduxState(buildingState("building"));
+  const selected = useReduxState(buildingState("building"));
+  const apartment = useReduxState(apartmentState("apartment"));
+  const services = useReduxState(serviceState("services"));
   const buildings = useReduxState(buildingState("buildings"));
 
   const create = useReduxAction(createBuildingAction());
   const update = useReduxAction(updateBuildingAction());
+  const createApartment = useReduxAction(createApartmentAction());
+  const updateApartment = useReduxAction(updateApartmentAction());
+
   const loadBuilding = useReduxAction(refreshBuildingsAction());
-  const setBuilding = useReduxAction(setBuildingAction);
+  const loadServices = useReduxAction(loadServicesAction());
+  const setSelected = useReduxAction(setBuildingAction);
+  const setApartment = useReduxAction(setApartmentAction);
 
-  const closeChildBlades = useReduxAction(closeChildBladeAction);
-
-  const clear = () => {
-    closeChildBlades(props.id);
-    const payload = { condominiumId: condominium.id };
-    setBuilding(payload);
+  const onSelectBuilding = (building: Building) => () => {
+    setSelected(building);
   };
 
-  const onOpenApartment = () => {
-    props.history.push(`/apartments/${building.id}`);
+  const onOpenApartment = (apartment: Apartment) => () => {
+    setApartment(apartment);
+    setApartmentModal(true);
+  };
+
+  const onOpenBuilding = (building: Building) => () => {
+    setBuilding(building);
+    setBuildingModal(true);
+  };
+
+  const onCreateApartment = async () => {
+    if (apartment.id) {
+      await updateApartment(apartment);
+    } else {
+      await createApartment(apartment);
+    }
+    setApartmentModal(false);
+  };
+
+  const onCreateBuilding = async () => {
+    if (building.id) {
+      await update(building);
+    } else {
+      await create(building);
+    }
+    setBuildingModal(false);
   };
 
   useEffect(() => {
-    if (condominium.id === building.condominiumId) return;
+    if (condominium.id === selected.condominiumId) return;
     const payload = { condominiumId: condominium.id };
-    setBuilding(payload);
+    setSelected(payload);
     loadBuilding(payload);
-    closeChildBlades(props.id);
+    loadServices(payload);
   }, [condominium.id]);
 
   return (
-    <BladeTemplate
-      header={
-        <>
-          {building.id && (
-            <Button onClick={onOpenApartment}>Apartamentos</Button>
-          )}
+    <>
+      <ApartmentModal
+        apartment={apartment}
+        services={services}
+        visible={apartmentModal}
+        onCancel={() => setApartmentModal(false)}
+        onOk={onCreateApartment}
+        apartmentChange={setApartment}
+      />
+      <Modal
+        title={(building.id ? "Modificar " : "Actualizar ") + "Edificio"}
+        visible={buildingModal}
+        onOk={onCreateBuilding}
+        onCancel={() => setBuildingModal(false)}
+      >
+        <Row>
+          <BuildingForm building={building} buildingChange={setBuilding} />
+        </Row>
+      </Modal>
+      <WrapperTemplate>
+        <BuildingWrapper className="isomorphicNoteComponent">
+          <div style={{ width: "320px" }} className="isoNoteListSidebar">
+            <SideList
+              items={buildings}
+              resetId={condominium.id!}
+              filterKeys={["name"]}
+            >
+              {(building: Building) => {
+                const activeClass = selected.id === building.id ? "active" : "";
+                return (
+                  <div
+                    className={`isoList ${activeClass}`}
+                    key={building.id}
+                    onClick={onSelectBuilding(building)}
+                  >
+                    <div className="isoNoteBGColor" style={{ width: "5px" }} />
+                    <div className="isoNoteText">
+                      <h3>{"Edificio " + building.name}</h3>
+                    </div>
+                    <div style={{ flex: 1 }} />
+                    <div className="isoNoteText">
+                      <Icon
+                        type="edit"
+                        style={{ fontSize: 20 }}
+                        onClick={() => onOpenBuilding(building)()}
+                      />
+                    </div>
+                  </div>
+                );
+              }}
+            </SideList>
+          </div>
 
-          <div style={{ flex: 1 }} />
-          {!building.id && (
-            <Button type="primary" onClick={() => create(building)}>
-              Crear
-            </Button>
-          )}
-
-          {building.id && (
-            <Button type="primary" onClick={() => update(building)}>
-              Guardar
-            </Button>
-          )}
-
-          <Button style={{ marginLeft: 5 }} onClick={clear}>
-            Limpiar
-          </Button>
-        </>
-      }
-    >
-      <BuildingForm building={building} buildingChange={setBuilding} />
-      <Col sm={24} md={24}>
-        <div
-          className="ag-theme-balham"
-          style={{
-            marginTop: 15,
-            flexGrow: 1,
-            minHeight: 100,
-            height: 250,
-            width: "100%"
-          }}
-        >
-          <AgGridReact
-            rowData={buildings}
-            columnDefs={columns}
-            onRowClicked={event => setBuilding(event.data)}
-          />
-        </div>
-      </Col>
-    </BladeTemplate>
+          <Layout className="isoNotepadWrapper">
+            <Layout.Header className="isoHeader">
+              <div style={{ flex: 1 }} />
+              <Button
+                type="primary"
+                className="isoAddNoteBtn"
+                style={{ marginLeft: "0.5rem" }}
+                onClick={onOpenBuilding({ condominiumId: condominium.id })}
+              >
+                Crear Edificio
+              </Button>
+              <Button
+                onClick={onOpenApartment({ buildingId: selected.id })}
+                type="primary"
+                className="isoAddNoteBtn"
+                style={{ marginLeft: "0.5rem" }}
+              >
+                Crear Apartamento
+              </Button>
+            </Layout.Header>
+            {selected.id && (
+              <Layout.Content
+                style={{
+                  padding: "2rem",
+                  paddingBottom: "0",
+                  flexDirection: "column"
+                }}
+                className="isoNoteEditingArea"
+              >
+                <div
+                  className="isoColorChooseWrapper"
+                  style={{ marginBottom: "0.7rem" }}
+                >
+                  <h2 style={{ marginRight: "0.7rem" }}>
+                    {"Edificio " + selected.name}
+                  </h2>
+                </div>
+                <Scrollbar>
+                  <ApartmentView
+                    buildingId={selected.id!}
+                    onEditApartment={apartment => onOpenApartment(apartment)()}
+                  />
+                </Scrollbar>
+              </Layout.Content>
+            )}
+          </Layout>
+        </BuildingWrapper>
+      </WrapperTemplate>
+    </>
   );
 }

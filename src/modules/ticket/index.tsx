@@ -22,6 +22,7 @@ import Comment from "../../components/molecules/comment";
 import { appSelector } from "../../shared-ui/store/selectors/app";
 import { IQuery } from "../../shared-ui/models/keylist";
 import CommentList from "../../components/molecules/comment-list";
+import WrapperTemplate from "../../components/templates/wrapper-template";
 
 const { Header, Content, Footer } = Layout;
 
@@ -93,136 +94,138 @@ export default function TicketView(props: IModule) {
   }, [parseInt(`${condominium.id}`, 10)]);
   return (
     <>
-      <TicketWrapper className="isomorphicNoteComponent">
-        <div style={{ width: "320px" }} className="isoNoteListSidebar">
-          <TicketList
-            tickets={tickets}
-            keylist={keylist}
-            onQueryChange={handleQueryChange}
-            selectedId={ticket.id}
-            onTicketClicked={setTicket}
-          />
-        </div>
-        <Layout className="isoNotepadWrapper">
-          <Header className="isoHeader">
-            <div style={{ flex: 1 }} />
-            {!ticket.id && (
-              <>
+      <WrapperTemplate>
+        <TicketWrapper className="isomorphicNoteComponent">
+          <div style={{ width: "320px" }} className="isoNoteListSidebar">
+            <TicketList
+              tickets={tickets}
+              keylist={keylist}
+              onQueryChange={handleQueryChange}
+              selectedId={ticket.id}
+              onTicketClicked={setTicket}
+            />
+          </div>
+          <Layout className="isoNotepadWrapper">
+            <Header className="isoHeader">
+              <div style={{ flex: 1 }} />
+              {!ticket.id && (
+                <>
+                  <Button
+                    type="primary"
+                    className="isoAddNoteBtn"
+                    style={{ marginLeft: "0.5rem" }}
+                    onClick={handleCreateTicketModal(true)}
+                  >
+                    Crear Ticket
+                  </Button>
+                </>
+              )}
+              {ticket.id && (
+                <>
+                  <Button
+                    type="primary"
+                    className="isoAddNoteBtn"
+                    style={{ marginLeft: "0.5rem" }}
+                    onClick={() => setTicket({})}
+                  >
+                    Limpiar
+                  </Button>
+                  {!["CA", "RE"].includes(ticket.statusType!) && (
+                    <Button
+                      type="danger"
+                      style={{ marginLeft: "0.5rem" }}
+                      onClick={handleUpdateTicket({
+                        ...ticket,
+                        statusType: "CA"
+                      })}
+                    >
+                      Cancelar Ticket
+                    </Button>
+                  )}
+                </>
+              )}
+              {["ES", "PA"].includes(ticket.statusType!) && (
                 <Button
                   type="primary"
                   className="isoAddNoteBtn"
+                  onClick={handleUpdateTicket({ ...ticket, statusType: "TR" })}
                   style={{ marginLeft: "0.5rem" }}
-                  onClick={handleCreateTicketModal(true)}
                 >
-                  Crear Ticket
+                  Empezar a Trabajar
                 </Button>
-              </>
-            )}
+              )}
+              {ticket.statusType === "TR" && (
+                <Button
+                  type="ghost"
+                  onClick={handleUpdateTicket({ ...ticket, statusType: "RE" })}
+                  style={{ marginLeft: "0.5rem" }}
+                >
+                  Resolver
+                </Button>
+              )}
+              {ticket.statusType === "TR" && (
+                <Button
+                  type="default"
+                  onClick={handleUpdateTicket({ ...ticket, statusType: "PA" })}
+                  style={{ marginLeft: "0.5rem" }}
+                >
+                  Pausar
+                </Button>
+              )}
+            </Header>
             {ticket.id && (
               <>
-                <Button
-                  type="primary"
-                  className="isoAddNoteBtn"
-                  style={{ marginLeft: "0.5rem" }}
-                  onClick={() => setTicket({})}
+                <Content
+                  style={{
+                    padding: "3rem",
+                    paddingBottom: "0",
+                    flexDirection: "column"
+                  }}
+                  className="isoNoteEditingArea"
                 >
-                  Limpiar
-                </Button>
-                {!["CA", "RE"].includes(ticket.statusType!) && (
-                  <Button
-                    type="danger"
-                    style={{ marginLeft: "0.5rem" }}
-                    onClick={handleUpdateTicket({
-                      ...ticket,
-                      statusType: "CA"
-                    })}
+                  <div
+                    className="isoColorChooseWrapper"
+                    style={{ marginBottom: "0.7rem" }}
                   >
-                    Cancelar Ticket
-                  </Button>
+                    <h2 style={{ marginRight: "0.7rem" }}>{ticket.title}</h2>
+                    <span>Estado: {ticket.status!.name}</span>
+                  </div>
+
+                  <h3>Descripción</h3>
+                  <p>{ticket.description}</p>
+                  {ticket.solution && (
+                    <>
+                      <h3>Solución</h3>
+                      <p>{ticket.solution}</p>
+                    </>
+                  )}
+                  {ticket.comments && Boolean(ticket.comments.length) && (
+                    <>
+                      <h4 style={{ marginBottom: "1rem", marginTop: "1rem" }}>
+                        Comentarios
+                      </h4>
+                      <div
+                        style={{
+                          flex: 1,
+                          marginLeft: "2rem",
+                          overflowY: "auto"
+                        }}
+                      >
+                        <CommentList comments={ticket.comments!} />
+                      </div>{" "}
+                    </>
+                  )}
+                </Content>
+                {ticket.statusType !== "CA" && (
+                  <Footer>
+                    <Comment onSend={handleAddComment} resetId={ticket.id!} />
+                  </Footer>
                 )}
               </>
             )}
-            {["ES", "PA"].includes(ticket.statusType!) && (
-              <Button
-                type="primary"
-                className="isoAddNoteBtn"
-                onClick={handleUpdateTicket({ ...ticket, statusType: "TR" })}
-                style={{ marginLeft: "0.5rem" }}
-              >
-                Empezar a Trabajar
-              </Button>
-            )}
-            {ticket.statusType === "TR" && (
-              <Button
-                type="ghost"
-                onClick={handleUpdateTicket({ ...ticket, statusType: "RE" })}
-                style={{ marginLeft: "0.5rem" }}
-              >
-                Resolver
-              </Button>
-            )}
-            {ticket.statusType === "TR" && (
-              <Button
-                type="default"
-                onClick={handleUpdateTicket({ ...ticket, statusType: "PA" })}
-                style={{ marginLeft: "0.5rem" }}
-              >
-                Pausar
-              </Button>
-            )}
-          </Header>
-          {ticket.id && (
-            <>
-              <Content
-                style={{
-                  padding: "3rem",
-                  paddingBottom: "0",
-                  flexDirection: "column"
-                }}
-                className="isoNoteEditingArea"
-              >
-                <div
-                  className="isoColorChooseWrapper"
-                  style={{ marginBottom: "0.7rem" }}
-                >
-                  <h2 style={{ marginRight: "0.7rem" }}>{ticket.title}</h2>
-                  <span>Estado: {ticket.status!.name}</span>
-                </div>
-
-                <h3>Descripción</h3>
-                <p>{ticket.description}</p>
-                {ticket.solution && (
-                  <>
-                    <h3>Solución</h3>
-                    <p>{ticket.solution}</p>
-                  </>
-                )}
-                {ticket.comments && Boolean(ticket.comments.length) && (
-                  <>
-                    <h4 style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-                      Comentarios
-                    </h4>
-                    <div
-                      style={{
-                        flex: 1,
-                        marginLeft: "2rem",
-                        overflowY: "auto"
-                      }}
-                    >
-                      <CommentList comments={ticket.comments!} />
-                    </div>{" "}
-                  </>
-                )}
-              </Content>
-              {ticket.statusType !== "CA" && (
-                <Footer>
-                  <Comment onSend={handleAddComment} resetId={ticket.id!} />
-                </Footer>
-              )}
-            </>
-          )}
-        </Layout>
-      </TicketWrapper>
+          </Layout>
+        </TicketWrapper>
+      </WrapperTemplate>
       <TicketCreateForm
         visible={createTicketVisible}
         onCreate={handleCreateTicket}

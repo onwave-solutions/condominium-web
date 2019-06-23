@@ -1,7 +1,11 @@
 import React from "react";
+import { Spin } from "antd";
 import styled from "styled-components";
 
 import Row from "../../atoms/row";
+import { select } from "../../../shared-ui/store/selectors";
+import { appSelector } from "../../../shared-ui/store/selectors/app";
+import { useReduxState } from "../../../shared-ui/store/hooks";
 
 const LayoutContentWrapper = styled(Row)`
   padding: 40px 20px 0px 20px;
@@ -70,12 +74,17 @@ export interface IBladeTemplate {
   footer?: React.ReactNode;
 }
 
+const appState = select(appSelector);
+
 export default function BladeTemplate(props: IBladeTemplate) {
   const { children, header, footer } = props;
+  const loading = useReduxState(appState("loading"));
   return (
     <LayoutContentWrapper className="isoLayoutContentWrapper">
-      {header && <HeaderWrapper>{header}</HeaderWrapper>}
-      <Wrapper>{children}</Wrapper>
+      <Spin tip="Cargando Favor Espere..." spinning={loading}>
+        {header && <HeaderWrapper>{header}</HeaderWrapper>}
+        <Wrapper>{children}</Wrapper>
+      </Spin>
       {/* <FooterWrapper>{footer}</FooterWrapper> */}
     </LayoutContentWrapper>
   );

@@ -2,6 +2,17 @@ import { Field } from "@rijudev/parseus";
 import { Building } from "./building";
 import { Service } from "./service.model";
 
+export class ApartmentUser {
+  @Field()
+  id?: number;
+  @Field()
+  username?: string;
+  @Field()
+  name?: string;
+  @Field()
+  lastName?: string;
+}
+
 export class Apartment {
   @Field()
   id?: number;
@@ -15,7 +26,7 @@ export class Apartment {
   floor?: number;
   @Field({ type: "decimal", fixed: 2 })
   mt2?: number;
-  @Field()
+  @Field({ type: "array", factory: String })
   parkingLots?: string[];
   @Field()
   createdAt?: string;
@@ -27,4 +38,18 @@ export class Apartment {
 
   @Field({ factory: Service, type: "object" })
   service?: Service;
+
+  @Field({ factory: ApartmentUser, type: "array" })
+  tenants?: ApartmentUser[];
+}
+
+export class ApartmentTenant {
+  @Field()
+  apartmentId?: number;
+
+  @Field()
+  tenantId?: number;
+
+  @Field()
+  default?: boolean;
 }

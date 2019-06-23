@@ -1,5 +1,6 @@
 import React from "react";
 
+import AntSelect from "antd/lib/select";
 import Input from "../../atoms/input";
 import Select, { Option } from "../../atoms/select";
 import Switch from "../../atoms/switch";
@@ -38,10 +39,13 @@ export default function ApartmentForm(props: IApartmentForm) {
         />
       </FormItem>
       <FormItem label="Parqueos" md={24} sm={24}>
-        <Select
+        <AntSelect
           mode="tags"
-          onChangeItem={onItemSelect}
-          data={apartment.parkingLots}
+          onChange={(value: string[]) =>
+            onItemSelect("parkingLots", value.map(item => item.toUpperCase()))
+          }
+          style={{ width: "100%" }}
+          value={apartment.parkingLots || []}
         >
           {apartment.parkingLots
             ? apartment.parkingLots.map((parking: string, index: number) => (
@@ -50,7 +54,7 @@ export default function ApartmentForm(props: IApartmentForm) {
                 </Option>
               ))
             : null}
-        </Select>
+        </AntSelect>
       </FormItem>
       <FormItem label="Servicio" md={24} sm={24}>
         <Select

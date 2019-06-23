@@ -1,9 +1,9 @@
-import React, { Suspense, lazy, useMemo } from "react";
+import React, { Suspense, lazy } from "react";
+import { Spin } from "antd";
 import { Route } from "react-router-dom";
 import { modules } from "../../../modules/module";
 
 import BladeWrapper from "../../molecules/blade-wrapper";
-import BladeHeader from "../../molecules/blade-header";
 import { IModule } from "../../../shared-ui/models/module";
 
 export interface IBladeManager {
@@ -17,7 +17,7 @@ function renderBlade(props: IBladeManager) {
     let Blade: any;
     Blade = lazy(() => import(`../../../modules/${blade.route}`));
     const component = (props: any) => (
-      <Suspense fallback={<h1>loading</h1>}>
+      <Suspense fallback={<Spin />}>
         <Blade {...blade} {...props} />
       </Suspense>
     );

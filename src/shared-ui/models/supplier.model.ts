@@ -11,6 +11,12 @@ export class Supplier {
   public description?: string;
 
   @Field()
+  public documentId?: string;
+
+  @Field()
+  public document?: string;
+
+  @Field()
   public disabled?: boolean;
 
   @Field()

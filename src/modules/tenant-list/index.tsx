@@ -15,7 +15,8 @@ import {
   signUpTenantAction,
   loadTenantAction,
   setTenantAction,
-  addApartmentToTenant
+  addApartmentToTenant,
+  findTenantBy
 } from "../../shared-ui/store/actions/tenant.action";
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
 import { User } from "../../shared-ui/models/user";
@@ -23,6 +24,7 @@ import TenantCard from "../../components/molecules/tenant-card";
 import ApartmentSelect from "../../components/organisisms/apartment-select";
 import { BuildingService } from "../../shared-ui/services/building";
 import { ApartmentService } from "../../shared-ui/services/apartment";
+import WrapperTemplate from "../../components/templates/wrapper-template";
 
 const { Content } = Layout;
 
@@ -75,72 +77,75 @@ export default function TenantList(props: IModule) {
 
   return (
     <>
-      <ContactsWrapper
-        className="isomorphicContacts"
-        style={{ background: "none" }}
-      >
-        <div className="isoContactListBar">
-          <TenantContactList
-            users={tenants}
-            selectedId={tenant.id}
-            onSelect={setTenant}
-          />
-        </div>
-        <Layout className="isoContactBoxWrapper">
-          <Content className="isoContactBox">
-            <div className="isoContactControl">
-              <div style={{ flex: 1 }} />
-              <Button
-                type="primary"
-                className="isoAddContactBtn"
-                onClick={handleModalVisibility(true)}
-              >
-                Agregar Nuevo Inquilino
-              </Button>
-
-              {tenant.id && (
+      <WrapperTemplate>
+        <ContactsWrapper
+          className="isomorphicContacts"
+          style={{ background: "none" }}
+        >
+          <div className="isoContactListBar">
+            <TenantContactList
+              users={tenants}
+              selectedId={tenant.id}
+              onSelect={setTenant}
+            />
+          </div>
+          <Layout className="isoContactBoxWrapper">
+            <Content className="isoContactBox">
+              <div className="isoContactControl">
+                <div style={{ flex: 1 }} />
                 <Button
                   type="primary"
                   className="isoAddContactBtn"
-                  onClick={handleApartmentModalVisibility(true)}
+                  onClick={handleModalVisibility(true)}
                 >
-                  Asignar Apartamento
+                  Agregar Nuevo Inquilino
                 </Button>
-              )}
-            </div>
-            <Scrollbar className="contactBoxScrollbar">
-              {tenant.id && (
-                <TenantCard
-                  tenant={tenant}
-                  otherAttributes={[
-                    {
-                      value: tenant => tenant.documentRaw!.name!,
-                      title: "Tipo de Documento"
-                    },
-                    { value: "document", title: "Documento" },
-                    { value: "username", title: "Correo Eléctronico" },
-                    {
-                      value: tenant => tenant.statusRaw!.name!,
-                      title: "Estado"
-                    },
-                    {
-                      value: tenant =>
-                        tenant
-                          .apartments!.map(
-                            a => `${a.name} (${a.building!.name})`
-                          )
-                          .join(", "),
-                      title: "Apartamentos"
-                    }
-                  ]}
-                />
-              )}
-            </Scrollbar>
-          </Content>
-        </Layout>
-      </ContactsWrapper>
+
+                {tenant.id && (
+                  <Button
+                    type="primary"
+                    className="isoAddContactBtn"
+                    onClick={handleApartmentModalVisibility(true)}
+                  >
+                    Asignar Apartamento
+                  </Button>
+                )}
+              </div>
+              <Scrollbar className="contactBoxScrollbar">
+                {tenant.id && (
+                  <TenantCard
+                    tenant={tenant}
+                    otherAttributes={[
+                      {
+                        value: tenant => tenant.documentRaw!.name!,
+                        title: "Tipo de Documento"
+                      },
+                      { value: "document", title: "Documento" },
+                      { value: "username", title: "Correo Eléctronico" },
+                      {
+                        value: tenant => tenant.statusRaw!.name!,
+                        title: "Estado"
+                      },
+                      {
+                        value: tenant =>
+                          tenant
+                            .apartments!.map(
+                              a => `${a.name} (${a.building!.name})`
+                            )
+                            .join(", "),
+                        title: "Apartamentos"
+                      }
+                    ]}
+                  />
+                )}
+              </Scrollbar>
+            </Content>
+          </Layout>
+        </ContactsWrapper>
+      </WrapperTemplate>
       <TenantCreateForm
         visible={visible}
+        onSearchTenant={findTenantBy}
         onAction={handleCreateTenant}
         onClose={handleModalVisibility(false)}
         keylist={keylist}

@@ -9,25 +9,49 @@ import { User } from "../../../shared-ui/models/user";
 export interface ICondominiumManagerForm {
   condominium: Condominium;
   onManagerChange?(manager: User): void;
+  onCondominiumChange?(condominum: Condominium): void;
   manager: User;
   managers: User[];
+  condominiums?: Condominium[];
+  disableCondo?: boolean;
+  disableManager?: boolean;
 }
 
-export default function CondominiumManagerForm(props: ICondominiumManagerForm) {
-  const { condominium, onManagerChange, manager, managers } = props;
+export default function CondominiumManagerForm({
+  condominium = {},
+  onManagerChange,
+  condominiums = [],
+  onCondominiumChange,
+  manager = {},
+  managers = [],
+  disableCondo,
+  disableManager
+}: ICondominiumManagerForm) {
   const handleManagerChange = (managerId: number) => {
     const manager = managers.find(x => x.id === managerId);
     onManagerChange && onManagerChange(manager!);
   };
+  const handleCondominiumChange = (id: number) => {
+    const condominium = condominiums.find(x => x.id === id);
+    onCondominiumChange && onCondominiumChange(condominium!);
+  };
   return (
     <>
       <FormItem label="Condominio" sm={24} md={24}>
-        <Input disabled={true} value={condominium.name} />
+        <Select
+          disabled={disableCondo}
+          value={condominium.id}
+          typeName="id"
+          labelName="name"
+          data={condominiums}
+          onSelect={handleCondominiumChange as any}
+        />
       </FormItem>
-      <FormItem label="Manager" sm={24} md={24}>
+      <FormItem label="Condominio" sm={24} md={24}>
         <Select
           value={manager.id}
           typeName="id"
+          disabled={disableManager}
           labelName="name"
           data={managers}
           onSelect={handleManagerChange as any}

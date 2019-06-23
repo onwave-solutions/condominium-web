@@ -3,6 +3,8 @@ import { toast } from "react-toastify";
 import { createAction } from "../../utils/redux";
 import { User } from "../../models/user";
 import { UserService } from "../../services/users";
+import { getErrorResponse } from "../../utils/objects";
+import { loadingWrapper } from "./app";
 
 export enum AdminActions {
   SetAdmin = "SET_ADMIN",
@@ -20,36 +22,44 @@ export function setAdminsAction(payload: User[]) {
 }
 
 export function loadAdminAction(id?: string) {
-  return () => async (dispatch: ThunkDispatch<any, any, any>) => {
-    try {
-      const data = await service.query({ roleId: "AD" });
-      dispatch(setAdminsAction(data));
-    } catch (e) {}
-  };
+  return () =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const data = await service.query({ roleId: "AD" });
+        dispatch(setAdminsAction(data));
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function updateAdminAction(id?: string) {
-  return (user: Partial<User>) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      const data = await service.update(user.id!, user);
-      dispatch(setAdminAction(data));
-      dispatch(loadAdminAction(id)());
-      toast.success("Administrador Actualizado Correctamente.");
-    } catch (e) {}
-  };
+  return (user: Partial<User>) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const data = await service.update(user.id!, user);
+        dispatch(setAdminAction(data));
+        dispatch(loadAdminAction(id)());
+        toast.success("Administrador Actualizado Correctamente.");
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function signUpAdminAction(id?: string) {
-  return (user: Partial<User>) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      const data = await service.signUp({ ...user, roleId: "AD" });
-      dispatch(setAdminAction(data));
-      dispatch(loadAdminAction(id)());
-      toast.success("Administrador Creado Correctamente.");
-    } catch (e) {}
-  };
+  return (user: Partial<User>) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        await service.signUp({ ...user, roleId: "AD" });
+        dispatch(setAdminAction({}));
+        dispatch(loadAdminAction(id)());
+        toast.success("Administrador Creado Correctamente.");
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }

@@ -1,7 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import BladeTemplate from "../../components/templates/blade-template";
 import Col from "../../components/atoms/col";
 import Button from "../../components/atoms/button";
+import Modal from "../../components/atoms/modal";
+import Row from "../../components/atoms/row";
+import Scrollbar from "../../components/atoms/scrollbar";
+import Table, { Column } from "../../components/atoms/table";
 import { AgGridReact } from "ag-grid-react";
 import { ColDef } from "ag-grid-community";
 
@@ -19,12 +23,15 @@ import {
 import { closeChildBladeAction } from "../../shared-ui/store/actions/app";
 import BankAccountForm from "../../components/organisisms/bank-account-form";
 import { appSelector } from "../../shared-ui/store/selectors/app";
+import { Wrapper } from "../../components/atoms/body-wrapper";
+import { BankAccount } from "../../shared-ui/models/bank-account";
 
 const bankAccountState = select(bankAccountSelector);
 const managerState = select(managerSelector);
 const appState = select(appSelector);
 
-export default function BankAccount(props: IModule) {
+export default function BankAccountView(props: IModule) {
+  const [bankAccModal, setBankModal] = useState<boolean>(false);
   const keylist = useReduxState(appState("keylist"));
   const condominium = useReduxState(managerState("condominium"));
   const bankAccount = useReduxState(bankAccountState("bankAccount"));
@@ -32,7 +39,6 @@ export default function BankAccount(props: IModule) {
 
   const loadBankAccounts = useReduxAction(refreshBankAccountsAction());
   const setBankAccount = useReduxAction(setBankAccountAction);
-  const closeChildBlades = useReduxAction(closeChildBladeAction);
   const create = useReduxAction(createBankAccountAction(props.id));
   const update = useReduxAction(updateBankAccountAction(props.id));
   const clear = () => setBankAccount({});
@@ -42,68 +48,96 @@ export default function BankAccount(props: IModule) {
     const payload = { condominiumId: condominium.id };
     setBankAccount(payload);
     loadBankAccounts(payload);
-    closeChildBlades(props.id);
   }, [condominium.id]);
 
+  const handleOpenModal = (bankAcc: BankAccount) => () => {
+    setBankAccount(bankAcc);
+    setBankModal(true);
+  };
+
+  const handleAction = async () => {
+    if (bankAccount.id) {
+      await update(bankAccount);
+    } else {
+      await create(bankAccount);
+    }
+    setBankModal(false);
+  };
+
   return (
-    <BladeTemplate
-      header={
-        <>
-          {!bankAccount.id && (
-            <Button type="primary" onClick={() => create(bankAccount)}>
+    <>
+      <Modal
+        visible={bankAccModal}
+        onCancel={() => setBankModal(false)}
+        onOk={handleAction}
+        closable={false}
+        title={`${bankAccount.id ? "Actualizar" : "Crear"} Cuenta Bancaria`}
+      >
+        <Row>
+          <BankAccountForm
+            bankAccount={bankAccount}
+            keylist={keylist}
+            bankAccountChange={setBankAccount}
+          />
+        </Row>
+      </Modal>
+      <BladeTemplate
+        header={
+          <>
+            <Button
+              type="primary"
+              onClick={handleOpenModal({ condominiumId: condominium.id })}
+            >
               Crear
             </Button>
-          )}
-          {bankAccount.id && (
-            <Button type="primary" onClick={() => update(bankAccount)}>
-              Guardar
-            </Button>
-          )}
-          <Button onClick={clear} style={{ marginLeft: 5 }}>
-            Limpiar
-          </Button>
-        </>
-      }
-    >
-      <BankAccountForm
-        bankAccount={bankAccount}
-        keylist={keylist}
-        bankAccountChange={setBankAccount}
-      />
-      <Col sm={24} md={24} style={{ paddingTop: 15 }}>
-        <div
-          className="ag-theme-balham"
-          style={{
-            height: "280px",
-            width: "100%"
-          }}
-        >
-          <AgGridReact
-            rowData={bankAccounts}
-            columnDefs={columns}
-            onRowClicked={event => setBankAccount && setBankAccount(event.data)}
-          />
-        </div>
-      </Col>
-    </BladeTemplate>
+          </>
+        }
+      >
+        <Wrapper>
+          <Scrollbar style={{ width: "100%" }}>
+            <Table
+              dataSource={bankAccounts}
+              rowKey="id"
+              pagination={{ pageSize: 5 }}
+            >
+              <Column
+                title="Banco"
+                dataIndex="bankName"
+                width="80px"
+                render={(_: string, bankAcc: BankAccount) => (
+                  <span>{bankAcc.bank!.name}</span>
+                )}
+              />
+              <Column
+                title="Número de Cuenta"
+                dataIndex="account"
+                width="80px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
+                title="Balance"
+                dataIndex="balance"
+                width="80px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
+                title="Descripción"
+                dataIndex="description"
+                width="80px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
+                title="Editar"
+                dataIndex={"edit"}
+                width={"5%"}
+                render={(_: string, bank: BankAccount) => (
+                  <Button onClick={handleOpenModal(bank)} icon="edit" />
+                )}
+              />
+            </Table>
+          </Scrollbar>
+        </Wrapper>
+      </BladeTemplate>
+    </>
   );
 }
-
-const columns: ColDef[] = [
-  {
-    field: "bank.name",
-    headerName: "Banco"
-  },
-  {
-    field: "account",
-    headerName: "Número de Cuenta"
-  },
-  {
-    field: "balance",
-    headerName: "Balance"
-  },
-  {
-    field: "description",
-    headerName: "Descripción"
-  }
-];

@@ -8,6 +8,8 @@ import {
   createApartment,
   getApartment
 } from "../../services/apartment";
+import { getErrorResponse } from "../../utils/objects";
+import { loadingWrapper } from "./app";
 
 export enum ApartmentActions {
   SetApartment = "APARTMENT_SET_APARTMENT",
@@ -23,46 +25,53 @@ export function setApartmentsAction(payload: Apartment[]) {
 }
 
 export function updateApartmentAction(id?: string) {
-  return (apartment: Partial<Apartment>) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      const data = await updateApartment(apartment.id!, apartment);
-      dispatch(setApartmentAction(data));
-      toast.success("Apartamento Actualizado Correctamente");
-      dispatch(
-        refreshApartmentsAction(id)({
-          buildingId: apartment.buildingId
-        })
-      );
-    } catch (e) {}
-  };
+  return (apartment: Partial<Apartment>) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const data = await updateApartment(apartment.id!, apartment);
+        dispatch(setApartmentAction(data));
+        toast.success("Apartamento Actualizado Correctamente");
+        dispatch(
+          refreshApartmentsAction(id)({
+            buildingId: apartment.buildingId
+          })
+        );
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function createApartmentAction(id?: string) {
-  return (apartment: Partial<Apartment>) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      const data = await createApartment(apartment);
-      dispatch(setApartmentAction(data));
-      toast.success("Apartamento Creado Correctamente");
-      dispatch(
-        refreshApartmentsAction(id)({
-          buildingId: apartment.buildingId
-        })
-      );
-    } catch (e) {}
-  };
+  return (apartment: Partial<Apartment>) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const data = await createApartment(apartment);
+        dispatch(setApartmentAction({ buildingId: data.buildingId }));
+        toast.success("Apartamento Creado Correctamente");
+        dispatch(
+          refreshApartmentsAction(id)({
+            buildingId: apartment.buildingId
+          })
+        );
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function refreshApartmentsAction(id?: string) {
-  return (payload: Partial<Apartment>) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      const data = await getApartment({ buildingId: payload.buildingId });
-      dispatch(setApartmentsAction(data));
-    } catch (e) {}
-  };
+  return (payload: Partial<Apartment>) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        dispatch(setApartmentsAction([]));
+        const data = await getApartment({ buildingId: payload.buildingId });
+        dispatch(setApartmentsAction(data));
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }

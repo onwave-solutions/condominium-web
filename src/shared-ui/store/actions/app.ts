@@ -171,10 +171,30 @@ export function addChildBlade(parentBlade: string) {
   };
 }
 
-export function setLoading(id: string) {
+export function setLoadingAction(id: string) {
   return (loading: boolean) => {
     const payload = { id, loading };
     return createAction(ApplicationActions.SetLoading, payload);
+  };
+}
+
+let counter = 0;
+
+export function loadingWrapper(
+  fn: (val: ThunkDispatch<any, any, any>) => void
+) {
+  return async (dispatch: ThunkDispatch<any, any, any>) => {
+    const loading = setLoadingAction("");
+    try {
+      counter++;
+      dispatch(loading(true));
+      await fn(dispatch);
+    } finally {
+      counter--;
+      if (!counter) {
+        dispatch(loading(false));
+      }
+    }
   };
 }
 

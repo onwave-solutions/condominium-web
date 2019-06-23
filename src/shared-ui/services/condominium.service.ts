@@ -24,8 +24,8 @@ export class CondominumService extends AbstractService<Condominium> {
   }
 
   async dropManager(payload: CondominiumManager) {
-    await this.service.delete(
-      `${this.prefix}/manager`,
+    await this.service.post(
+      `${this.prefix}/dropmanager`,
       Parseus.encode(payload, CondominiumManager)
     );
   }

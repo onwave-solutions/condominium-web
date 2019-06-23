@@ -45,4 +45,12 @@ export class ApartmentService extends AbstractService<Apartment> {
       apartmentId
     });
   }
+
+  async getDefaultApartmentByTenantId(id: number) {
+    const { data } = await this.service.get<Apartment>(
+      `${this.prefix}/tenant/${id}/default`
+    );
+
+    return Parseus.decode(data).to(Apartment);
+  }
 }

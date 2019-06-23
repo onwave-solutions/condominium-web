@@ -13,14 +13,17 @@ import {
   createSupplierAction
 } from "../../shared-ui/store/actions/supplier.action";
 import { Supplier } from "../../shared-ui/models/supplier.model";
+import { appSelector } from "../../shared-ui/store/selectors/app";
 
 const managerState = select(managerSelector);
 const supplierState = select(supplierSelector);
+const appState = select(appSelector);
 
 export default function SupplierView(props: IModule) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const condominium = useReduxState(managerState("condominium"));
   const suppliers = useReduxState(supplierState("suppliers"));
+  const keylist = useReduxState(appState("keylist"));
 
   const loadSupplierList = useReduxAction(loadSuppliersAction(props.id));
   const createSupplier = useReduxAction(createSupplierAction(props.id));
@@ -87,6 +90,7 @@ export default function SupplierView(props: IModule) {
       </BladeTemplate>
       <SupplierModal
         visible={modalVisible}
+        keylist={keylist}
         onAction={onCreateSupplier}
         onClose={handleModalVisibility(false)}
       />

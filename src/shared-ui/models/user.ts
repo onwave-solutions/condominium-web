@@ -2,6 +2,7 @@ import { Field } from "@rijudev/parseus";
 import { Apartment } from "./apartment";
 import { Company } from "./company.model";
 import { KeylistType } from "./keylist";
+import { Condominium } from "./condominium";
 
 export class User {
   @Field()
@@ -52,6 +53,9 @@ export class User {
 
   @Field({ type: "object", factory: KeylistType })
   statusRaw?: KeylistType;
+
+  @Field({ type: "array", factory: Condominium })
+  condominiums?: Condominium[];
 }
 
 export interface IAuthorization {

@@ -42,7 +42,7 @@ export function Login(props: any) {
       <div className="isoLoginContentWrapper">
         <div className="isoLoginContent">
           <div className="isoLogoWrapper">
-            <Link to="/">ONWAVE</Link>
+            <Link to="/">DOMINET</Link>
           </div>
           <Form onSubmit={onSubmit} className="isoSignInForm">
             <Form.Item className="isoInputWrapper">

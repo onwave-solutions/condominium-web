@@ -56,9 +56,6 @@ const WDContactCardWrapper = styled.div`
       align-items: center;
       justify-content: center;
       margin-bottom: 10px;
-      border-width: 0.6px;
-      border-style: solid;
-      border-color: #0f0f0f;
       overflow: hidden;
       ${borderRadius("5px")};
 

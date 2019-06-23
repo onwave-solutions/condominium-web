@@ -1,19 +1,22 @@
 import React from "react";
+import { Avatar } from "antd";
 import { ContactCardWrapper } from "./style";
 import { KeyOf } from "../../../shared-ui/utils/objects";
 import { User } from "../../../shared-ui/models/user";
 
 export interface ITenantCard {
   tenant: User;
+  children?: React.ReactChild;
   otherAttributes?: {
     title: string;
-    value: KeyOf<User> | ((tenant: User) => string);
+    value: KeyOf<User> | ((tenant: User) => string | number | undefined);
   }[];
 }
 
 export default function TenantCard({
   tenant = {},
-  otherAttributes = []
+  otherAttributes = [],
+  children
 }: ITenantCard) {
   const name = tenant.name ? tenant.name + " " + tenant.lastName : "Sin Nombre";
   const extraInfos: any[] = [];
@@ -41,10 +44,16 @@ export default function TenantCard({
   return (
     <ContactCardWrapper className="isoContactCard">
       <div className="isoContactCardHead">
-        <div className="isoPersonImage">{/*<img alt="#" />*/}</div>
+        <div className="isoPersonImage">
+          <Avatar shape="square" size={100} icon="user" />
+        </div>
         <h1 className="isoPersonName">{name}</h1>
       </div>
-      <div className="isoContactInfoWrapper">{extraInfos}</div>
+      <div className="isoContactInfoWrapper">
+        {extraInfos}
+
+        {children}
+      </div>
     </ContactCardWrapper>
   );
 }

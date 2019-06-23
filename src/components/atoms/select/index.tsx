@@ -17,6 +17,8 @@ export type ISelect = SelectProps & {
   renderNode?: (data: any) => React.ReactNode;
 };
 
+let component: any;
+
 function Select(props: ISelect) {
   const {
     value,
@@ -40,8 +42,10 @@ function Select(props: ISelect) {
   };
   return (
     <SelectComp
-      id={name}
       value={value}
+      autoFocus={true}
+      showSearch={true}
+      showArrow={false}
       onChange={handleItemSelect as any}
       {...selectProps}
     >

@@ -10,12 +10,12 @@ import { condominiumSelector } from "../../shared-ui/store/selectors/condominium
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
 import { select } from "../../shared-ui/store/selectors";
 import { loadManagerAction } from "../../shared-ui/store/actions/manager.action";
-import { ManagerGrid } from "../manager";
 import {
   getCondominiumManagerAction,
   setCondominiumManagerAction,
   addCondominiumManagerAction
 } from "../../shared-ui/store/actions/condominium.action";
+import ManagerWrapper from "../../components/molecules/ticket-wrapper";
 
 const condominiumState = select(condominiumSelector);
 const managerState = select(managerSelector);
@@ -78,7 +78,7 @@ export default function CondominiumManager(props: IModule) {
         onManagerChange={setManager}
       />
       <Col sm={24} md={24} style={{ paddingTop: 15 }}>
-        <ManagerGrid managers={condominiumManagers} />
+        {/*        <ManagerGrid managers={condominiumManagers} /> */}
       </Col>
     </BladeTemplate>
   );

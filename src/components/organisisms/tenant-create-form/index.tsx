@@ -11,7 +11,11 @@ import FormItem from "../../molecules/form-item";
 import Input from "../../atoms/input";
 import { Supplier } from "../../../shared-ui/models/supplier.model";
 import { User } from "../../../shared-ui/models/user";
-import { Keylist } from "../../../shared-ui/models/keylist";
+import {
+  Keylist,
+  AdvanceQuery,
+  Query
+} from "../../../shared-ui/models/keylist";
 import { changeHandler } from "../../../shared-ui/utils/input";
 
 const WDModal = Modals(AntdModal);
@@ -24,7 +28,7 @@ export interface ITenantCreateForm {
   onClose?(): void;
   onAction?(tenant: User): void;
   keylist?: Keylist;
-  onSearchTenant?(user: Partial<User>): Promise<User[]>;
+  onSearchTenant?(user: AdvanceQuery<User>): Promise<User[]>;
 }
 
 let timeout: any;
@@ -44,10 +48,14 @@ export default function TenantCreateForm({
   };
 
   const searchByDocument = () => {
-    if (!user.document || !onSearchTenant) return;
+    if (!user.document || user.id || !onSearchTenant) return;
     clearTimeout(timeout);
     timeout = setTimeout(async () => {
-      const data = await onSearchTenant({ document: user.document });
+      const data = await onSearchTenant({
+        document: {
+          like: user.document
+        }
+      });
       setUsers(data);
     }, 300);
   };
@@ -61,6 +69,25 @@ export default function TenantCreateForm({
     setUser({});
     setUsers([]);
   }, [visible]);
+
+  const onSelectTenant = (id: any) => {
+    console.log(id, typeof id);
+    const tenant = users.find(x => x.id === id);
+    if (!tenant) return;
+    setTimeout(() => {
+      setUser({
+        id: tenant.id,
+        documentId: tenant.documentId,
+        document: tenant.document,
+        name: tenant.name,
+        lastName: tenant.lastName,
+        username: tenant.username
+      });
+    });
+    console.log(tenant);
+  };
+
+  console.log(user);
 
   return (
     <Modal
@@ -77,17 +104,27 @@ export default function TenantCreateForm({
             <Select
               name="documentId"
               onChangeItem={onItemSelect}
-              value={user!.documentId}
+              disabled={Boolean(user.id)}
+              value={user!.documentId || ""}
               data={keylist!.documentTypes!}
             />
           </FormItem>
           <FormItem label="Documento">
             <AutoComplete
-              value={user!.document}
-              backfill={true}
+              value={user!.document || ""}
+              backfill={false}
+              allowClear={true}
+              onSelect={onSelectTenant}
               onChange={value => {
-                console.log(value);
-                setUser({ ...user, document: value as string });
+                if (user.id) {
+                  setUser({ document: value as string });
+                } else {
+                  setUser({
+                    ...user,
+                    id: undefined,
+                    document: value as string
+                  });
+                }
               }}
               //placeholder="Documento"
               style={{ width: "100%" }}
@@ -103,7 +140,8 @@ export default function TenantCreateForm({
             <Input
               name="name"
               onChange={changer}
-              value={user!.name}
+              disabled={Boolean(user.id)}
+              value={user!.name || ""}
               //disabled={disabledAll}
             />
           </FormItem>
@@ -111,8 +149,8 @@ export default function TenantCreateForm({
             <Input
               name="lastName"
               onChange={changer}
-              value={user!.lastName}
-              //disabled={disabledAll}
+              value={user!.lastName || ""}
+              disabled={Boolean(user.id)}
             />
           </FormItem>
           <FormItem label={"Usuario"} sm={24} md={24}>
@@ -120,7 +158,8 @@ export default function TenantCreateForm({
               name="username"
               required={true}
               onChange={changer}
-              value={user!.username}
+              value={user!.username || ""}
+              disabled={Boolean(user.id)}
               //disabled={Boolean(user!.id) || disabledAll}
             />
           </FormItem>

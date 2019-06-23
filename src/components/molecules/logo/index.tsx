@@ -10,7 +10,7 @@ export default function Logo({ collapsed }: { collapsed: boolean }) {
         </div>
       ) : (
         <h3>
-          <Link to="#">OnWave</Link>
+          <Link to="#">DOMINET</Link>
         </h3>
       )}
     </div>

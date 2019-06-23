@@ -1,8 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ColDef } from "ag-grid-community/dist/lib/entities/colDef";
 import { AgGridReact } from "ag-grid-react";
 
-import condominiumManagerModule from "../condominium-manager/module";
+import Modal from "../../components/atoms/modal";
+import Row from "../../components/atoms/row";
+
+import Scrollbar from "../../components/atoms/scrollbar";
+import Table, { Column } from "../../components/atoms/table";
+import { Wrapper } from "../../components/atoms/body-wrapper";
 
 import Col from "../../components/atoms/col";
 import Button from "../../components/atoms/button";
@@ -19,11 +24,9 @@ import {
   refreshCondominiumsAction
 } from "../../shared-ui/store/actions/condominium.action";
 
-import {
-  addChildBlade,
-  closeChildBladeAction
-} from "../../shared-ui/store/actions/app";
+import { addChildBlade } from "../../shared-ui/store/actions/app";
 import { IModule } from "../../shared-ui/models/module";
+import { Condominium } from "../../shared-ui/models/condominium";
 
 const columns: ColDef[] = [
   {
@@ -34,19 +37,12 @@ const columns: ColDef[] = [
     field: "address",
     headerName: "Dirección"
   }
-  //  {
-  //    field: "longitude",
-  //    headerName: "Longitud"
-  //  },
-  //  {
-  //    field: "latitude",
-  //    headerName: "Latitud"
-  //  }
 ];
 
 const condominiumState = select(condominiumSelector);
 
 export default function CondominiumBlade(props: IModule) {
+  const [visible, setVisibility] = useState<boolean>(false);
   const condominium = useReduxState(condominiumState("condominium"));
   const condominiums = useReduxState(condominiumState("condominiums"));
 
@@ -54,8 +50,6 @@ export default function CondominiumBlade(props: IModule) {
   const create = useReduxAction(createCondominiumAction());
   const update = useReduxAction(updateCondominiumAction());
   const loadCondominium = useReduxAction(refreshCondominiumsAction());
-
-  const handleAddBlade = useReduxAction(addChildBlade(props.id));
 
   const clear = () => {
     setCondominium({});
@@ -68,54 +62,82 @@ export default function CondominiumBlade(props: IModule) {
     };
   }, []);
 
+  const handleOpenModal = (condominium: Condominium) => () => {
+    setCondominium(condominium);
+    setVisibility(true);
+  };
+
+  const handleAction = async () => {
+    if (condominium.id) {
+      await update(condominium);
+    } else {
+      await create(condominium);
+    }
+    setVisibility(false);
+  };
+
   return (
-    <BladeTemplate
-      header={
-        <>
-          {condominium.id && (
-            <Button
-              onClick={() =>
-                props.history.push(`condominium-manager/${condominium.id}`)
-              }
-            >
-              Lista de Managers
-            </Button>
-          )}
-          <div style={{ flex: 1 }} />
-          {!condominium.id && (
-            <Button onClick={() => create(condominium)}>Crear</Button>
-          )}
-
-          {condominium.id && (
-            <Button onClick={() => update(condominium)}>Guardar</Button>
-          )}
-
-          <Button style={{ marginLeft: 5 }} onClick={clear}>
-            Limpiar
-          </Button>
-        </>
-      }
-    >
-      <CondominiumForm
-        condominium={condominium}
-        condominiumChanged={setCondominium}
-      />
-      <Col sm={24} md={24}>
-        <div
-          className="ag-theme-balham"
-          style={{
-            marginTop: 15,
-            height: "180px",
-            width: "100%"
-          }}
-        >
-          <AgGridReact
-            rowData={condominiums}
-            columnDefs={columns}
-            onRowClicked={event => setCondominium(event.data)}
+    <>
+      <Modal
+        visible={visible}
+        onCancel={() => setVisibility(false)}
+        onOk={handleAction}
+        closable={false}
+        title={`${condominium.id ? "Actualizar" : "Crear"} Condominio`}
+      >
+        <Row>
+          <CondominiumForm
+            condominium={condominium}
+            condominiumChanged={setCondominium}
           />
-        </div>
-      </Col>
-    </BladeTemplate>
+        </Row>
+      </Modal>
+
+      <BladeTemplate
+        header={
+          <>
+            <Button type="primary" onClick={handleOpenModal({})}>
+              Crear
+            </Button>
+          </>
+        }
+      >
+        <Wrapper>
+          <Scrollbar style={{ width: "100%" }}>
+            <Table
+              dataSource={condominiums}
+              rowKey="id"
+              pagination={{ pageSize: 5 }}
+            >
+              <Column
+                title="Nombre"
+                dataIndex="name"
+                width="80px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
+                title="Dirección"
+                dataIndex="address"
+                width="80px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
+                title="Editar"
+                dataIndex={"edit"}
+                width={"5%"}
+                render={(_: string, condominium: Condominium) => (
+                  <>
+                    <Button
+                      onClick={handleOpenModal(condominium)}
+                      icon="edit"
+                    />
+                  </>
+                )}
+              />
+            </Table>
+          </Scrollbar>
+        </Wrapper>
+      </BladeTemplate>
+    </>
   );
 }

@@ -21,7 +21,7 @@ const serviceAndProducts: IModule = {
   title: "Setup",
   id: "parent-product-service",
   iconType: "lock",
-  children: [building, bankAccount, service, supplier]
+  children: [service, bankAccount, building, supplier]
 };
 
 export const modules = [
@@ -44,5 +44,5 @@ export const modulesByPermissions: { [id: string]: IModule[] } = {
   SA: modules,
   AD: [admin, company, manager, condominium],
   MA: [tenantList, ticket, financial, serviceAndProducts],
-  TE: []
+  TE: [ticket]
 };

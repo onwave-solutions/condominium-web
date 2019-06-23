@@ -7,7 +7,8 @@ import {
   BulkInvoice
 } from "../../models/invoice.model";
 import { InvoiceService } from "../../services/invoice.service";
-import { closeBlade, addBlade } from "./app";
+import { closeBlade, addBlade, loadingWrapper } from "./app";
+import { getErrorResponse } from "../../utils/objects";
 
 export enum InvoiceActions {
   ResetInvoice = "INVOICE_RESET_INVOICE",
@@ -25,29 +26,35 @@ export function bulkCreateAction(id?: string) {
     invoiceListId: string,
     condominiumId: number,
     cb: () => void
-  ) => async (dispatch: ThunkDispatch<any, any, any>) => {
-    try {
-      await service.bulkCreate(payload);
-      dispatch(closeBlade(id!));
-      dispatch(addBlade(invoiceListId));
-      dispatch(getInvoiceListAction(id)(condominiumId));
-      toast.success("Factura Creada Correctamente");
-      cb();
-    } catch (e) {}
-  };
+  ) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        await service.bulkCreate(payload);
+        dispatch(closeBlade(id!));
+        dispatch(addBlade(invoiceListId));
+        dispatch(getInvoiceListAction(id)(condominiumId));
+        toast.success("Factura Creada Correctamente");
+        cb();
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function updateInvoiceServiceAction(id?: string) {
-  return (condominiumId: number, payload: Partial<Invoice>) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      const record = await service.update(payload.id!, payload);
-      dispatch(setInvoiceAction(record));
-      dispatch(getInvoiceListAction(id)(condominiumId));
-      toast.success("Factura Actualizada Correctamente");
-    } catch (e) {}
-  };
+  return (condominiumId: number, payload: Partial<Invoice>) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const record = await service.update(payload.id!, payload);
+        dispatch(setInvoiceAction(record));
+        dispatch(getInvoiceListAction(id)(condominiumId));
+        toast.success("Factura Actualizada Correctamente");
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function resetInvoiceAction() {
@@ -55,12 +62,16 @@ export function resetInvoiceAction() {
 }
 
 export function getInvoiceByIdAction(id?: string) {
-  return (id: number) => async (dispatch: ThunkDispatch<any, any, any>) => {
-    try {
-      const data = await service.findOne(id);
-      dispatch(setInvoiceAction(data));
-    } catch (e) {}
-  };
+  return (id: number) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const data = await service.findOne(id);
+        dispatch(setInvoiceAction(data));
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function setInvoicesAction(payload: Invoice[]) {
@@ -68,16 +79,16 @@ export function setInvoicesAction(payload: Invoice[]) {
 }
 
 export function getInvoiceListAction(id?: string) {
-  return (condominiumId: number) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    try {
-      const invoices = await service.getByCondominiumId(condominiumId);
-      dispatch(setInvoicesAction(invoices));
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  return (condominiumId: number) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const invoices = await service.getByCondominiumId(condominiumId);
+        dispatch(setInvoicesAction(invoices));
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function updateInvoiceAction(payload: Invoice) {

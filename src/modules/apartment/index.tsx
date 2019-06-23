@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { ColDef } from "ag-grid-community/dist/lib/entities/colDef";
-import { AgGridReact } from "ag-grid-react";
+
+import { Card, Icon } from "antd";
 
 import Col from "../../components/atoms/col";
 import Button from "../../components/atoms/button";
@@ -17,128 +18,83 @@ import {
   updateApartmentAction,
   refreshApartmentsAction
 } from "../../shared-ui/store/actions/apartment";
-import { closeChildBladeAction } from "../../shared-ui/store/actions/app";
-import { IModule } from "../../shared-ui/models/module";
 import { serviceSelector } from "../../shared-ui/store/selectors/service.selector";
 import { loadServicesAction } from "../../shared-ui/store/actions/service.action";
+import { Apartment } from "../../shared-ui/models/apartment";
 
 const buildingState = select(buildingSelector);
 const apartmentState = select(apartmentSelector);
 const serviceState = select(serviceSelector);
 
-export default function Apartment(props: IModule) {
-  const { match } = props;
-  const building = useReduxState(buildingState("building"));
-  const services = useReduxState(serviceState("services"));
-  const apartment = useReduxState(apartmentState("apartment"));
-  const apartments = useReduxState(apartmentState("apartments"));
+export interface IApartment {
+  buildingId: number;
+  onEditApartment(apartment: Apartment): void;
+}
 
-  const setApartment = useReduxAction(setApartmentAction);
+export default function ApartmentView({
+  buildingId,
+  onEditApartment
+}: IApartment) {
+  const apartments = useReduxState(apartmentState("apartments"));
 
   const create = useReduxAction(createApartmentAction());
   const update = useReduxAction(updateApartmentAction());
   const loadApartment = useReduxAction(refreshApartmentsAction());
-  const loadServices = useReduxAction(loadServicesAction(props.id));
-
-  const closeChildBlades = useReduxAction(closeChildBladeAction);
-
-  const clear = () => {
-    closeChildBlades(props.id);
-    const payload = { buildingId: building.id };
-    setApartment(payload);
-  };
 
   useEffect(() => {
-    const payload = { condominiumId: building.condominiumId };
-    loadServices(payload);
-    if (match && match.params && match.params.id) {
-      const payload = { buildingId: match.params.id };
-      setApartment(payload);
-      loadApartment(payload);
-    }
-    return () => {
-      clear();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (apartment.buildingId === building.id) return;
-    const payload = { buildingId: building.id };
-    setApartment(payload);
+    const payload = { buildingId: buildingId };
     loadApartment(payload);
-  }, [building.id]);
+  }, [buildingId]);
 
   return (
-    <BladeTemplate
-      footer={
-        <>
-          {!apartment.id && (
-            <Button size={"small"} onClick={() => create(apartment)}>
-              Crear
-            </Button>
-          )}
-
-          {apartment.id && (
-            <Button size={"small"} onClick={() => update(apartment)}>
-              Guardar
-            </Button>
-          )}
-
-          <Button size={"small"} style={{ marginLeft: 5 }} onClick={clear}>
-            Limpiar
-          </Button>
-        </>
-      }
-    >
-      <h3>{building.name} </h3>
-      <ApartmentForm
-        apartment={apartment}
-        apartmentChange={setApartment}
-        services={services}
-      />
-      <Col sm={24} md={24}>
-        <div
-          className="ag-theme-balham"
-          style={{
-            marginTop: 15,
-            height: "180px",
-            width: "100%"
-          }}
-        >
-          <AgGridReact
-            rowData={apartments}
-            columnDefs={columns}
-            onRowClicked={event => setApartment(event.data)}
-          />
-        </div>
-      </Col>
-    </BladeTemplate>
+    <div>
+      {apartments && apartments.length
+        ? apartments.map(apartment => {
+            return (
+              <Card
+                key={apartment.id}
+                style={{
+                  marginBottom: "1rem"
+                }}
+                title={"Apartamento " + apartment.name}
+                actions={[
+                  <Icon
+                    type="edit"
+                    onClick={() => onEditApartment(apartment)}
+                  />
+                ]}
+              >
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <Information title={"Piso"} name={apartment.floor} />
+                  <Information title={"Área (mts2)"} name={apartment.mt2} />
+                  <Information title={"Plan"} name={apartment.service!.name} />
+                  <Information
+                    title={"Parqueos"}
+                    name={apartment.parkingLots!.join(", ")}
+                  />
+                  <Information
+                    title={"Inquilinos"}
+                    name={apartment
+                      .tenants!.map(
+                        tenant =>
+                          `${tenant.name || ""} ${tenant.lastName || ""}`
+                      )
+                      .join(", ")}
+                  />
+                </div>
+              </Card>
+            );
+          })
+        : null}
+    </div>
   );
 }
 
-const columns: ColDef[] = [
-  {
-    field: "building.name",
-    headerName: "Edificio"
-  },
-  {
-    field: "service.name",
-    headerName: "Servicio"
-  },
-  {
-    field: "name",
-    headerName: "Nombre"
-  },
-  {
-    field: "floor",
-    headerName: "Piso"
-  },
-  {
-    field: "mt2",
-    headerName: "Metraje"
-  },
-  {
-    field: "parkingLots",
-    headerName: "Parqueos"
-  }
-];
+function Information({ name, title, children }: any) {
+  return (
+    <div style={{ display: "flex", flexDirection: "row" }}>
+      {title + ": "} <strong>{name}</strong>
+      {children}
+    </div>
+  );
+}

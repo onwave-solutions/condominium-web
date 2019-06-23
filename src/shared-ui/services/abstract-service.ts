@@ -1,7 +1,7 @@
 import Parseus from "@rijudev/parseus";
 import { IParameterlessConstructor } from "@rijudev/parseus/dist/lib/src/utils";
 import axiosInstance from "./axios";
-import { Keylist } from "../models/keylist";
+import { Keylist, AdvanceQuery } from "../models/keylist";
 
 export abstract class AbstractService<T extends object> {
   protected service = axiosInstance;
@@ -40,12 +40,13 @@ export abstract class AbstractService<T extends object> {
     return Parseus.decode(data).to(this.model);
   }
 
-  async query(payload: Partial<T> | Partial<T>[]): Promise<T[]> {
+  async query(payload: AdvanceQuery<T> | AdvanceQuery<T>[]): Promise<T[]> {
     const { data } = await axiosInstance.post<T[]>(
       `${this.prefix}/find`,
-      Array.isArray(payload)
-        ? payload.map(item => Parseus.encode(item, this.model))
-        : Parseus.encode(payload, this.model)
+      payload
+      // Array.isArray(payload)
+      //   ? payload.map(item => Parseus.encode(item, this.model))
+      //   : Parseus.encode(payload, this.model)
     );
 
     return data.map(item => Parseus.decode(item).to(this.model));

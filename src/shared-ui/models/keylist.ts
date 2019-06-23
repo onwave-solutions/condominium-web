@@ -43,3 +43,18 @@ export interface IQuery {
   query?: string;
   state?: string;
 }
+
+export type Query<T> = {
+  like?: T;
+  equals?: T;
+  startWith?: T;
+  endWith?: T;
+  between?: {
+    start: T;
+    end: T;
+  };
+  not?: T;
+  isNull?: boolean;
+};
+
+export type AdvanceQuery<T> = { [P in keyof T]?: Query<T[P]> | T[P] };

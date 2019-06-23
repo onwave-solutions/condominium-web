@@ -1,4 +1,5 @@
 import { Field } from "@rijudev/parseus";
+import { KeylistType } from "./keylist";
 
 export class Company {
   @Field()
@@ -21,4 +22,7 @@ export class Company {
 
   @Field()
   public phone?: string;
+
+  @Field({ factory: KeylistType, type: "object" })
+  public documentRaw?: KeylistType;
 }

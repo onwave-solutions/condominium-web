@@ -1,11 +1,13 @@
-import React, { useEffect } from "react";
-import { AgGridReact } from "ag-grid-react";
-import { ColDef } from "ag-grid-community";
+import React, { useEffect, useState } from "react";
+import Modal from "../../components/atoms/modal";
+import Row from "../../components/atoms/row";
 
-import Col from "../../components/atoms/col";
+import Scrollbar from "../../components/atoms/scrollbar";
+import Table, { Column } from "../../components/atoms/table";
 import Button from "../../components/atoms/button";
 import BladeTemplate from "../../components/templates/blade-template";
 import CompanyForm from "../../components/organisisms/company-form";
+import { Wrapper } from "../../components/atoms/body-wrapper";
 
 import { useReduxState, useReduxAction } from "../../shared-ui/store/hooks";
 import { appSelector } from "../../shared-ui/store/selectors/app";
@@ -18,11 +20,13 @@ import {
   createCompanyAction,
   updateCompanyAction
 } from "../../shared-ui/store/actions/company.action";
+import { Company } from "../../shared-ui/models/company.model";
 
 const companyState = select(companySelector);
 const appState = select(appSelector);
 
-export default function Company(props: IModule) {
+export default function CompanyView(props: IModule) {
+  const [visible, setVisibility] = useState<boolean>(false);
   const company = useReduxState(companyState("company"));
   const companies = useReduxState(companyState("companies"));
   const keylist = useReduxState(appState("keylist"));
@@ -40,62 +44,94 @@ export default function Company(props: IModule) {
     };
   }, []);
 
+  const handleOpenModal = (company: Company) => () => {
+    setCompany(company);
+    setVisibility(true);
+  };
+
+  const handleAction = async () => {
+    if (company.id) {
+      await update(company);
+    } else {
+      await create(company);
+    }
+    setVisibility(false);
+  };
+
   return (
-    <BladeTemplate
-      header={
-        <>
-          {!company.id && (
-            <Button onClick={() => create(company)}>Crear</Button>
-          )}
-          {company.id && (
-            <Button onClick={() => update(company)}>Guardar</Button>
-          )}
-          <Button onClick={clear} style={{ marginLeft: 5 }}>
-            Limpiar
-          </Button>
-        </>
-      }
-    >
-      <CompanyForm
-        company={company}
-        keylist={keylist}
-        companyChange={setCompany}
-      />
-      <Col sm={24} md={24}>
-        <div
-          className="ag-theme-balham"
-          style={{
-            marginTop: 15,
-            height: "170px",
-            width: "100%"
-          }}
-        >
-          <AgGridReact
-            rowData={companies}
-            columnDefs={columns}
-            onRowClicked={event => setCompany(event.data)}
+    <>
+      <Modal
+        visible={visible}
+        onCancel={() => setVisibility(false)}
+        onOk={handleAction}
+        closable={false}
+        title={`${company.id ? "Actualizar" : "Crear"} Compañia`}
+      >
+        <Row>
+          <CompanyForm
+            company={company}
+            keylist={keylist}
+            companyChange={setCompany}
           />
-        </div>
-      </Col>
-    </BladeTemplate>
+        </Row>
+      </Modal>
+
+      <BladeTemplate
+        header={
+          <>
+            <Button type="primary" onClick={handleOpenModal({})}>
+              Crear
+            </Button>
+          </>
+        }
+      >
+        <Wrapper>
+          <Scrollbar style={{ width: "100%" }}>
+            <Table
+              dataSource={companies}
+              rowKey="id"
+              pagination={{ pageSize: 5 }}
+            >
+              <Column
+                title="Compañia"
+                dataIndex="name"
+                width="80px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
+                title="Tipo de Documento"
+                dataIndex="documentId"
+                width="80px"
+                render={(_: string, company: Company) => (
+                  <span>{company.documentRaw!.name}</span>
+                )}
+              />
+              <Column
+                title="Documento"
+                dataIndex="document"
+                width="80px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
+                title="Teléfono"
+                dataIndex="phone"
+                width="80px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
+                title="Editar"
+                dataIndex={"edit"}
+                width={"5%"}
+                render={(_: string, company: Company) => (
+                  <>
+                    <Button onClick={handleOpenModal(company)} icon="edit" />
+                  </>
+                )}
+              />
+            </Table>
+          </Scrollbar>
+        </Wrapper>
+      </BladeTemplate>
+    </>
   );
 }
-
-const columns: ColDef[] = [
-  {
-    field: "name",
-    headerName: "Nombre"
-  },
-  {
-    field: "documentId",
-    headerName: "Tipo de documento"
-  },
-  {
-    field: "document",
-    headerName: "Documento"
-  },
-  {
-    field: "phone",
-    headerName: "Teléfono"
-  }
-];
