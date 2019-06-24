@@ -59,6 +59,9 @@ export class Ticket {
   @Field()
   public updatedBy?: number;
 
+  @Field({ type: "object", factory: User })
+  public userCreatedBy?: User;
+
   @Field({ type: "object", factory: KeylistType })
   public status?: KeylistType;
   @Field({ type: "array", factory: TicketComment })

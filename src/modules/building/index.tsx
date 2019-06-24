@@ -171,14 +171,16 @@ export default function BuildingView(props: IModule) {
               >
                 Crear Edificio
               </Button>
-              <Button
-                onClick={onOpenApartment({ buildingId: selected.id })}
-                type="primary"
-                className="isoAddNoteBtn"
-                style={{ marginLeft: "0.5rem" }}
-              >
-                Crear Apartamento
-              </Button>
+              {selected.id && (
+                <Button
+                  onClick={onOpenApartment({ buildingId: selected.id })}
+                  type="primary"
+                  className="isoAddNoteBtn"
+                  style={{ marginLeft: "0.5rem" }}
+                >
+                  Crear Apartamento
+                </Button>
+              )}
             </Layout.Header>
             {selected.id && (
               <Layout.Content

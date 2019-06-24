@@ -91,6 +91,19 @@ export function getInvoiceListAction(id?: string) {
     });
 }
 
+export function getInvoicesByApartmentIdAction(apartmentId: number) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      if (!apartmentId) return;
+      const invoices = await service.query({ apartmentId });
+      dispatch(setInvoicesAction(invoices));
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
+}
+
 export function updateInvoiceAction(payload: Invoice) {
   return createAction(InvoiceActions.UpdateInvoice, payload);
 }

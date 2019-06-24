@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import _ from "lodash";
 import { Layout } from "antd";
 import TicketWrapper from "../../components/molecules/ticket-wrapper";
 import Button from "../../components/atoms/button";
+import Scrollbar from "../../components/atoms/scrollbar";
 import { IModule } from "../../shared-ui/models/module";
 import { InputArea } from "../../components/atoms/input";
 import TicketList from "../../components/organisisms/ticket-list";
@@ -20,24 +22,27 @@ import TicketCreateForm from "../../components/organisisms/ticket-create-form";
 import { Ticket } from "../../shared-ui/models/ticket.model";
 import Comment from "../../components/molecules/comment";
 import { appSelector } from "../../shared-ui/store/selectors/app";
-import { IQuery } from "../../shared-ui/models/keylist";
+import { IQuery, AdvanceQuery } from "../../shared-ui/models/keylist";
 import CommentList from "../../components/molecules/comment-list";
 import WrapperTemplate from "../../components/templates/wrapper-template";
+import { tenantSelector } from "../../shared-ui/store/selectors/tenant.selector";
 
 const { Header, Content, Footer } = Layout;
 
 const managerState = select(managerSelector);
+const tenantState = select(tenantSelector);
 const ticketState = select(ticketSelector);
 const appState = select(appSelector);
 
 function buildQuery(condominiumId: number) {
-  return ({ state, query }: IQuery): Partial<Ticket>[] => {
+  return ({ state, query }: IQuery): Partial<AdvanceQuery<Ticket>>[] => {
+    if (!condominiumId) return [];
     const base: Partial<Ticket> = { condominiumId, statusType: state };
     if (!query) return [base];
     return [
-      { ...base, description: query.toUpperCase() },
+      { ...base, description: { like: query } },
       { ...base, solution: query.toUpperCase() },
-      { ...base, title: query.toUpperCase() }
+      { ...base, title: { like: query } }
     ];
   };
 }
@@ -45,13 +50,17 @@ function buildQuery(condominiumId: number) {
 export default function TicketView(props: IModule) {
   const [query, setQuery] = useState<IQuery>({});
   const condominium = useReduxState(managerState("condominium"));
+  const apartment = useReduxState(tenantState("apartment"));
   const keylist = useReduxState(appState("keylist"));
   const tickets = useReduxState(ticketState("tickets"));
   const [ticket, setTicket] = useState<Ticket>({});
   const [createTicketVisible, setCreateTicketVisible] = useState<boolean>(
     false
   );
-  const queryBuilder = buildQuery(condominium.id!);
+
+  const condominiumId =
+    _.get(condominium, "id") || _.get(apartment, "building.condominium.id");
+  const queryBuilder = buildQuery(condominiumId!);
 
   const onCreateTicket = useReduxAction(createTicketAction(props.id));
   const onUpdateTicket = useReduxAction(updateTicketAction(props.id));
@@ -68,7 +77,7 @@ export default function TicketView(props: IModule) {
   };
 
   const handleCreateTicket = async (ticket: Ticket) => {
-    await onCreateTicket({ ...ticket, condominiumId: condominium.id }, onCb);
+    await onCreateTicket({ ...ticket, condominiumId }, onCb);
     handleCreateTicketModal(false)();
   };
 
@@ -91,7 +100,7 @@ export default function TicketView(props: IModule) {
   useEffect(() => {
     if (!query.state) return;
     loadTickets(queryBuilder(query));
-  }, [parseInt(`${condominium.id}`, 10)]);
+  }, [condominiumId]);
   return (
     <>
       <WrapperTemplate>
@@ -108,29 +117,19 @@ export default function TicketView(props: IModule) {
           <Layout className="isoNotepadWrapper">
             <Header className="isoHeader">
               <div style={{ flex: 1 }} />
-              {!ticket.id && (
-                <>
-                  <Button
-                    type="primary"
-                    className="isoAddNoteBtn"
-                    style={{ marginLeft: "0.5rem" }}
-                    onClick={handleCreateTicketModal(true)}
-                  >
-                    Crear Ticket
-                  </Button>
-                </>
-              )}
+              <>
+                <Button
+                  type="primary"
+                  className="isoAddNoteBtn"
+                  style={{ marginLeft: "0.5rem" }}
+                  onClick={handleCreateTicketModal(true)}
+                >
+                  Crear Ticket
+                </Button>
+              </>
               {ticket.id && (
                 <>
-                  <Button
-                    type="primary"
-                    className="isoAddNoteBtn"
-                    style={{ marginLeft: "0.5rem" }}
-                    onClick={() => setTicket({})}
-                  >
-                    Limpiar
-                  </Button>
-                  {!["CA", "RE"].includes(ticket.statusType!) && (
+                  {!["CA", "RE"].includes(ticket.statusType!) && !apartment.id && (
                     <Button
                       type="danger"
                       style={{ marginLeft: "0.5rem" }}
@@ -144,7 +143,7 @@ export default function TicketView(props: IModule) {
                   )}
                 </>
               )}
-              {["ES", "PA"].includes(ticket.statusType!) && (
+              {["ES", "PA"].includes(ticket.statusType!) && !apartment.id && (
                 <Button
                   type="primary"
                   className="isoAddNoteBtn"
@@ -154,7 +153,7 @@ export default function TicketView(props: IModule) {
                   Empezar a Trabajar
                 </Button>
               )}
-              {ticket.statusType === "TR" && (
+              {ticket.statusType === "TR" && !apartment.id && (
                 <Button
                   type="ghost"
                   onClick={handleUpdateTicket({ ...ticket, statusType: "RE" })}
@@ -163,7 +162,7 @@ export default function TicketView(props: IModule) {
                   Resolver
                 </Button>
               )}
-              {ticket.statusType === "TR" && (
+              {ticket.statusType === "TR" && !apartment.id && (
                 <Button
                   type="default"
                   onClick={handleUpdateTicket({ ...ticket, statusType: "PA" })}
@@ -191,30 +190,29 @@ export default function TicketView(props: IModule) {
                     <span>Estado: {ticket.status!.name}</span>
                   </div>
 
-                  <h3>Descripción</h3>
-                  <p>{ticket.description}</p>
-                  {ticket.solution && (
-                    <>
-                      <h3>Solución</h3>
-                      <p>{ticket.solution}</p>
-                    </>
-                  )}
-                  {ticket.comments && Boolean(ticket.comments.length) && (
-                    <>
-                      <h4 style={{ marginBottom: "1rem", marginTop: "1rem" }}>
-                        Comentarios
-                      </h4>
-                      <div
-                        style={{
-                          flex: 1,
-                          marginLeft: "2rem",
-                          overflowY: "auto"
-                        }}
-                      >
-                        <CommentList comments={ticket.comments!} />
-                      </div>{" "}
-                    </>
-                  )}
+                  <Scrollbar>
+                    <div>
+                      <h3>Descripción</h3>
+                      <p>{ticket.description}</p>
+                      <h3>Creado por</h3>
+                      <p>
+                        {ticket.userCreatedBy!.name}{" "}
+                        {ticket.userCreatedBy!.lastName}
+                      </p>
+
+                      {ticket.solution && (
+                        <>
+                          <h3>Solución</h3>
+                          <p>{ticket.solution}</p>
+                        </>
+                      )}
+                      {ticket.comments && Boolean(ticket.comments.length) && (
+                        <>
+                          <CommentList comments={ticket.comments!} />
+                        </>
+                      )}
+                    </div>
+                  </Scrollbar>
                 </Content>
                 {ticket.statusType !== "CA" && (
                   <Footer>

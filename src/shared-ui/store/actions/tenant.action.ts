@@ -75,7 +75,7 @@ export function loadTenantApartmentsAction(tenantId: number) {
       if (!tenantId) return;
       const apartments = await tenantService.getApartmentsByTenantId(tenantId);
       dispatch(setApartments(apartments));
-      const defaultApartment = await apartmentService.getDefaultApartmentByTenantId(
+      const defaultApartment = await tenantService.getDefaultApartmentByTenantId(
         tenantId
       );
       dispatch(setApartmentAction(defaultApartment));

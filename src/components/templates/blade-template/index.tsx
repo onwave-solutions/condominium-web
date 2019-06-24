@@ -10,6 +10,7 @@ import { useReduxState } from "../../../shared-ui/store/hooks";
 const LayoutContentWrapper = styled(Row)`
   padding: 40px 20px 0px 20px;
   display: flex;
+  width: 100% !important;
   flex: 1;
   flex-flow: row wrap;
   overflow: hidden;
@@ -20,6 +21,14 @@ const LayoutContentWrapper = styled(Row)`
 
   @media (max-width: 580px) {
     padding: 15px;
+  }
+  & .ant-spin-nested-loading {
+    height: 100% !important;
+    width: 100% !important;
+  }
+  & .ant-spin-container {
+    height: 100% !important;
+    width: 100% !important;
   }
 `;
 

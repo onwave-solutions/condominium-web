@@ -15,7 +15,6 @@ export interface IShellTemplate {
 const { Content } = Layout;
 
 export default function ShellTemplate(props: IShellTemplate) {
-  //const appHeight = window.innerHeight;
   const { children, topBar, sideBar } = props;
   return (
     <AppWrapper>

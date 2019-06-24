@@ -62,6 +62,7 @@ function MenuTitle(props: IModule) {
 }
 
 function MenuItem(props: IModule) {
+  if (props.hide) return null;
   const { children, iconType, id, route, title, ...otherProps } = props;
   if (children && children.length) return <SubMenuItem key={id} {...props} />;
   return (
@@ -75,6 +76,7 @@ function MenuItem(props: IModule) {
 }
 
 function SubMenuItem(props: IModule) {
+  if (props.hide) return null;
   const submenuStyle = {
     backgroundColor: "rgba(0,0,0,0.3)"
     // color: customizedtheme.textcolor

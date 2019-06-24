@@ -16,6 +16,14 @@ export class TenantService extends AbstractService<User> {
     return data.map(item => Parseus.decode(item).to(Apartment));
   }
 
+  async getDefaultApartmentByTenantId(id: number): Promise<Apartment> {
+    const { data } = await this.service.get<Apartment>(
+      `${this.prefix}/${id}/apartment/default`
+    );
+
+    return Parseus.decode(data).to(Apartment);
+  }
+
   async setDefaultApartmentToTenant(payload: ApartmentTenant) {
     await this.service.post<void>(
       `${this.prefix}/apartment/default`,

@@ -5,9 +5,7 @@ const ShellContentWrapper = styled.div`
   padding: 2px;
   display: flex;
   height: 100%;
-  width: 99.85%;
-  //overflow: hidden;
-  //overflow-x: scroll;
+  width: 100%;
 
   @media only screen and (max-width: 767px) {
     padding: 5px;

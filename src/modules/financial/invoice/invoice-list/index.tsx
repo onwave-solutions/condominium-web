@@ -34,6 +34,7 @@ import paymentBladeModule from "../../payment/payment-process/module";
 import ColumnInputFilter from "../../../../components/molecules/column-input-filter";
 import ColumnSelectFilter from "../../../../components/molecules/column-select-filter";
 import { appSelector } from "../../../../shared-ui/store/selectors/app";
+import InvoiceListView from "../../../../components/organisisms/invoice-list-view";
 
 const ScrollbarWrapper = styled(Scrollbars)``;
 
@@ -48,8 +49,6 @@ export default function InvoiceModule(props: IModule) {
 
   const getInvoiceList = useReduxAction(getInvoiceListAction(props.id));
   const setInvoice = useReduxAction(setInvoiceAction);
-  const handleAddBlade = useReduxAction(addChildBlade(props.id));
-  const handleCloseBlade = useReduxAction(closeBlade);
   const onResetInvoice = useReduxAction(resetInvoiceAction);
   const updateInvoice = useReduxAction(updateInvoiceServiceAction(props.id));
 
@@ -70,10 +69,6 @@ export default function InvoiceModule(props: IModule) {
     //handleCloseBlade(invoiceViewModule.id);
     //setInvoice({ ...invoice });
     props.history.push(`/invoice-builder-detail/${invoice.id}`);
-  };
-
-  const onClickPayInvoice = (invoice: Invoice) => () => {
-    handleAddBlade(paymentBladeModule.id);
   };
 
   const onAddInvoice = () => {
@@ -104,174 +99,14 @@ export default function InvoiceModule(props: IModule) {
   }, [condominium.id]);
 
   return (
-    <BladeTemplate
-      header={
-        <>
-          <Button icon="sync" onClick={() => getInvoiceList(condominium.id!)} />
-          <div style={{ flex: 1 }} />
-          <Button onClick={onAddInvoice}>Agregar Factura</Button>
-        </>
-      }
-    >
-      <Wrapper>
-        <div className="isoInvoiceTable">
-          <ScrollbarWrapper style={{ width: "100%" }}>
-            <Table
-              //rowSelection={rowSelection}
-              dataSource={invoices}
-              rowKey="sequence"
-              scroll={{ x: 1400 }}
-              pagination={false}
-              className="invoiceListTable"
-            >
-              <Column
-                title="Factura No."
-                fixed={"left"}
-                dataIndex="sequence"
-                onFilter={onFilter(record => record.sequence)}
-                filterDropdown={(filterProps: any) => (
-                  <ColumnInputFilter
-                    {...filterProps}
-                    handleSearch={handleSearch}
-                    handleReset={handleReset}
-                  />
-                )}
-                width="80px"
-                render={(text: string) => <span>{text}</span>}
-              />
-              <Column
-                title={"Apartamento"}
-                dataIndex={"apartment"}
-                width={"22%"}
-                filterDropdown={(filterProps: any) => (
-                  <ColumnInputFilter
-                    {...filterProps}
-                    handleSearch={handleSearch}
-                    handleReset={handleReset}
-                  />
-                )}
-                onFilter={onFilter(
-                  record =>
-                    record.apartment.name + record.apartment.building.name
-                )}
-                render={(_: string, invoice: Invoice) => {
-                  return (
-                    <strong>{`${invoice.apartment!.name} [${
-                      invoice.apartment!.building!.name
-                    }]`}</strong>
-                  );
-                }}
-              />
-              <Column
-                title={"Descripción"}
-                dataIndex={"description"}
-                width={"25%"}
-                filterDropdown={(filterProps: any) => (
-                  <ColumnInputFilter
-                    {...filterProps}
-                    handleSearch={handleSearch}
-                    handleReset={handleReset}
-                  />
-                )}
-                onFilter={onFilter(record => record.description || "")}
-                render={(text: string) => <span>{text}</span>}
-              />
-              <Column
-                title={"Fecha de Pago"}
-                dataIndex={"dueDate"}
-                width={"15%"}
-                render={(text: string) => <strong>{text}</strong>}
-              />
-              <Column
-                title={"Estado"}
-                dataIndex={"statusType"}
-                filterDropdown={(filterProps: any) => (
-                  <ColumnSelectFilter
-                    {...filterProps}
-                    data={keylist.invoiceStatus}
-                    handleSearch={handleSearch}
-                    handleReset={handleReset}
-                  />
-                )}
-                onFilter={onFilter(record => record.statusType || "")}
-                width={"18%"}
-                render={(text: string, invoice: Invoice) => {
-                  let className;
-                  if (text === "PA") {
-                    className = "delivered";
-                  } else if (text === "MO") {
-                    className = "shipped";
-                  } else if (text === "AN") {
-                    className = "pending";
-                  }
-                  return (
-                    <StatusTag className={className}>
-                      {invoice.status!.name}
-                    </StatusTag>
-                  );
-                }}
-              />
-              <Column
-                title={"Total"}
-                dataIndex={"total"}
-                width={"20%"}
-                render={(text: string) => <strong>RD$ {text}</strong>}
-              />
-              <Column
-                title={"Acciones"}
-                dataIndex={"view"}
-                width={"5%"}
-                render={(_: string, invoice: Invoice) => (
-                  <div className="isoInvoiceBtnView">
-                    <Button
-                      shape="circle"
-                      onClick={onClickViewInvoice(invoice)}
-                      className="invoiceDltBtn"
-                      ghost={true}
-                      size="default"
-                      icon="eye"
-                    />
-                    {["PA", "AN"].includes(invoice.statusType!) ? null : (
-                      <Button
-                        shape="circle"
-                        className="invoiceDltBtn"
-                        type="primary"
-                        onClick={onClickEditInvoice(invoice)}
-                        size="default"
-                        icon="edit"
-                      />
-                    )}
-                    {["AN", "PA"].includes(invoice.statusType!) ? null : (
-                      <Button
-                        className="invoiceDltBtn"
-                        shape="circle"
-                        onClick={onVoidInvoice(invoice)}
-                        type="danger"
-                        size="default"
-                        icon="delete"
-                      />
-                    )}
-                  </div>
-                )}
-              />
-              <Column
-                title="Pagos"
-                dataIndex={"payment"}
-                width={"5%"}
-                render={(_: string, invoice: Invoice) =>
-                  ["PE", "MO"].includes(invoice.statusType!) ? (
-                    <Button size="small" onClick={onClickPayInvoice(invoice)}>
-                      Pagar
-                    </Button>
-                  ) : (
-                    <span />
-                  )
-                }
-              />
-            </Table>
-          </ScrollbarWrapper>
-        </div>
-      </Wrapper>
-    </BladeTemplate>
+    <InvoiceListView
+      invoices={invoices}
+      keylist={keylist}
+      onAddInvoice={onAddInvoice}
+      onClickEditInvoice={onClickEditInvoice}
+      onClickViewInvoice={onClickViewInvoice}
+      onVoidInvoice={onVoidInvoice}
+      refetch={() => getInvoiceList(condominium.id!)}
+    />
   );
 }

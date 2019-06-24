@@ -8,11 +8,14 @@ import { useReduxState } from "../../../shared-ui/store/hooks";
 
 const LayoutContentWrapper = styled.div`
   height: 100%;
+  width: 100% !important;
   & .ant-spin-nested-loading {
     height: 100% !important;
+    width: 100% !important;
   }
   & .ant-spin-container {
     height: 100% !important;
+    width: 100% !important;
   }
 `;
 

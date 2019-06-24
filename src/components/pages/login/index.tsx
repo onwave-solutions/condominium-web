@@ -15,9 +15,9 @@ import { appSelector } from "../../../shared-ui/store/selectors/app";
 import { select } from "../../../shared-ui/store/selectors";
 
 const appState = select(appSelector);
-
 export function Login(props: any) {
   const user = useReduxState(appState("user"));
+  const loading = useReduxState(appState("loading"));
   const { getFieldDecorator } = props.form;
   const onLogin = useReduxAction(loginAction);
   const validateCode = useReduxAction(validateCodeAction);
@@ -29,7 +29,12 @@ export function Login(props: any) {
         if (user.status === "P") {
           validateCode({ username: values.username, code: values.code });
         } else {
-          onLogin({ username: values.username, password: values.password });
+          onLogin(
+            { username: values.username, password: values.password },
+            () => {
+              props.history.replace("/");
+            }
+          );
         }
       }
     });
@@ -108,7 +113,7 @@ export function Login(props: any) {
               </Form.Item>
             )}
             <Form.Item className="isoInputWrapper isoLeftRightComponent">
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={loading}>
                 {user.status === "P" ? "Confirmar Usuario" : "Iniciar Sesión"}
               </Button>
             </Form.Item>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ColDef } from "ag-grid-community";
-import { Tag, Layout, List, Avatar, Skeleton } from "antd";
+import { Tag, Layout, List} from "antd";
 
 import Table, { Column } from "../../components/atoms/table";
 import Col from "../../components/atoms/col";

@@ -73,6 +73,7 @@ export default function TenantList(props: IModule) {
 
   useEffect(() => {
     loadTenants(condominium.id!);
+    setTenant({});
   }, [condominium.id]);
 
   return (

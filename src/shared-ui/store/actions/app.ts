@@ -16,6 +16,8 @@ import { UserService } from "../../services/users";
 // } from '../../http/user'
 import { setAuthorization } from "../../services/axios";
 import { IAuthorization, User } from "../../models/user";
+import { setCondominiumToManagerAction } from "./manager.action";
+import { setApartmentAction } from "./tenant.action";
 
 export enum ApplicationActions {
   SetPath = "APPLICATION_SET_PATH",
@@ -43,21 +45,25 @@ export function setKeylistAction(keylist: Keylist) {
 }
 
 export function loadKeylistAction() {
-  return async (dispatch: ThunkDispatch<any, any, any>) => {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
       const data = await service.keylist();
       dispatch(setKeylistAction(data));
     } catch (e) {}
-  };
+  });
 }
 
 export function logoutAction() {
-  sessionStorage.removeItem("token");
-  return setUser({});
+  return async (dispatch: ThunkDispatch<any, any, any>) => {
+    sessionStorage.removeItem("token");
+    dispatch(setCondominiumToManagerAction({}));
+    dispatch(setApartmentAction({}));
+    return dispatch(setUser({}));
+  };
 }
 
 export function restoreSessionAction() {
-  return async (dispatch: ThunkDispatch<any, any, any>) => {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     const token = sessionStorage.getItem("token");
     if (!token) return;
     try {
@@ -68,7 +74,7 @@ export function restoreSessionAction() {
     } catch (e) {
       sessionStorage.removeItem("token");
     }
-  };
+  });
 }
 
 // export function onSendChangePassword(auth: IAuthorization) {
@@ -102,7 +108,7 @@ export function restoreSessionAction() {
 // }
 
 export function validateCodeAction(auth: IAuthorization) {
-  return async (dispatch: ThunkDispatch<any, any, any>) => {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
       await service.confirmUser(auth);
       dispatch(setUser({}));
@@ -111,11 +117,11 @@ export function validateCodeAction(auth: IAuthorization) {
       const error = getErrorResponse(e);
       toast.error(error.message);
     }
-  };
+  });
 }
 
-export function loginAction(auth: IAuthorization) {
-  return async (dispatch: ThunkDispatch<any, any, any>) => {
+export function loginAction(auth: IAuthorization, cb?: () => void) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
       const data = await service.signIn(auth);
 
@@ -129,12 +135,12 @@ export function loginAction(auth: IAuthorization) {
       sessionStorage.setItem("token", data.token!);
       setAuthorization(data.token!);
       dispatch(setUser(data));
+      cb && cb();
     } catch (e) {
       const error = getErrorResponse(e);
       toast.error(error.message);
-      // dispatch(setUser({ loading: false }))
     }
-  };
+  });
 }
 
 // export function setPath(payload: string) {

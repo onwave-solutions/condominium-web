@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import _ from "lodash";
 import debounce from "lodash/fp/debounce";
 
 import Topbar from "../../organisisms/topbar";
@@ -6,6 +7,7 @@ import Sidebar from "../../organisisms/sidebar";
 import ShellTemplate from "../../templates/shell-template";
 import BladeManager from "../../organisisms/blade-manager";
 import Icon from "../../atoms/icon";
+import Menu from "../../atoms/menu";
 import Popover from "../../atoms/popover";
 import Button from "../../atoms/button";
 import Dropdown from "../../atoms/dropdown";
@@ -23,6 +25,9 @@ import {
 } from "../../../shared-ui/store/actions/app";
 import useManagerCondominium from "../../hooks/use-manager-condominium";
 import CondominiumMenuDropdown from "../../molecules/condominium-menu";
+import useTenantApartment from "../../hooks/use-tenant-apartment";
+import { Apartment } from "../../../shared-ui/models/apartment";
+import WrapperTemplate from "../../templates/wrapper-template";
 
 const appState = select(appSelector);
 
@@ -32,6 +37,13 @@ function subscribe(subscriber: any) {
   return () => {
     window.removeEventListener("resize", subscriber);
   };
+}
+
+function formatApartment(apartment: Apartment) {
+  if (!apartment.id) return "";
+  return `${apartment.name} (${apartment.building!.condominium!.name} - ${
+    apartment.building!.name
+  }) `;
 }
 
 export default function Shell(props: any) {
@@ -50,6 +62,9 @@ export default function Shell(props: any) {
     condominiumSelected,
     changeCondominium
   ] = useManagerCondominium(user);
+  const [apartments, selectedApartment, changeApartment] = useTenantApartment(
+    user
+  );
   const handleWindowResize = () => {
     if (window.innerWidth > 800) {
       //setCollapsed(false);
@@ -66,6 +81,11 @@ export default function Shell(props: any) {
     return unsubscribe;
   }, []);
 
+  const isValid =
+    Boolean(selectedApartment.id) ||
+    Boolean(condominiumSelected.id) ||
+    (user.id || user.roleId === "AD");
+
   return (
     <ShellTemplate
       topBar={
@@ -75,16 +95,44 @@ export default function Shell(props: any) {
           onCloseSession={onLogOut}
         >
           {user.roleId === "TE" && (
-            <Popover
-              trigger="click"
-              arrowPointAtCenter={true}
-              placement="bottomLeft"
+            <Dropdown
+              overlay={() => (
+                <Menu
+                  onClick={({ key }) =>
+                    changeApartment(apartments.find(x => `${x.id}` === key)!)
+                  }
+                  selectedKeys={[`${selectedApartment.id}`]}
+                >
+                  {_.entries(_.groupBy(apartments, "buildingId")).map(
+                    ([key, values]) => {
+                      const nodes: any[] = [];
+                      const zero = values[0];
+                      nodes.push(
+                        <Menu.Item disabled={true} key={key + "entry"}>
+                          {zero.building!.condominium!.name +
+                            "- EDIF. " +
+                            zero.building!.name}
+                        </Menu.Item>
+                      );
+                      values.forEach(value =>
+                        nodes.push(
+                          <Menu.Item key={value.id}>{value.name}</Menu.Item>
+                        )
+                      );
+                      return nodes;
+                    }
+                  )}
+                </Menu>
+              )}
             >
               <Button type="ghost">
-                <span>Seleccione un Apartamento</span>
+                <span>
+                  {formatApartment(selectedApartment) ||
+                    "Seleccione un apartamento"}
+                </span>
                 <Icon type="down" />
               </Button>
-            </Popover>
+            </Dropdown>
           )}
           {user.roleId === "MA" && (
             <>
@@ -122,13 +170,17 @@ export default function Shell(props: any) {
       }
       sideBar={
         <Sidebar
-          modules={modules}
+          modules={isValid ? modules : []}
           onBladePress={mod => props.history.push(`${url}${mod}`)}
           collapsed={visivility}
         />
       }
     >
-      <BladeManager url={url} />
+      {isValid ? (
+        <BladeManager url={url} modules={isValid ? modules : []} />
+      ) : (
+        <WrapperTemplate />
+      )}
     </ShellTemplate>
   );
 }

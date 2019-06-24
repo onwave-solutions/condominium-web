@@ -16,7 +16,6 @@ export default function useTenantApartment(
   user: User
 ): [Apartment[], Apartment, (value: Apartment) => void] {
   if (!user.id || user.roleId !== "TE") return [[], {}, () => undefined];
-
   const apartments = useReduxState(tenantState("apartments"));
   const apartment = useReduxState(tenantState("apartment"));
 

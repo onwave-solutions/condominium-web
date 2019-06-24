@@ -10,6 +10,7 @@ import condominumManager from "./condominium-manager/module";
 import bankAccount from "./bank-account/module";
 import financial from "./financial/module";
 import invoiceView from "./financial/invoice/invoice-view/module";
+import invoiceListTenant from "./financial/invoice/invoice-list-tenant/module";
 import invoiceEditor from "./financial/invoice/invoice-editor/module";
 import service from "./service/module";
 import ticket from "./ticket/module";
@@ -43,6 +44,6 @@ export const modules = [
 export const modulesByPermissions: { [id: string]: IModule[] } = {
   SA: modules,
   AD: [admin, company, manager, condominium],
-  MA: [tenantList, ticket, financial, serviceAndProducts],
-  TE: [ticket]
+  MA: [tenantList, ticket, financial, serviceAndProducts, invoiceView],
+  TE: [ticket, invoiceListTenant, invoiceView]
 };
