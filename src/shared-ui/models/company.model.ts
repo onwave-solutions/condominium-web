@@ -23,6 +23,12 @@ export class Company {
   @Field()
   public phone?: string;
 
+  @Field()
+  public cellphone?: string;
+
+  @Field()
+  public address?: string;
+
   @Field({ factory: KeylistType, type: "object" })
   public documentRaw?: KeylistType;
 }

@@ -1,4 +1,6 @@
 import { Field } from "@rijudev/parseus";
+import { KeylistType } from "./keylist";
+import { Transaction } from './transaction.model';
 
 export class Payment {
   @Field()
@@ -20,17 +22,17 @@ export class Payment {
   public invoiceId?: number;
 
   @Field()
-  public description?: string;
-
-  @Field()
-  public paymentMethodType?: string;
+  public methodTypeId?: string;
 
   @Field({ type: "decimal", fixed: 2 })
   public amount?: number;
 
-  @Field({ isVirtual: true })
-  public buildingId?: number;
+  @Field()
+  public statusTypeId?: string;
 
-  @Field({ isVirtual: true })
-  public apartmentId?: number;
+  @Field({ factory: KeylistType, type: "object" })
+  public status?: KeylistType;
+
+  @Field({ factory: Transaction, type: "object" })
+  public transaction?: Transaction
 }

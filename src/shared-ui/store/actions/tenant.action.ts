@@ -38,13 +38,14 @@ export function setTenantAction(payload: Partial<User>) {
 }
 
 export function addApartmentToTenant(id?: string, condominiumId?: number) {
-  return (tenantId: number, apartmentId: number) =>
+  return (tenantId: number, apartmentId: number, cb?: () => void) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         await apartmentService.addTenant(tenantId, apartmentId);
         const tenant = await tenantService.findOne(tenantId);
         dispatch(setTenantAction(tenant));
         dispatch(loadTenantAction(id)(condominiumId!));
+        cb && cb();
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);

@@ -32,7 +32,6 @@ export default function InvoicePaymentForm(props: IInvoicePaymentForm) {
       <FormItem label="Método de Pago" sm={24} md={24}>
         <Select
           name="paymentMethodType"
-          value={payment.paymentMethodType}
           data={keylist!.paymentMethods}
         />
       </FormItem>

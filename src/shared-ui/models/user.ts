@@ -24,6 +24,12 @@ export class User {
   @Field()
   document?: string;
   @Field()
+  address?: string;
+  @Field()
+  phone?: string;
+  @Field()
+  cellphone?: string;
+  @Field()
   lastLogin?: Date;
   @Field()
   createdAt?: Date;

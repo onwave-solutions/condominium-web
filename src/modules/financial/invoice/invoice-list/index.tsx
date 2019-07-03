@@ -30,7 +30,6 @@ import {
 
 import invoiceEditorModule from "../invoice-editor/module";
 import invoiceViewModule from "../invoice-view/module";
-import paymentBladeModule from "../../payment/payment-process/module";
 import ColumnInputFilter from "../../../../components/molecules/column-input-filter";
 import ColumnSelectFilter from "../../../../components/molecules/column-select-filter";
 import { appSelector } from "../../../../shared-ui/store/selectors/app";
@@ -76,6 +75,10 @@ export default function InvoiceModule(props: IModule) {
     onResetInvoice();
   };
 
+  const onClickPayInvoice = (invoice: Invoice) => () => {
+    props.history.push(`/payment/${invoice.id}`);
+  };
+
   const [searchText, setSearchText] = useState("");
 
   const handleSearch = (selectedKeys: string[], confirm: Function) => {
@@ -102,6 +105,7 @@ export default function InvoiceModule(props: IModule) {
     <InvoiceListView
       invoices={invoices}
       keylist={keylist}
+      onClickPayInvoice={onClickPayInvoice}
       onAddInvoice={onAddInvoice}
       onClickEditInvoice={onClickEditInvoice}
       onClickViewInvoice={onClickViewInvoice}

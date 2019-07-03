@@ -14,9 +14,11 @@ import bankAccountReducer from "./bank-account.reducer";
 import invoiceReducer from "./invoice.reducer";
 import paymentReducer from "./payment.reducer";
 import ticketReducer from "./ticket.reducer";
+import expenseReducer from "./expense.reducer";
 
 const reducer = combineReducers({
   app: appReducer,
+  expense: expenseReducer,
   bankAccount: bankAccountReducer,
   manager: managerReducer,
   tenant: tenantReducer,

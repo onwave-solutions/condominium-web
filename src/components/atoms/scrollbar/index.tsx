@@ -8,7 +8,7 @@ export interface IScrollbar extends ScrollbarProps {
 export default function Scrollbar(props: IScrollbar) {
   const { children, ...scrollProps } = props;
   return (
-    <SmoothScrollbar continuousScrolling={true} {...scrollProps}>
+    <SmoothScrollbar continuousScrolling={true} {...scrollProps} >
       {children}
     </SmoothScrollbar>
   );

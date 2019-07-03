@@ -1,5 +1,7 @@
 import React, { useContext } from "react";
-import SelectComp, { SelectProps } from "antd/lib/select";
+import SelectComp, {
+  AutoCompleteProps as SelectProps
+} from "antd/lib/auto-complete";
 
 import withInputStyle from "../../hoc/with-input-style";
 import withDirection from "../../hoc/with-direction";
@@ -35,17 +37,25 @@ function Select(props: ISelect) {
 
   const handleItemSelect = (item: any, option: any) => {
     if (onChange) {
-      onChange(item, option);
+      onChange(item);
     }
     if (!onChangeItem) return;
     onChangeItem(name!, item);
   };
+
+  const handleBlur = () => {
+    const val = data!.find(item => item[typeName!] === value);
+    if (val) return;
+    if (!onChangeItem) return;
+    onChangeItem(name!, undefined);
+  };
+
   return (
     <SelectComp
       value={value}
-      autoFocus={true}
       showSearch={true}
       showArrow={false}
+      onBlur={handleBlur}
       onChange={handleItemSelect as any}
       {...selectProps}
     >

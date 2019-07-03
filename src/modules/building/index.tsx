@@ -40,21 +40,31 @@ import {
 } from "../../shared-ui/store/actions/apartment";
 import { Apartment } from "../../shared-ui/models/apartment";
 import WrapperTemplate from "../../components/templates/wrapper-template";
+import TenantContactList from "../../components/organisisms/tenant-contact-list";
+import { tenantSelector } from "../../shared-ui/store/selectors/tenant.selector";
+import {
+  loadTenantAction,
+  addApartmentToTenant
+} from "../../shared-ui/store/actions/tenant.action";
+import TenantSelectForm from "../../components/organisisms/tenant-select";
 
 const managerState = select(managerSelector);
 const buildingState = select(buildingSelector);
 const apartmentState = select(apartmentSelector);
 const serviceState = select(serviceSelector);
+const tenantState = select(tenantSelector);
 
 export default function BuildingView(props: IModule) {
   const [building, setBuilding] = useState<Building>({});
   const [apartmentModal, setApartmentModal] = useState<boolean>(false);
   const [buildingModal, setBuildingModal] = useState<boolean>(false);
+  const [tenantModal, setTenantModal] = useState<boolean>(false);
   const condominium = useReduxState(managerState("condominium"));
   const selected = useReduxState(buildingState("building"));
   const apartment = useReduxState(apartmentState("apartment"));
   const services = useReduxState(serviceState("services"));
   const buildings = useReduxState(buildingState("buildings"));
+  const tenants = useReduxState(tenantState("tenants"));
 
   const create = useReduxAction(createBuildingAction());
   const update = useReduxAction(updateBuildingAction());
@@ -62,9 +72,13 @@ export default function BuildingView(props: IModule) {
   const updateApartment = useReduxAction(updateApartmentAction());
 
   const loadBuilding = useReduxAction(refreshBuildingsAction());
+  const loadTenants = useReduxAction(loadTenantAction(props.id));
   const loadServices = useReduxAction(loadServicesAction());
   const setSelected = useReduxAction(setBuildingAction);
   const setApartment = useReduxAction(setApartmentAction);
+  const addApartment = useReduxAction(
+    addApartmentToTenant(props.id, condominium.id)
+  );
 
   const onSelectBuilding = (building: Building) => () => {
     setSelected(building);
@@ -78,6 +92,11 @@ export default function BuildingView(props: IModule) {
   const onOpenBuilding = (building: Building) => () => {
     setBuilding(building);
     setBuildingModal(true);
+  };
+
+  const onOpenTenant = (apartment: Apartment) => {
+    setApartment(apartment);
+    setTenantModal(true);
   };
 
   const onCreateApartment = async () => {
@@ -98,12 +117,25 @@ export default function BuildingView(props: IModule) {
     setBuildingModal(false);
   };
 
+  const onAddTenant = async (tenantId: number) => {
+    await addApartment(tenantId, apartment.id!, () => {
+      const payload = { condominiumId: condominium.id };
+      const building = { ...selected };
+      setSelected({});
+      setTimeout(() => {
+        setSelected(building);
+      });
+      setTenantModal(false);
+    });
+  };
+
   useEffect(() => {
     if (condominium.id === selected.condominiumId) return;
     const payload = { condominiumId: condominium.id };
     setSelected(payload);
     loadBuilding(payload);
     loadServices(payload);
+    loadTenants(condominium.id!);
   }, [condominium.id]);
 
   return (
@@ -126,6 +158,12 @@ export default function BuildingView(props: IModule) {
           <BuildingForm building={building} buildingChange={setBuilding} />
         </Row>
       </Modal>
+      <TenantSelectForm
+        visible={tenantModal}
+        onClose={() => setTenantModal(false)}
+        tenants={tenants}
+        onSubmit={onAddTenant}
+      />
       <WrapperTemplate>
         <BuildingWrapper className="isomorphicNoteComponent">
           <div style={{ width: "320px" }} className="isoNoteListSidebar">
@@ -203,6 +241,7 @@ export default function BuildingView(props: IModule) {
                   <ApartmentView
                     buildingId={selected.id!}
                     onEditApartment={apartment => onOpenApartment(apartment)()}
+                    onAddTenant={onOpenTenant}
                   />
                 </Scrollbar>
               </Layout.Content>

@@ -37,6 +37,9 @@ export class Keylist {
 
   @Field({ type: "array", factory: KeylistType })
   ticketStatus?: KeylistType[];
+
+  @Field({ type: "array", factory: KeylistType })
+  serviceTypes?: KeylistType[];
 }
 
 export interface IQuery {

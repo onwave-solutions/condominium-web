@@ -15,6 +15,8 @@ import invoiceEditor from "./financial/invoice/invoice-editor/module";
 import service from "./service/module";
 import ticket from "./ticket/module";
 import supplier from "./supplier/module";
+import payment from "./payment/module";
+import dashboard from "./dashboard/module";
 
 import { IModule } from "../shared-ui/models/module";
 
@@ -26,9 +28,11 @@ const serviceAndProducts: IModule = {
 };
 
 export const modules = [
+  dashboard,
   admin,
   manager,
   ticket,
+  payment,
   ...apartment.children,
   tenantList,
   company,
@@ -44,6 +48,6 @@ export const modules = [
 export const modulesByPermissions: { [id: string]: IModule[] } = {
   SA: modules,
   AD: [admin, company, manager, condominium],
-  MA: [tenantList, ticket, financial, serviceAndProducts, invoiceView],
-  TE: [ticket, invoiceListTenant, invoiceView]
+  MA: [dashboard, tenantList, ticket, {...dashboard, title: 'Noticias', id: 'news', },  financial, serviceAndProducts, invoiceView, payment],
+  TE: [dashboard, ticket, invoiceListTenant, invoiceView, payment]
 };

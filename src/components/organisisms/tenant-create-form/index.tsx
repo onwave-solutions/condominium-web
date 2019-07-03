@@ -9,7 +9,6 @@ import Modals from "../../hoc/with-modal-style";
 import withDirection from "../../hoc/with-direction";
 import FormItem from "../../molecules/form-item";
 import Input from "../../atoms/input";
-import { Supplier } from "../../../shared-ui/models/supplier.model";
 import { User } from "../../../shared-ui/models/user";
 import {
   Keylist,
@@ -71,7 +70,6 @@ export default function TenantCreateForm({
   }, [visible]);
 
   const onSelectTenant = (id: any) => {
-    console.log(id, typeof id);
     const tenant = users.find(x => x.id === id);
     if (!tenant) return;
     setTimeout(() => {
@@ -84,10 +82,7 @@ export default function TenantCreateForm({
         username: tenant.username
       });
     });
-    console.log(tenant);
   };
-
-  console.log(user);
 
   return (
     <Modal

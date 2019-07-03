@@ -1,0 +1,190 @@
+import React, { useState, useEffect } from "react";
+
+import { IModule } from "../../shared-ui/models/module";
+import { select } from "../../shared-ui/store/selectors";
+import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
+import { useReduxState, useReduxAction } from "../../shared-ui/store/hooks";
+import BladeTemplate from "../../components/templates/blade-template";
+import Button from "../../components/atoms/button";
+import { Wrapper } from "../../components/atoms/body-wrapper";
+import Table, { Column } from "../../components/atoms/table";
+import ScrollbarWrapper from "../../components/atoms/scrollbar";
+import ColumnInputFilter from "../../components/molecules/column-input-filter";
+//import ColumnSelectFilter from "../../components/molecules/column-select-filter";
+
+import { expenseSelector } from "../../shared-ui/store/selectors/expense.selector";
+import {
+  refreshExpensesAction,
+  createExpenseAction
+} from "../../shared-ui/store/actions/expense.actions";
+import ExpenseCreateForm from "../../components/organisisms/expense-create-form";
+import { supplierSelector } from "../../shared-ui/store/selectors/supplier.selector";
+import { loadSuppliersAction } from "../../shared-ui/store/actions/supplier.action";
+import { Expense } from "../../shared-ui/models/expense.model";
+
+const managerState = select(managerSelector);
+const expenseState = select(expenseSelector);
+const supplierState = select(supplierSelector);
+
+export default function ExpenseModule(props: IModule) {
+  const [visible, setVisibility] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
+  const onFilter = (fn: (record: any) => any) => (value: any, record: any) =>
+    fn(record)
+      .toString()
+      .toLowerCase()
+      .includes(value.toLowerCase());
+
+  const handleSearch = (selectedKeys: string[], confirm: Function) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+  };
+
+  const handleReset = (clearFilters: Function) => {
+    clearFilters();
+    setSearchText("");
+  };
+
+  const condominium = useReduxState(managerState("condominium"));
+  const expenses = useReduxState(expenseState("expenses"));
+  const suppliers = useReduxState(supplierState("suppliers"));
+
+  const loadExpenses = useReduxAction(refreshExpensesAction(props.id));
+  const loadSupplierList = useReduxAction(loadSuppliersAction(props.id));
+  const createExpense = useReduxAction(createExpenseAction(props.id));
+
+  const handleLoadSuppliers = () =>
+    loadSupplierList({ condominiumId: condominium.id });
+
+  useEffect(() => {
+    loadExpenses({
+      condominiumId: condominium.id
+    });
+    handleLoadSuppliers();
+  }, [condominium.id]);
+
+  const handleCreateExpense = async (expense: Expense) => {
+    await createExpense({ ...expense, condominiumId: condominium.id });
+    setVisibility(false);
+  };
+
+  return (
+    <>
+      <ExpenseCreateForm
+        visible={visible}
+        suppliers={suppliers}
+        onAction={handleCreateExpense}
+        onClose={() => setVisibility(false)}
+      />
+      <BladeTemplate
+        header={
+          <>
+            <Button onClick={() => setVisibility(true)}> Agregar Gasto </Button>
+          </>
+        }
+      >
+        <Wrapper>
+          <div className="isoInvoiceTable">
+            <ScrollbarWrapper style={{ width: "100%" }}>
+              <Table
+                dataSource={expenses}
+                rowKey="id"
+                pagination={{ pageSize: 5, showSizeChanger: true }}
+                className="invoiceListTable"
+              >
+                <Column
+                  title="ID"
+                  dataIndex="id"
+                  onFilter={onFilter(record => record.id)}
+                  filterDropdown={(filterProps: any) => (
+                    <ColumnInputFilter
+                      {...filterProps}
+                      handleSearch={handleSearch}
+                      handleReset={handleReset}
+                    />
+                  )}
+                  width="80px"
+                  render={(text: string) => <span>{text}</span>}
+                />
+                <Column
+                  title="Suplidor"
+                  dataIndex="supplier.description"
+                  onFilter={onFilter(record => record.supplier.description)}
+                  filterDropdown={(filterProps: any) => (
+                    <ColumnInputFilter
+                      {...filterProps}
+                      handleSearch={handleSearch}
+                      handleReset={handleReset}
+                    />
+                  )}
+                  width="100px"
+                  render={(_: string, expense: Expense) => (
+                    <span>{expense.supplier!.description}</span>
+                  )}
+                />
+                <Column
+                  title="Monto"
+                  dataIndex="amount"
+                  onFilter={onFilter(record => record.amount)}
+                  filterDropdown={(filterProps: any) => (
+                    <ColumnInputFilter
+                      {...filterProps}
+                      handleSearch={handleSearch}
+                      handleReset={handleReset}
+                    />
+                  )}
+                  width="80px"
+                  render={(_: string, expense: Expense) => (
+                    <span>{expense.amount}</span>
+                  )}
+                />
+                <Column
+                  title="Descripción"
+                  dataIndex="description"
+                  onFilter={onFilter(record => record.description)}
+                  filterDropdown={(filterProps: any) => (
+                    <ColumnInputFilter
+                      {...filterProps}
+                      handleSearch={handleSearch}
+                      handleReset={handleReset}
+                    />
+                  )}
+                  width="80px"
+                  render={(_: string, expense: Expense) => (
+                    <span>{expense.description}</span>
+                  )}
+                />
+                <Column
+                  title="Creado Por"
+                  dataIndex="createdBy"
+                  onFilter={onFilter(
+                    record =>
+                      record.userCreatedBy.name +
+                      " " +
+                      record.userCreatedBy.lastName
+                  )}
+                  filterDropdown={(filterProps: any) => (
+                    <ColumnInputFilter
+                      {...filterProps}
+                      handleSearch={handleSearch}
+                      handleReset={handleReset}
+                    />
+                  )}
+                  width="80px"
+                  render={(_: string, expense: Expense) => (
+                    <span>
+                      {(expense.userCreatedBy!.name || "") +
+                        " " +
+                        (expense.userCreatedBy!.lastName || "")}
+                    </span>
+                  )}
+                />
+              </Table>
+            </ScrollbarWrapper>
+          </div>
+        </Wrapper>
+      </BladeTemplate>
+    </>
+  );
+}

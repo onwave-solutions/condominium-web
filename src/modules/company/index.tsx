@@ -119,6 +119,18 @@ export default function CompanyView(props: IModule) {
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
+                title="Celular"
+                dataIndex="cellphone"
+                width="80px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
+                title="Dirección"
+                dataIndex="address"
+                width="100px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
                 title="Editar"
                 dataIndex={"edit"}
                 width={"5%"}

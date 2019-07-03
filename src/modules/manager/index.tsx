@@ -163,6 +163,35 @@ export default function Manager(props: IModule) {
       >
         <Row>
           <UserForm user={manager} userChanged={setManager} keylist={keylist} />
+          <FormItem label="Teléfono">
+            <Input
+              name="phone"
+              type="number"
+              onChange={(event: any) =>
+                onItemSelect(event.target.name, event.target.value)
+              }
+              value={manager!.phone}
+            />
+          </FormItem>
+          <FormItem label="Celular">
+            <Input
+              name="cellphone"
+              type="number"
+              onChange={(event: any) =>
+                onItemSelect(event.target.name, event.target.value)
+              }
+              value={manager!.cellphone}
+            />
+          </FormItem>
+          <FormItem label="Dirección" md={24} sm={24}>
+            <Input
+              name="address"
+              onChange={(event: any) =>
+                onItemSelect(event.target.name, event.target.value)
+              }
+              value={manager!.address}
+            />
+          </FormItem>
           <FormItem label="Dia de Pago">
             <Input
               name="dueDay"
@@ -300,6 +329,9 @@ export default function Manager(props: IModule) {
                           },
                           { value: "document", title: "Documento" },
                           { value: "username", title: "Correo Eléctronico" },
+                          { value: "address", title: "Dirección" },
+                          { value: "phone", title: "Teléfono" },
+                          { value: "cellphone", title: "Celular" },
                           {
                             value: tenant => tenant.statusRaw!.name!,
                             title: "Estado"

@@ -61,6 +61,16 @@ export default function SupplierView(props: IModule) {
             render={(text: string) => <span>{text}</span>}
           />
           <Column
+            title="Tipo de Documento"
+            dataIndex="documentId"
+            render={(text: string) => <span>{text}</span>}
+          />
+          <Column
+            title="Documento"
+            dataIndex="document"
+            render={(text: string) => <span>{text}</span>}
+          />
+          <Column
             title="Habilitado"
             dataIndex="disabled"
             width="100px"

@@ -73,8 +73,8 @@ export default function InvoiceListView({
               //rowSelection={rowSelection}
               dataSource={invoices}
               rowKey="sequence"
+              pagination={{ pageSize: 5, showSizeChanger: true }}
               scroll={{ x: 1400 }}
-              pagination={false}
               className="invoiceListTable"
             >
               <Column

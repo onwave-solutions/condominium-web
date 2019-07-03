@@ -20,11 +20,14 @@ import {
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
 import { Wrapper } from "../../components/atoms/body-wrapper";
 import { Service } from "../../shared-ui/models/service.model";
+import { appSelector } from "../../shared-ui/store/selectors/app";
 
 const serviceState = select(serviceSelector);
 const managerState = select(managerSelector);
+const appState = select(appSelector);
 
 export default function ServiceView(props: IModule) {
+  const keylist = useReduxState(appState("keylist"));
   const [serviceModal, setServiceModal] = useState<boolean>(false);
   const service = useReduxState(serviceState("service"));
   const services = useReduxState(serviceState("services"));
@@ -66,7 +69,11 @@ export default function ServiceView(props: IModule) {
         title={`${service.id ? "Actualizar" : "Crear"} Servicio`}
       >
         <Row>
-          <ServiceForm service={service} serviceChanged={setService} />
+          <ServiceForm
+            service={service}
+            serviceChanged={setService}
+            keylist={keylist}
+          />
         </Row>
       </Modal>
       <BladeTemplate
@@ -104,6 +111,28 @@ export default function ServiceView(props: IModule) {
                   render={(text: string) => <span>{text}</span>}
                 />
                 <Column
+                  title="Tipo de Tasación"
+                  dataIndex="serviceType"
+                  width="80px"
+                  render={(_: string, service: Service) => (
+                    <span>{service.serviceTypeRaw!.name}</span>
+                  )}
+                />
+                <Column
+                  title="Tasación (MT2)"
+                  dataIndex="mt2"
+                  width="80px"
+                  render={(text: string) => (
+                    <span>{text && `${text} MT2`} </span>
+                  )}
+                />
+                <Column
+                  title="Monto Bruto"
+                  dataIndex="amount"
+                  width="80px"
+                  render={(text: string) => <span>{text} </span>}
+                />
+                <Column
                   title="Día de Corte"
                   dataIndex="cutoffDay"
                   width="80px"
@@ -116,10 +145,16 @@ export default function ServiceView(props: IModule) {
                   render={(text: string) => <span>{text}</span>}
                 />
                 <Column
-                  title="Monto"
-                  dataIndex="amount"
+                  title="Total"
+                  dataIndex="total"
                   width="80px"
-                  render={(text: string) => <span>{text}</span>}
+                  render={(_: string, service: Service) => (
+                    <span>
+                      {service.serviceType === "MT"
+                        ? service.amount! * service.mt2!
+                        : service.amount}
+                    </span>
+                  )}
                 />
                 <Column
                   title="Editar"

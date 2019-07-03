@@ -7,14 +7,12 @@ import { Invoice } from "../../models/invoice.model";
 
 export type IPaymentState = {
   payment: Partial<Payment>;
-  payments: Payment[];
-  invoices: Invoice[];
+  invoice: Invoice;
 };
 
 const initialState: Readonly<IPaymentState> = {
   payment: {},
-  payments: [],
-  invoices: []
+  invoice: {}
 };
 
 function reducer(action: Action<PaymentActions, any>) {
@@ -22,6 +20,9 @@ function reducer(action: Action<PaymentActions, any>) {
     switch (action.type) {
       case PaymentActions.SetPayment:
         draft.payment = action.payload;
+        break;
+      case PaymentActions.SetInvoice:
+        draft.invoice = action.payload;
         break;
       default:
     }

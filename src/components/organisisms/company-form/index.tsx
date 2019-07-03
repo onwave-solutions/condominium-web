@@ -39,6 +39,12 @@ export default function CompanyForm(props: ICompanyForm) {
       <FormItem label="Teléfono">
         <Input name="phone" onChange={changer} value={company!.phone} />
       </FormItem>
+      <FormItem label="Celular">
+        <Input name="cellphone" onChange={changer} value={company!.cellphone} />
+      </FormItem>
+      <FormItem label="Dirección">
+        <Input name="address" onChange={changer} value={company!.address} />
+      </FormItem>
     </>
   );
 }

@@ -1,7 +1,7 @@
 import { IModule } from "../../../../shared-ui/models/module";
 
 export default {
-  title: "Lista de Facturas",
+  title: "Mis Facturas",
   id: "invoice-list",
   iconType: "lock",
   size: "large",
