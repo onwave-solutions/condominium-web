@@ -3,13 +3,16 @@ import { produce } from "immer";
 import { Action } from "../../models/redux";
 import { Building } from "../../models/building";
 import { BuildingActions } from "../actions/building";
+import { Condominium } from '../../models/condominium';
 
 export type IBuildingState = {
+  condominium: Condominium;
   building: Partial<Building>;
   buildings: Building[];
 };
 
 const initialState: Readonly<IBuildingState> = {
+  condominium: {},
   building: {},
   buildings: []
 };
@@ -23,6 +26,9 @@ function reducer(action: Action<BuildingActions, any>) {
       case BuildingActions.SetBuildings:
         draft.buildings = action.payload;
         break;
+      case BuildingActions.SetCondominium:
+        draft.condominium = action.payload
+        break
       default:
     }
   };

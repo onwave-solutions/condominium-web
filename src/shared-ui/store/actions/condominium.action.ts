@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { ThunkDispatch } from "redux-thunk";
 import { Condominium, CondominiumManager } from "../../models/condominium";
 import { createAction } from "../../utils/redux";
-import { CondominumService } from "../../services/condominium.service";
+import { CondominiumService } from "../../services/condominium.service";
 import { setBuildingAction } from "./building";
 import { User } from "../../models/user";
 import { UserService } from "../../services/users";
@@ -16,7 +16,7 @@ export enum CondominiumActions {
   SetCondominiumManagers = "CONDOMINIUM_SET_CONDOMINIUM_MANAGERS"
 }
 
-const service = new CondominumService();
+const service = new CondominiumService();
 const userService = new UserService();
 
 export function addCondominiumManagerAction(id?: string) {

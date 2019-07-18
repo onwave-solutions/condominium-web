@@ -55,6 +55,10 @@ export default function BankAccountView(props: IModule) {
     setBankModal(true);
   };
 
+  const showTransactions = (bank: BankAccount) => () => {
+    props.history.push(`/transactions/${bank.id}`);
+  };
+
   const handleAction = async () => {
     if (bankAccount.id) {
       await update(bankAccount);
@@ -71,7 +75,7 @@ export default function BankAccountView(props: IModule) {
         onCancel={() => setBankModal(false)}
         onOk={handleAction}
         closable={false}
-        title={`${bankAccount.id ? "Actualizar" : "Crear"} Cuenta Bancaria`}
+        title={`${bankAccount.id ? "Actualizar" : "Crear"} Caja`}
       >
         <Row>
           <BankAccountForm
@@ -101,7 +105,7 @@ export default function BankAccountView(props: IModule) {
               pagination={{ pageSize: 5 }}
             >
               <Column
-                title="Banco"
+                title="Caja"
                 dataIndex="bankName"
                 width="80px"
                 render={(_: string, bankAcc: BankAccount) => (
@@ -109,7 +113,7 @@ export default function BankAccountView(props: IModule) {
                 )}
               />
               <Column
-                title="Número de Cuenta"
+                title="Número de Referencia"
                 dataIndex="account"
                 width="80px"
                 render={(text: string) => <span>{text}</span>}
@@ -125,6 +129,14 @@ export default function BankAccountView(props: IModule) {
                 dataIndex="description"
                 width="80px"
                 render={(text: string) => <span>{text}</span>}
+              />
+              <Column
+                title="Transacciones"
+                dataIndex={"view"}
+                width={"5%"}
+                render={(_: string, bank: BankAccount) => (
+                  <Button onClick={showTransactions(bank)} icon="eye" />
+                )}
               />
               <Column
                 title="Editar"

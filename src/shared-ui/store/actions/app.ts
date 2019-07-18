@@ -120,14 +120,28 @@ export function validateCodeAction(auth: IAuthorization) {
   });
 }
 
+export function changePasswordAction(auth: IAuthorization, cb?: () => void) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      const data = await service.changePassword(auth);
+      dispatch(setUser(data));
+      toast.success("Contraseña cambiada con exito.");
+      cb && cb();
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
+}
+
 export function loginAction(auth: IAuthorization, cb?: () => void) {
   return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
       const data = await service.signIn(auth);
 
-      if (data.status === "P") {
-        dispatch(setUser(data));
-        toast.warn("Favor confirmar su usuario.");
+      if (data.status === "C") {
+        dispatch(setUser({ ...data, password: auth.password }));
+        toast.warn("Favor Cambiar su contraseña.");
         return;
       }
 

@@ -27,7 +27,7 @@ export function updateBankAccountAction(id?: string) {
       try {
         const data = await service.update(bankAccount.id!, bankAccount);
         dispatch(setBankAccountAction(data));
-        toast.success("Cuenta Bancaria Actualizada Correctamente");
+        toast.success("Caja Actualizada Correctamente");
         dispatch(
           refreshBankAccountsAction(id)({
             condominiumId: bankAccount.condominiumId
@@ -46,7 +46,7 @@ export function createBankAccountAction(id?: string) {
       try {
         const data = await service.create(bankAccount);
         dispatch(setBankAccountAction({ condominiumId: data.condominiumId }));
-        toast.success("Cuenta Bancaria Creada Correctamente");
+        toast.success("Caja Creada Correctamente");
         dispatch(
           refreshBankAccountsAction(id)({
             condominiumId: bankAccount.condominiumId

@@ -10,7 +10,9 @@ import { supplierSelector } from "../../shared-ui/store/selectors/supplier.selec
 import { useReduxState, useReduxAction } from "../../shared-ui/store/hooks";
 import {
   loadSuppliersAction,
-  createSupplierAction
+  createSupplierAction,
+  updateSupplierAction,
+  setSupplierAction
 } from "../../shared-ui/store/actions/supplier.action";
 import { Supplier } from "../../shared-ui/models/supplier.model";
 import { appSelector } from "../../shared-ui/store/selectors/app";
@@ -23,10 +25,13 @@ export default function SupplierView(props: IModule) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const condominium = useReduxState(managerState("condominium"));
   const suppliers = useReduxState(supplierState("suppliers"));
+  const supplier = useReduxState(supplierState("supplier"));
   const keylist = useReduxState(appState("keylist"));
 
   const loadSupplierList = useReduxAction(loadSuppliersAction(props.id));
+  const setSupplier = useReduxAction(setSupplierAction);
   const createSupplier = useReduxAction(createSupplierAction(props.id));
+  const updateSupplier = useReduxAction(updateSupplierAction(props.id));
   const handleLoadSuppliers = () =>
     loadSupplierList({ condominiumId: condominium.id });
 
@@ -34,9 +39,24 @@ export default function SupplierView(props: IModule) {
     return () => setModalVisible(status);
   };
 
-  const onCreateSupplier = (supplier: Supplier) => {
-    createSupplier({ ...supplier, condominiumId: condominium.id });
-    setModalVisible(false);
+  const onAction = (supplier: Supplier) => {
+    if (supplier.id) {
+      updateSupplier({ ...supplier, condominiumId: condominium.id });
+      setModalVisible(false);
+    } else {
+      createSupplier({ ...supplier, condominiumId: condominium.id });
+      setModalVisible(false);
+    }
+  };
+
+  const onCreateSupplier = () => {
+    setSupplier({});
+    setModalVisible(true);
+  };
+
+  const onUpdateSupplier = (supplier: Supplier) => () => {
+    setSupplier(supplier);
+    setModalVisible(true);
   };
 
   useEffect(() => {
@@ -48,7 +68,7 @@ export default function SupplierView(props: IModule) {
       <BladeTemplate
         header={
           <>
-            <Button onClick={handleModalVisibility(true)} type="primary">
+            <Button onClick={onCreateSupplier} type="primary">
               Crear Suplidor
             </Button>
           </>
@@ -63,7 +83,7 @@ export default function SupplierView(props: IModule) {
           <Column
             title="Tipo de Documento"
             dataIndex="documentId"
-            render={(text: string) => <span>{text}</span>}
+            render={(_: string, supplier: Supplier) => <span>{supplier.documentId}</span>}
           />
           <Column
             title="Documento"
@@ -88,6 +108,7 @@ export default function SupplierView(props: IModule) {
                   <Button
                     shape="circle"
                     className="invoiceDltBtn"
+                    onClick={onUpdateSupplier(supplier)}
                     type="primary"
                     size="default"
                     icon="edit"
@@ -99,9 +120,11 @@ export default function SupplierView(props: IModule) {
         </Table>
       </BladeTemplate>
       <SupplierModal
+        form={supplier}
+        setForm={setSupplier}
         visible={modalVisible}
         keylist={keylist}
-        onAction={onCreateSupplier}
+        onAction={onAction}
         onClose={handleModalVisibility(false)}
       />
     </>

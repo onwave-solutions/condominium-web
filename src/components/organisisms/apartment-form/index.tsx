@@ -39,34 +39,11 @@ export default function ApartmentForm(props: IApartmentForm) {
         />
       </FormItem>
       <FormItem label="Parqueos" md={24} sm={24}>
-        <AntSelect
-          mode="tags"
-          onChange={(value: string[]) =>
-            onItemSelect("parkingLots", value.map(item => item.toUpperCase()))
-          }
-          style={{ width: "100%" }}
-          value={apartment.parkingLots || []}
-        >
-          {apartment.parkingLots
-            ? apartment.parkingLots.map((parking: string, index: number) => (
-                <Option key={index} value={parking}>
-                  {parking}
-                </Option>
-              ))
-            : null}
-        </AntSelect>
-      </FormItem>
-      <FormItem label="Servicio" md={24} sm={24}>
-        <Select
-          name="serviceId"
-          typeName="id"
-          labelName="name"
-          onChangeItem={onItemSelect}
-          value={apartment.serviceId}
-          data={services}
-          renderNode={(item: Service) => {
-            return <>{`${item.name} [$${item.amount}]`}</>;
-          }}
+        <Input
+          name="parkingLots"
+          type="number"
+          value={apartment.parkingLots}
+          onChange={changer}
         />
       </FormItem>
     </>

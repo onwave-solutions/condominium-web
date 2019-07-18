@@ -15,9 +15,12 @@ import invoiceReducer from "./invoice.reducer";
 import paymentReducer from "./payment.reducer";
 import ticketReducer from "./ticket.reducer";
 import expenseReducer from "./expense.reducer";
+import newsFeeReducer from "./news-fee.reducer";
+import transactionReducer from "./transaction.reducer";
 
 const reducer = combineReducers({
   app: appReducer,
+  newsFee: newsFeeReducer,
   expense: expenseReducer,
   bankAccount: bankAccountReducer,
   manager: managerReducer,
@@ -31,7 +34,8 @@ const reducer = combineReducers({
   condominium: condominiumReducer,
   building: buildingReducer,
   ticket: ticketReducer,
-  apartment: apartmentReducer
+  apartment: apartmentReducer,
+  transaction: transactionReducer
 });
 
 export type RootState = typeof reducer extends Reducer<infer S> ? S : never;

@@ -43,6 +43,14 @@ export class UserService extends AbstractService<User> {
     return Parseus.decode(data).to(User);
   }
 
+  async changePassword(payload: IAuthorization): Promise<User> {
+    const { data } = await this.service.post<User>(
+      `${this.prefix}/changepassword`,
+      payload
+    );
+    return Parseus.decode(data).to(User);
+  }
+
   async confirmUser(payload: IAuthorization): Promise<User> {
     const { data } = await this.service.post<User>(
       `${this.prefix}/confirmuser`,

@@ -21,7 +21,8 @@ import {
   editInvoiceDetailAction,
   bulkCreateAction,
   updateInvoiceServiceAction,
-  getInvoiceByIdAction
+  getInvoiceByIdAction,
+  resetInvoiceAction
 } from "../../../../shared-ui/store/actions/invoice.actions";
 import {
   changeHandler,
@@ -45,6 +46,7 @@ export default function InvoiceEditor(props: IModule) {
   const setInvoice = useReduxAction(updateInvoiceAction);
   const setInvoiceDetails = useReduxAction(setInvoiceDetailsAction);
   const bulkCreate = useReduxAction(bulkCreateAction(props.id));
+  const resetInvoice = useReduxAction(resetInvoiceAction);
   const getInvoiceById = useReduxAction(getInvoiceByIdAction(props.id));
   const updateInvoice = useReduxAction(updateInvoiceServiceAction(props.id));
   const editInvoiceDetail = useReduxAction(
@@ -61,6 +63,7 @@ export default function InvoiceEditor(props: IModule) {
   };
 
   useEffect(() => {
+    resetInvoice();
     if (match && match.params && match.params.id) {
       getInvoiceById(match.params.id);
     }

@@ -5,4 +5,5 @@ export class ServiceService extends AbstractService<Service> {
   constructor() {
     super(Service, "service");
   }
-}
+
+  }

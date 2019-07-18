@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import moment from "moment";
+
+import { DateRangepicker } from "../../atoms/datepicker";
 import BladeTemplate from "../../templates/blade-template";
 import ScrollbarWrapper from "../../atoms/scrollbar";
 import Table, { Column } from "../../atoms/table";
@@ -10,12 +13,14 @@ import ColumnSelectFilter from "../../molecules/column-select-filter";
 import { Keylist } from "../../../shared-ui/models/keylist";
 
 export interface IInvoiceListView {
-  refetch(): void;
+  refetch: (startDate: moment.Moment, endDate: moment.Moment) => () => void;
   hideInvoiceEditor?: boolean;
   onAddInvoice?(): void;
   invoices: Invoice[];
   onClickPayInvoice?: (invoice: Invoice) => () => void;
   keylist: Keylist;
+  resetKey?: number;
+  isTenant?: boolean
   onClickViewInvoice?: (invoice: Invoice) => () => void;
   onClickEditInvoice?: (invoice: Invoice) => () => void;
   onVoidInvoice?: (invoice: Invoice) => () => void;
@@ -25,14 +30,31 @@ export default function InvoiceListView({
   refetch,
   invoices,
   keylist,
+  isTenant,
   onClickPayInvoice,
   hideInvoiceEditor,
   onClickEditInvoice,
   onClickViewInvoice,
   onVoidInvoice,
-  onAddInvoice
+  onAddInvoice,
+  resetKey
 }: IInvoiceListView) {
   const [searchText, setSearchText] = useState("");
+  const [startDate, setStartDate] = useState<moment.Moment>(
+    moment()
+      .startOf("month")
+      .startOf("hours")
+      .startOf("minutes")
+      .startOf("seconds")
+  );
+
+  const [endDate, setEndDate] = useState<moment.Moment>(
+    moment()
+      .endOf("month")
+      .endOf("hours")
+      .endOf("minutes")
+      .endOf("seconds")
+  );
 
   const onFilter = (fn: (record: any) => any) => (value: any, record: any) =>
     fn(record)
@@ -50,14 +72,38 @@ export default function InvoiceListView({
     setSearchText("");
   };
 
+  const onChange = ([startDate, endDate]: moment.Moment[]) => {
+    const start = startDate
+      .startOf("month")
+      .startOf("hours")
+      .startOf("minutes")
+      .startOf("seconds");
+
+    const end = endDate
+      .endOf("month")
+      .endOf("hours")
+      .endOf("minutes")
+      .endOf("seconds");
+
+    setStartDate(start);
+    setEndDate(end);
+    refetch(start, end)();
+  };
+
+  useEffect(() => {
+    if (!resetKey) return;
+    refetch(startDate, endDate)();
+  }, [resetKey]);
+
   return (
     <BladeTemplate
       header={
         <>
-          <Button
-            icon="sync"
-            onClick={refetch}
-            //onClick={() => getInvoiceList(condominium.id!)}
+          <Button icon="sync" onClick={refetch(startDate, endDate)} />
+          <DateRangepicker
+            format="DD/MMM/YYYY"
+            onChange={onChange as any}
+            value={[startDate, endDate]}
           />
           <div style={{ flex: 1 }} />
           {!hideInvoiceEditor && (
@@ -114,6 +160,12 @@ export default function InvoiceListView({
                     }]`}</strong>
                   );
                 }}
+              />
+              <Column
+                title={"Fecha de Creación"}
+                dataIndex={"createdAt"}
+                width={"15%"}
+                render={(text: string) => <strong>{text}</strong>}
               />
               <Column
                 title={"Descripción"}

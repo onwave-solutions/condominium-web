@@ -4,6 +4,7 @@ export interface IModule {
   route?: string;
   loading?: boolean;
   iconType: string;
+  fromParent?: boolean
   parent?: string;
   permission?: string[];
   size?: "large" | "normal";

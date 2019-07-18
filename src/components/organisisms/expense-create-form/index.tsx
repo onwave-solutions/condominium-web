@@ -11,6 +11,7 @@ import withDirection from "../../hoc/with-direction";
 import { Expense } from "../../../shared-ui/models/expense.model";
 import { Supplier } from "../../../shared-ui/models/supplier.model";
 import { changeHandler } from "../../../shared-ui/utils/input";
+import { BankAccount } from "../../../shared-ui/models/bank-account";
 
 const WDModal = Modals(AntdModal);
 const Modal = withDirection(WDModal);
@@ -20,11 +21,13 @@ export interface IExpenseCreateForm {
   onClose?(): void;
   onAction?(expense: Expense): void;
   suppliers: Supplier[];
+  accounts?: BankAccount[];
 }
 
 export default function ExpenseCreateForm({
   visible,
   onClose,
+  accounts,
   onAction,
   suppliers
 }: IExpenseCreateForm) {
@@ -37,9 +40,11 @@ export default function ExpenseCreateForm({
   const changer = changeHandler(expense, setExpense);
 
   useEffect(() => {
-    if(!visible) return
-    setExpense({})
-  }, [visible])
+    if (!visible) return;
+    setExpense({});
+  }, [visible]);
+
+  console.log(expense.bankAccountId)
 
   return (
     <Modal
@@ -52,6 +57,22 @@ export default function ExpenseCreateForm({
     >
       <Row>
         <Form className="isoCardInfoForm">
+          <FormItem label="Caja" md={24} sm={24}>
+            <Select
+              name="bankAccountId"
+              typeName="id"
+              renderNode={(account: BankAccount) => {
+                return (
+                  `${account.account} [${account.bank!.name}] (${
+                    account.balance
+                  } RD$)`
+                );
+              }}
+              onChangeItem={onItemSelect}
+              value={expense.bankAccountId}
+              data={accounts}
+            />
+          </FormItem>
           <FormItem label="Suplidor">
             <Select
               name="supplierId"

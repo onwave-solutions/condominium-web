@@ -76,7 +76,7 @@ const TableWrapper = styled(Table)`
   }
 
   .ant-table-pagination {
-    float: ${(props: any) => (props["data-rtl"] === "rtl" ? "left" : "right")};
+    float: left !important;
   }
 
   .ant-pagination-prev,

@@ -1,15 +1,19 @@
 import { Field } from "@rijudev/parseus";
 import { KeylistType } from "./keylist";
-import { Transaction } from './transaction.model';
+import { Transaction } from "./transaction.model";
+import { BankAccount } from "./bank-account";
+import { Invoice } from './invoice.model';
+import { User } from './user';
+import { DateTimeTransformer } from '../utils/dates';
 
 export class Payment {
   @Field()
   public id?: number;
 
-  @Field()
+  @Field({ transformer: new DateTimeTransformer() })
   public createdAt?: string;
 
-  @Field()
+  @Field({ transformer: new DateTimeTransformer() })
   public updatedAt?: string;
 
   @Field()
@@ -33,6 +37,25 @@ export class Payment {
   @Field({ factory: KeylistType, type: "object" })
   public status?: KeylistType;
 
-  @Field({ factory: Transaction, type: "object" })
-  public transaction?: Transaction
+  @Field({ factory: KeylistType, type: "object" })
+  public methodType?: KeylistType;
+
+  @Field()
+  public condominiumId?: number;
+
+  @Field()
+  public bankAccountId?: number;
+
+  @Field({ factory: BankAccount, type: "object" })
+  public bankAccount?: BankAccount;
+
+  @Field({ factory: Invoice, type: "object" })
+  public invoice?: Invoice;
+
+  @Field({ type: "object", factory: User })
+  public userCreatedBy?: User;
+
+  @Field({ type: "object", factory: User })
+  public userUpdatedBy?: User;
+
 }

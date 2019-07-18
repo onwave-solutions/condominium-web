@@ -21,7 +21,8 @@ import {
   setBuildingAction,
   createBuildingAction,
   updateBuildingAction,
-  refreshBuildingsAction
+  refreshBuildingsAction,
+  findCondominiumByIdAction
 } from "../../shared-ui/store/actions/building";
 import { IModule } from "../../shared-ui/models/module";
 import { closeChildBladeAction } from "../../shared-ui/store/actions/app";
@@ -55,24 +56,24 @@ const serviceState = select(serviceSelector);
 const tenantState = select(tenantSelector);
 
 export default function BuildingView(props: IModule) {
+  const { match } = props;
+
   const [building, setBuilding] = useState<Building>({});
   const [apartmentModal, setApartmentModal] = useState<boolean>(false);
   const [buildingModal, setBuildingModal] = useState<boolean>(false);
-  const [tenantModal, setTenantModal] = useState<boolean>(false);
-  const condominium = useReduxState(managerState("condominium"));
   const selected = useReduxState(buildingState("building"));
+  const condominium = useReduxState(buildingState("condominium"));
   const apartment = useReduxState(apartmentState("apartment"));
   const services = useReduxState(serviceState("services"));
   const buildings = useReduxState(buildingState("buildings"));
-  const tenants = useReduxState(tenantState("tenants"));
 
   const create = useReduxAction(createBuildingAction());
   const update = useReduxAction(updateBuildingAction());
   const createApartment = useReduxAction(createApartmentAction());
   const updateApartment = useReduxAction(updateApartmentAction());
+  const findCondominium = useReduxAction(findCondominiumByIdAction);
 
   const loadBuilding = useReduxAction(refreshBuildingsAction());
-  const loadTenants = useReduxAction(loadTenantAction(props.id));
   const loadServices = useReduxAction(loadServicesAction());
   const setSelected = useReduxAction(setBuildingAction);
   const setApartment = useReduxAction(setApartmentAction);
@@ -94,11 +95,6 @@ export default function BuildingView(props: IModule) {
     setBuildingModal(true);
   };
 
-  const onOpenTenant = (apartment: Apartment) => {
-    setApartment(apartment);
-    setTenantModal(true);
-  };
-
   const onCreateApartment = async () => {
     if (apartment.id) {
       await updateApartment(apartment);
@@ -117,17 +113,11 @@ export default function BuildingView(props: IModule) {
     setBuildingModal(false);
   };
 
-  const onAddTenant = async (tenantId: number) => {
-    await addApartment(tenantId, apartment.id!, () => {
-      const payload = { condominiumId: condominium.id };
-      const building = { ...selected };
-      setSelected({});
-      setTimeout(() => {
-        setSelected(building);
-      });
-      setTenantModal(false);
-    });
-  };
+  useEffect(() => {
+    if (match && match.params && match.params.id) {
+      findCondominium(match.params.id);
+    }
+  }, []);
 
   useEffect(() => {
     if (condominium.id === selected.condominiumId) return;
@@ -135,7 +125,6 @@ export default function BuildingView(props: IModule) {
     setSelected(payload);
     loadBuilding(payload);
     loadServices(payload);
-    loadTenants(condominium.id!);
   }, [condominium.id]);
 
   return (
@@ -158,12 +147,6 @@ export default function BuildingView(props: IModule) {
           <BuildingForm building={building} buildingChange={setBuilding} />
         </Row>
       </Modal>
-      <TenantSelectForm
-        visible={tenantModal}
-        onClose={() => setTenantModal(false)}
-        tenants={tenants}
-        onSubmit={onAddTenant}
-      />
       <WrapperTemplate>
         <BuildingWrapper className="isomorphicNoteComponent">
           <div style={{ width: "320px" }} className="isoNoteListSidebar">
@@ -220,32 +203,34 @@ export default function BuildingView(props: IModule) {
                 </Button>
               )}
             </Layout.Header>
-            {selected.id && (
-              <Layout.Content
-                style={{
-                  padding: "2rem",
-                  paddingBottom: "0",
-                  flexDirection: "column"
-                }}
-                className="isoNoteEditingArea"
+            <Layout.Content
+              style={{
+                padding: "2rem",
+                paddingBottom: "0",
+                flexDirection: "column"
+              }}
+              className="isoNoteEditingArea"
+            >
+              <div
+                className="isoColorChooseWrapper"
+                style={{ marginBottom: "0.7rem" }}
               >
-                <div
-                  className="isoColorChooseWrapper"
-                  style={{ marginBottom: "0.7rem" }}
-                >
+                <h2>{condominium.name} </h2>
+                {selected.id && (
                   <h2 style={{ marginRight: "0.7rem" }}>
                     {"Edificio " + selected.name}
                   </h2>
-                </div>
+                )}
+              </div>
+              {selected.id && (
                 <Scrollbar>
                   <ApartmentView
                     buildingId={selected.id!}
                     onEditApartment={apartment => onOpenApartment(apartment)()}
-                    onAddTenant={onOpenTenant}
                   />
                 </Scrollbar>
-              </Layout.Content>
-            )}
+              )}
+            </Layout.Content>
           </Layout>
         </BuildingWrapper>
       </WrapperTemplate>

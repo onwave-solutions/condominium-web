@@ -4,7 +4,7 @@ import { createAction } from "../../utils/redux";
 import { User } from "../../models/user";
 import { UserService } from "../../services/users";
 import { Condominium, CondominiumManager } from "../../models/condominium";
-import { CondominumService } from "../../services/condominium.service";
+import { CondominiumService } from "../../services/condominium.service";
 import { getErrorResponse } from "../../utils/objects";
 import { loadingWrapper } from "./app";
 
@@ -16,7 +16,7 @@ export enum ManagerActions {
 }
 
 const service = new UserService();
-const condominiumService = new CondominumService();
+const condominiumService = new CondominiumService();
 
 export function setDefaultCondominiumAction(id?: string) {
   return (payload: CondominiumManager) =>

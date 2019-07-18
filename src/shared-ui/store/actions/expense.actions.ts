@@ -22,7 +22,7 @@ export function setExpensesAction(payload: Expense[]) {
 }
 
 export function createExpenseAction(id?: string) {
-  return (expense: Partial<Expense>) =>
+  return (expense: Partial<Expense>, cb?: () => void) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.create(expense);
@@ -33,6 +33,7 @@ export function createExpenseAction(id?: string) {
             condominiumId: expense.condominiumId
           })
         );
+        cb && cb()
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);

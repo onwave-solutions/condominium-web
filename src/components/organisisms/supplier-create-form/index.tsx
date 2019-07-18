@@ -10,6 +10,7 @@ import FormItem from "../../molecules/form-item";
 import Input from "../../atoms/input";
 import { Supplier } from "../../../shared-ui/models/supplier.model";
 import { Keylist } from "../../../shared-ui/models/keylist";
+import Checkbox from "../../atoms/checkbox";
 
 const WDModal = Modals(AntdModal);
 const Modal = withDirection(WDModal);
@@ -18,6 +19,8 @@ export interface ISupplierForm {
   visible?: boolean;
   onClose?(): void;
   keylist: Keylist;
+  form: Supplier;
+  setForm: (supplier: Supplier) => void;
   onAction?(supplier: Supplier): void;
 }
 
@@ -25,11 +28,12 @@ export default function SupplierForm({
   visible,
   onClose,
   keylist,
-  onAction
+  onAction,
+  form,
+  setForm
 }: ISupplierForm) {
-  const [form, setForm] = useState<Supplier>({});
   const handleChange = (event: any) =>
-    setForm({ ...form, [event.target.name]: event.target.value });
+    setForm!({ ...form, [event.target.name]: event.target.value });
 
   const onItemSelect = (name: string, value: any) => {
     setForm!({ ...form, [name]: value });
@@ -38,14 +42,15 @@ export default function SupplierForm({
   useEffect(() => {
     if (!visible) setForm({});
   }, [visible]);
+
   return (
     <Modal
       onCancel={onClose}
       visible={visible}
       onOk={() => onAction!(form)}
       cancelText="Cancelar"
-      okText="Crear Suplidor"
-      title="Crear Suplidor"
+      okText={!form.id ? "Crear Suplidor" : "Editar Suplidor"}
+      title={!form.id ? "Crear Suplidor" : "Editar Suplidor"}
     >
       <Row>
         <Form className="isoCardInfoForm">
@@ -73,6 +78,16 @@ export default function SupplierForm({
               onChange={handleChange}
               value={form!.document}
             />
+          </FormItem>
+          <FormItem label="" sm={12} md={8}>
+            <br />
+            <Checkbox
+              name="disabled"
+              checked={form!.disabled}
+              onChange={e => onItemSelect("disabled", e.target.checked)}
+            >
+              Deshabilitar
+            </Checkbox>
           </FormItem>
         </Form>
       </Row>

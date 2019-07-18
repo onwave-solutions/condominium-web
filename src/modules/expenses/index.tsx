@@ -21,10 +21,13 @@ import ExpenseCreateForm from "../../components/organisisms/expense-create-form"
 import { supplierSelector } from "../../shared-ui/store/selectors/supplier.selector";
 import { loadSuppliersAction } from "../../shared-ui/store/actions/supplier.action";
 import { Expense } from "../../shared-ui/models/expense.model";
+import { bankAccountSelector } from "../../shared-ui/store/selectors/bank-account.selector";
+import { refreshBankAccountsAction } from "../../shared-ui/store/actions/bank-account.actions";
 
 const managerState = select(managerSelector);
 const expenseState = select(expenseSelector);
 const supplierState = select(supplierSelector);
+const bankAccountState = select(bankAccountSelector);
 
 export default function ExpenseModule(props: IModule) {
   const [visible, setVisibility] = useState(false);
@@ -50,6 +53,13 @@ export default function ExpenseModule(props: IModule) {
   const expenses = useReduxState(expenseState("expenses"));
   const suppliers = useReduxState(supplierState("suppliers"));
 
+  const bankAccounts = useReduxState(bankAccountState("bankAccounts"));
+
+  const payload = {
+    condominiumId: condominium.id
+  };
+
+  const loadBankAccounts = useReduxAction(refreshBankAccountsAction());
   const loadExpenses = useReduxAction(refreshExpensesAction(props.id));
   const loadSupplierList = useReduxAction(loadSuppliersAction(props.id));
   const createExpense = useReduxAction(createExpenseAction(props.id));
@@ -58,15 +68,23 @@ export default function ExpenseModule(props: IModule) {
     loadSupplierList({ condominiumId: condominium.id });
 
   useEffect(() => {
-    loadExpenses({
-      condominiumId: condominium.id
-    });
+    loadExpenses(payload);
+    loadBankAccounts(payload);
     handleLoadSuppliers();
   }, [condominium.id]);
 
   const handleCreateExpense = async (expense: Expense) => {
-    await createExpense({ ...expense, condominiumId: condominium.id });
-    setVisibility(false);
+    await createExpense(
+      {
+        ...expense,
+        amount: parseFloat(`${expense.amount}`),
+        condominiumId: condominium.id
+      },
+      () => {
+        setVisibility(false);
+        loadBankAccounts(payload);
+      }
+    );
   };
 
   return (
@@ -74,6 +92,7 @@ export default function ExpenseModule(props: IModule) {
       <ExpenseCreateForm
         visible={visible}
         suppliers={suppliers}
+        accounts={bankAccounts}
         onAction={handleCreateExpense}
         onClose={() => setVisibility(false)}
       />
@@ -137,6 +156,16 @@ export default function ExpenseModule(props: IModule) {
                   width="80px"
                   render={(_: string, expense: Expense) => (
                     <span>{expense.amount}</span>
+                  )}
+                />
+                <Column
+                  title="Caja"
+                  dataIndex="bankAccountId"
+                  width="180px"
+                  render={(_: string, expense: Expense) => (
+                    <span>{`${expense.bankAccount!.bank!.name} - ${
+                      expense.bankAccount!.account
+                    }`}</span>
                   )}
                 />
                 <Column

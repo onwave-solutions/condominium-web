@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { Spin } from "antd";
+import { Spin, Icon } from "antd";
 import { Route, Switch } from "react-router-dom";
 
 import BladeWrapper from "../../molecules/blade-wrapper";
@@ -10,22 +10,38 @@ export interface IBladeManager {
   modules: IModule[];
 }
 
-//const blades: any = {};
-
-function renderBlade(props: IBladeManager) {
+function renderBlade(props: IBladeManager & { fromParent?: boolean }) {
   return (blade: IModule): any => {
     let Blade: any;
 
+    const fromParent = blade.id.includes(":");
+
     if (blade.children && blade.children.length) {
-      return blade.children.map(renderBlade(props));
+      return blade.children.map(renderBlade({ ...props }));
     }
 
     Blade = lazy(() => import(`../../../modules/${blade.route}`));
-    const component = (props: any) => (
-      <Suspense fallback={<Spin />}>
-        <Blade {...blade} {...props} />
-      </Suspense>
-    );
+    const component = (newProps: any) => {
+      return (
+        <Suspense fallback={<Spin />}>
+          <>
+            {fromParent && (
+              <Icon
+                type="arrow-left"
+                style={{
+                  textAlign: "left",
+                  marginLeft: 15,
+                  marginTop: 15,
+                  fontSize: 20
+                }}
+                onClick={() => newProps.history.goBack()}
+              />
+            )}
+            <Blade {...blade} {...newProps} fromParent={fromParent} />
+          </>
+        </Suspense>
+      );
+    };
 
     return (
       <Route

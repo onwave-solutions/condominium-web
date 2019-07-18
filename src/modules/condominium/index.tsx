@@ -122,6 +122,21 @@ export default function CondominiumBlade(props: IModule) {
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
+                title="Edificios"
+                dataIndex={"buildings"}
+                width={"5%"}
+                render={(_: string, condominium: Condominium) => (
+                  <>
+                    <Button
+                      onClick={() =>
+                        props.history.push(`/building/${condominium.id}`)
+                      }
+                      icon="eye"
+                    />
+                  </>
+                )}
+              />
+              <Column
                 title="Editar"
                 dataIndex={"edit"}
                 width={"5%"}

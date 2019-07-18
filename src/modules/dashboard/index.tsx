@@ -1,5 +1,9 @@
-import React from 'react'
+import React from "react";
+import { IModule } from "../../shared-ui/models/module";
+import BladeTemplate from '../../components/templates/blade-template';
 
-export default function DashboardView() {
-  return <div/>
-}
+const DashboardView: React.FC<IModule> = () => {
+  return <BladeTemplate>hola</BladeTemplate>;
+};
+
+export default DashboardView;

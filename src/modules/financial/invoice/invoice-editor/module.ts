@@ -5,5 +5,6 @@ export default {
   id: "invoice-builder",
   size: "large",
   iconType: "lock",
+
   route: "financial/invoice/invoice-editor"
 } as IModule;

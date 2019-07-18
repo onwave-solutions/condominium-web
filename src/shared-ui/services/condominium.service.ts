@@ -2,7 +2,7 @@ import Parseus from "@rijudev/parseus";
 import { AbstractService } from "./abstract-service";
 import { Condominium, CondominiumManager } from "../models/condominium";
 
-export class CondominumService extends AbstractService<Condominium> {
+export class CondominiumService extends AbstractService<Condominium> {
   constructor() {
     super(Condominium, "condominium");
   }

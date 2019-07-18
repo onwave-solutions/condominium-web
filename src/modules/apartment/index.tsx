@@ -29,13 +29,11 @@ const serviceState = select(serviceSelector);
 export interface IApartment {
   buildingId: number;
   onEditApartment(apartment: Apartment): void;
-  onAddTenant(apartment: Apartment): void;
 }
 
 export default function ApartmentView({
   buildingId,
-  onEditApartment,
-  onAddTenant
+  onEditApartment
 }: IApartment) {
   const apartments = useReduxState(apartmentState("apartments"));
 
@@ -63,8 +61,7 @@ export default function ApartmentView({
                   <Icon
                     type="edit"
                     onClick={() => onEditApartment(apartment)}
-                  />,
-                  <Icon type="plus" onClick={() => onAddTenant(apartment)} />
+                  />
                 ]}
               >
                 <div style={{ display: "flex", flexDirection: "column" }}>
@@ -73,16 +70,7 @@ export default function ApartmentView({
                   <Information title={"Plan"} name={apartment.service!.name} />
                   <Information
                     title={"Parqueos"}
-                    name={apartment.parkingLots!.join(", ")}
-                  />
-                  <Information
-                    title={"Inquilinos"}
-                    name={apartment
-                      .tenants!.map(
-                        tenant =>
-                          `${tenant.name || ""} ${tenant.lastName || ""}`
-                      )
-                      .join(", ")}
+                    name={apartment.parkingLots!}
                   />
                 </div>
               </Card>

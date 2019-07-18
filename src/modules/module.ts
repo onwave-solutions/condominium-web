@@ -17,6 +17,8 @@ import ticket from "./ticket/module";
 import supplier from "./supplier/module";
 import payment from "./payment/module";
 import dashboard from "./dashboard/module";
+import newsFee from "./news-fee/module";
+import transactions from "./transaction/module";
 
 import { IModule } from "../shared-ui/models/module";
 
@@ -24,7 +26,13 @@ const serviceAndProducts: IModule = {
   title: "Setup",
   id: "parent-product-service",
   iconType: "lock",
-  children: [service, bankAccount, building, supplier]
+  children: [service, bankAccount, supplier]
+};
+
+const editorDetail = {
+  ...invoiceEditor,
+  id: invoiceEditor.id + "-detail/:id",
+  hide: true
 };
 
 export const modules = [
@@ -38,16 +46,29 @@ export const modules = [
   company,
   condominium,
   tenant,
+  transactions,
   condominumManager,
   ...financial.children,
   ...serviceAndProducts.children,
+  editorDetail,
   invoiceView,
-  { ...invoiceEditor, id: invoiceEditor.id + "-detail/:id" }
+  newsFee
 ];
 
 export const modulesByPermissions: { [id: string]: IModule[] } = {
   SA: modules,
-  AD: [admin, company, manager, condominium],
-  MA: [dashboard, tenantList, ticket, {...dashboard, title: 'Noticias', id: 'news', },  financial, serviceAndProducts, invoiceView, payment],
+  AD: [admin, company, manager, condominium, building],
+  MA: [
+    dashboard,
+    tenantList,
+    ticket,
+    newsFee,
+    transactions,
+    financial,
+    serviceAndProducts,
+    editorDetail,
+    invoiceView,
+    payment
+  ],
   TE: [dashboard, ticket, invoiceListTenant, invoiceView, payment]
 };

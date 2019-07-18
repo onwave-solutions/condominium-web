@@ -2,6 +2,7 @@ import React from "react";
 
 import Input from "../../atoms/input";
 import Select from "../../atoms/select";
+import Row from "../../atoms/row";
 import FormItem from "../../molecules/form-item";
 import { Condominium } from "../../../shared-ui/models/condominium";
 import { User } from "../../../shared-ui/models/user";
@@ -36,7 +37,7 @@ export default function CondominiumManagerForm({
     onCondominiumChange && onCondominiumChange(condominium!);
   };
   return (
-    <>
+    <Row>
       <FormItem label="Condominio" sm={24} md={24}>
         <Select
           disabled={disableCondo}
@@ -47,23 +48,6 @@ export default function CondominiumManagerForm({
           onSelect={handleCondominiumChange as any}
         />
       </FormItem>
-      <FormItem label="Condominio" sm={24} md={24}>
-        <Select
-          value={manager.id}
-          typeName="id"
-          disabled={disableManager}
-          labelName="name"
-          data={managers}
-          onSelect={handleManagerChange as any}
-          renderNode={(item: User) => {
-            return (
-              <>{`${item.name} ${item.lastName} [${item.username} - ${
-                item.document
-              }]`}</>
-            );
-          }}
-        />
-      </FormItem>
-    </>
+    </Row>
   );
 }

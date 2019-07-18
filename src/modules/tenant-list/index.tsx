@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { Layout } from "antd";
+import { Layout, List } from "antd";
 import { IModule } from "../../shared-ui/models/module";
 import Button from "../../components/atoms/button";
 import Scrollbar from "../../components/atoms/scrollbar";
@@ -16,7 +16,9 @@ import {
   loadTenantAction,
   setTenantAction,
   addApartmentToTenant,
-  findTenantBy
+  findTenantBy,
+  updateTenantAction,
+  removeApartmentFromTenant
 } from "../../shared-ui/store/actions/tenant.action";
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
 import { User } from "../../shared-ui/models/user";
@@ -25,6 +27,7 @@ import ApartmentSelect from "../../components/organisisms/apartment-select";
 import { BuildingService } from "../../shared-ui/services/building";
 import { ApartmentService } from "../../shared-ui/services/apartment";
 import WrapperTemplate from "../../components/templates/wrapper-template";
+import { Apartment } from "../../shared-ui/models/apartment";
 
 const { Content } = Layout;
 
@@ -36,6 +39,7 @@ const apartmentService = new ApartmentService();
 
 export default function TenantList(props: IModule) {
   const [visible, setVisible] = useState<boolean>(false);
+  const [editVisible, setEditVisible] = useState<boolean>(false);
   const [apartmentVisible, setApartmentVisible] = useState<boolean>(false);
   //const [tenant, setTenant] = useState<User>({});
   const tenant = useReduxState(tenantState("tenant"));
@@ -47,14 +51,26 @@ export default function TenantList(props: IModule) {
     signUpTenantAction(props.id, condominium.id)
   );
 
+  const updateTenant = useReduxAction(
+    updateTenantAction(props.id, condominium.id)
+  );
+
   const loadTenants = useReduxAction(loadTenantAction(props.id));
   const setTenant = useReduxAction(setTenantAction);
   const addApartment = useReduxAction(
     addApartmentToTenant(props.id, condominium.id)
   );
 
+  const removeApartment = useReduxAction(
+    removeApartmentFromTenant(props.id, condominium.id)
+  );
+
   const handleModalVisibility = (status: boolean) => {
     return () => setVisible(status);
+  };
+
+  const handleEditModalVisibility = (status: boolean) => {
+    return () => setEditVisible(status);
   };
 
   const handleApartmentModalVisibility = (status: boolean) => {
@@ -62,8 +78,15 @@ export default function TenantList(props: IModule) {
   };
 
   const handleCreateTenant = (tenant: User) => {
-    createTenant(tenant);
-    setVisible(false);
+    createTenant(tenant, () => {
+      setVisible(false);
+    });
+  };
+
+  const handleUpdateTenant = (tenant: User) => {
+    updateTenant(tenant, () => {
+      setEditVisible(false);
+    });
   };
 
   const handleAddApartment = async (id: number) => {
@@ -103,13 +126,22 @@ export default function TenantList(props: IModule) {
                 </Button>
 
                 {tenant.id && (
-                  <Button
-                    type="primary"
-                    className="isoAddContactBtn"
-                    onClick={handleApartmentModalVisibility(true)}
-                  >
-                    Asignar Apartamento
-                  </Button>
+                  <>
+                    <Button
+                      type="primary"
+                      className="isoAddContactBtn"
+                      onClick={handleEditModalVisibility(true)}
+                    >
+                      Editar Perfil
+                    </Button>
+                    <Button
+                      type="primary"
+                      className="isoAddContactBtn"
+                      onClick={handleApartmentModalVisibility(true)}
+                    >
+                      Asignar Apartamento
+                    </Button>
+                  </>
                 )}
               </div>
               <Scrollbar className="contactBoxScrollbar">
@@ -128,16 +160,43 @@ export default function TenantList(props: IModule) {
                         title: "Estado"
                       },
                       {
-                        value: tenant =>
-                          tenant
-                            .apartments!.map(
-                              a => `${a.name} (${a.building!.name})`
-                            )
-                            .join(", "),
-                        title: "Apartamentos"
+                        value: "phone",
+                        title: "Teléfono"
+                      },
+                      {
+                        value: "cellphone",
+                        title: "Celular"
+                      },
+                      {
+                        value: "address",
+                        title: "Dirección"
                       }
                     ]}
-                  />
+                  >
+                    <List
+                      header={<h4>Apartamentos Asignados</h4>}
+                      dataSource={tenant.apartments || []}
+                      renderItem={(item: Apartment) => {
+                        return (
+                          <List.Item
+                            actions={[
+                              <a
+                                onClick={() =>
+                                  removeApartment(tenant.id!, item.id!)
+                                }
+                              >
+                                Eliminar
+                              </a>
+                            ]}
+                          >
+                            <div style={{ flex: 1 }}>
+                              {item.name} [{item.building!.name}]
+                            </div>
+                          </List.Item>
+                        );
+                      }}
+                    />
+                  </TenantCard>
                 )}
               </Scrollbar>
             </Content>
@@ -149,6 +208,14 @@ export default function TenantList(props: IModule) {
         onSearchTenant={findTenantBy}
         onAction={handleCreateTenant}
         onClose={handleModalVisibility(false)}
+        keylist={keylist}
+      />
+      <TenantCreateForm
+        visible={editVisible}
+        tenant={tenant}
+        onSearchTenant={findTenantBy}
+        onAction={handleUpdateTenant}
+        onClose={handleEditModalVisibility(false)}
         keylist={keylist}
       />
       <ApartmentSelect

@@ -11,10 +11,16 @@ import {
 import { getErrorResponse } from "../../utils/objects";
 import { loadingWrapper } from "./app";
 
+import { CondominiumService } from "../../services/condominium.service";
+import { Condominium } from '../../models/condominium';
+
 export enum BuildingActions {
-  SetBuilding = "BUILDING_SET_BUILDING",
-  SetBuildings = "BUILDING_SET_BUILDINGS"
+  SetCondominium = "building/SET_CONDOMINIUM",
+  SetBuilding = "building/SET_BUILDING",
+  SetBuildings = "building/SET_BUILDINGS"
 }
+
+const condominiumService = new CondominiumService();
 
 export function setBuildingAction(payload: Partial<Building>) {
   return createAction(BuildingActions.SetBuilding, payload);
@@ -22,6 +28,22 @@ export function setBuildingAction(payload: Partial<Building>) {
 
 export function setBuildingsAction(payload: Building[]) {
   return createAction(BuildingActions.SetBuildings, payload);
+}
+
+export function setCondominiumAction(payload: Condominium) {
+  return createAction(BuildingActions.SetCondominium, payload);
+}
+
+export function findCondominiumByIdAction(id: number) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      const data = await condominiumService.findOne(id);
+      dispatch(setCondominiumAction(data))
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
 }
 
 export function updateBuildingAction(id?: string) {

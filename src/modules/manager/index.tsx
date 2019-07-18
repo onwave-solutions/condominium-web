@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import _ from 'lodash'
 import { ColDef } from "ag-grid-community";
 import { Tag, Layout, List} from "antd";
 
@@ -320,7 +321,7 @@ export default function Manager(props: IModule) {
                         tenant={manager}
                         otherAttributes={[
                           {
-                            value: tenant => tenant.company!.name!,
+                            value: tenant => _.get(tenant, 'company.name'),
                             title: "Compañia"
                           },
                           {

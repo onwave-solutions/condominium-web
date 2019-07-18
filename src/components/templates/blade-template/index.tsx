@@ -30,6 +30,14 @@ const LayoutContentWrapper = styled(Row)`
     height: 100% !important;
     width: 100% !important;
   }
+
+  & tr:nth-child(even) {
+    background: #f7f7f7;
+  }
+
+  & tr:nth-child(odd) {
+    background: white;
+  }
 `;
 
 export const Wrapper = styled(Row)`
@@ -70,7 +78,6 @@ export const FooterWrapper = styled.footer`
   padding-right: 10px;
   padding-left: 10px;
   border-style: solid;
-  background: white;
   border-width: 0;
   border-color: #eaeaea;
   border-top-width: 1px;
@@ -86,7 +93,7 @@ export interface IBladeTemplate {
 const appState = select(appSelector);
 
 export default function BladeTemplate(props: IBladeTemplate) {
-  const { children, header, footer } = props;
+  const { children, header } = props;
   const loading = useReduxState(appState("loading"));
   return (
     <LayoutContentWrapper className="isoLayoutContentWrapper">

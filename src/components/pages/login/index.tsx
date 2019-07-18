@@ -8,7 +8,8 @@ import SignInStyleWrapper from "./style";
 import {
   loginAction,
   validateCodeAction,
-  restoreSessionAction
+  restoreSessionAction,
+  changePasswordAction
 } from "../../../shared-ui/store/actions/app";
 import { useReduxAction, useReduxState } from "../../../shared-ui/store/hooks";
 import { appSelector } from "../../../shared-ui/store/selectors/app";
@@ -21,18 +22,28 @@ export function Login(props: any) {
   const { getFieldDecorator } = props.form;
   const onLogin = useReduxAction(loginAction);
   const validateCode = useReduxAction(validateCodeAction);
+  const changePassword = useReduxAction(changePasswordAction);
   const restoreSession = useReduxAction(restoreSessionAction);
   const onSubmit = (e: any) => {
     e.preventDefault();
     props.form.validateFields((err: any, values: any) => {
       if (!err) {
-        if (user.status === "P") {
-          validateCode({ username: values.username, code: values.code });
+        if (user.status === "C") {
+          changePassword(
+            {
+              username: values.username,
+              password: values.password,
+              code: values.code
+            },
+            () => {
+              props.history.replace("/dashboard");
+            }
+          );
         } else {
           onLogin(
             { username: values.username, password: values.password },
             () => {
-              props.history.replace("/");
+              props.history.replace("/dashboard");
             }
           );
         }
@@ -63,58 +74,59 @@ export function Login(props: any) {
                       style={{ marginTop: 10, color: "rgba(0,0,0,.25)" }}
                     />
                   }
-                  disabled={user.status === "P"}
+                  disabled={!["A", undefined].includes(user.status)}
                   size="large"
                   placeholder="Usuario"
                 />
               )}
             </Form.Item>
-            {user.status !== "P" && (
-              <Form.Item className="isoInputWrapper">
-                {getFieldDecorator("password", {
-                  rules: [{ required: true, message: "Contraseña Requerida!" }]
-                })(
-                  <Input
-                    prefix={
-                      <Icon
-                        type="lock"
-                        style={{ marginTop: 10, color: "rgba(0,0,0,.25)" }}
-                      />
-                    }
-                    size="large"
-                    type="password"
-                    placeholder="Contraseña"
-                  />
-                )}
-              </Form.Item>
-            )}
-            {user.status === "P" && (
-              <Form.Item className="isoInputWrapper">
-                {getFieldDecorator("code", {
-                  rules: [
-                    {
-                      required: true,
-                      message: "Código de confirmación requerido!"
-                    }
-                  ]
-                })(
-                  <Input
-                    prefix={
-                      <Icon
-                        type="lock"
-                        style={{ marginTop: 10, color: "rgba(0,0,0,.25)" }}
-                      />
-                    }
-                    size="large"
-                    type="password"
-                    placeholder="Código de confirmación"
-                  />
-                )}
-              </Form.Item>
+            <Form.Item className="isoInputWrapper">
+              {getFieldDecorator("password", {
+                rules: [{ required: true, message: "Contraseña Requerida!" }]
+              })(
+                <Input
+                  prefix={
+                    <Icon
+                      type="lock"
+                      style={{ marginTop: 10, color: "rgba(0,0,0,.25)" }}
+                    />
+                  }
+                  size="large"
+                  disabled={!["A", undefined].includes(user.status)}
+                  type="password"
+                  placeholder="Contraseña"
+                />
+              )}
+            </Form.Item>
+            {user.status === "C" && (
+              <>
+                <Form.Item className="isoInputWrapper" label="Nueva Contraseña">
+                  {getFieldDecorator("code", {
+                    rules: [
+                      {
+                        required: true,
+                        message: "Nueva Contraseña Requerida"
+                      }
+                    ]
+                  })(
+                    <Input
+                      prefix={
+                        <Icon
+                          type="lock"
+                          style={{ marginTop: 10, color: "rgba(0,0,0,.25)" }}
+                        />
+                      }
+                      size="large"
+                      type="password"
+                      placeholder="Nueva Contraseña"
+                    />
+                  )}
+                </Form.Item>
+              </>
             )}
             <Form.Item className="isoInputWrapper isoLeftRightComponent">
               <Button type="primary" htmlType="submit" loading={loading}>
-                {user.status === "P" ? "Confirmar Usuario" : "Iniciar Sesión"}
+                {user.status === "C" ? "Confirmar Usuario" : "Iniciar Sesión"}
               </Button>
             </Form.Item>
             <Link to="/forgotpassword" className="isoForgotPass">

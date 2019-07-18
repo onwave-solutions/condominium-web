@@ -1,7 +1,7 @@
 import Parseus from "@rijudev/parseus";
 import { AbstractService } from "./abstract-service";
 import { Invoice, BulkInvoice } from "../models/invoice.model";
-import { Query } from "../utils/objects";
+import { AdvanceQuery } from "../models/keylist";
 
 export class InvoiceService extends AbstractService<Invoice> {
   constructor() {
@@ -10,11 +10,11 @@ export class InvoiceService extends AbstractService<Invoice> {
 
   async getByCondominiumId(
     condominiumId: number,
-    where: Invoice = {}
+    where: AdvanceQuery<Invoice> = {}
   ): Promise<Invoice[]> {
     const { data } = await this.service.post<Invoice[]>(
       `${this.prefix}/condominium/${condominiumId}`,
-      Parseus.encode(where, Invoice)
+      where
     );
 
     return data.map(item => Parseus.decode(item).to(Invoice));

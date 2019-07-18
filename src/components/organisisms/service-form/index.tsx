@@ -2,6 +2,8 @@ import React from "react";
 import { Service } from "../../../shared-ui/models/service.model";
 import { changeHandler } from "../../../shared-ui/utils/input";
 import Input from "../../atoms/input";
+import Checkbox from "../../atoms/checkbox";
+import Icon from "../../atoms/icon";
 import Select from "../../atoms/select";
 import FormItem from "../../molecules/form-item";
 import { Keylist } from "../../../shared-ui/models/keylist";
@@ -17,9 +19,6 @@ export default function ServiceForm(props: IServiceForm) {
   const changer = changeHandler(service, serviceChanged!);
   const onServiceChange = (name: string, value: any) => {
     const newService = { ...service };
-    if (value !== "MT") {
-      newService.mt2 = undefined;
-    }
     serviceChanged!({ ...newService, [name]: value });
   };
 
@@ -43,16 +42,6 @@ export default function ServiceForm(props: IServiceForm) {
           value={service.serviceType}
         />
       </FormItem>
-      <FormItem label="Tasación (MT2)">
-        <Input
-          name="mt2"
-          onChange={changer}
-          value={service.mt2}
-          min={0}
-          disabled={service.serviceType !== "MT"}
-          type="number"
-        />
-      </FormItem>
       <FormItem label="Dia de Corte" sm={12} md={6}>
         <Input
           name="cutoffDay"
@@ -74,7 +63,7 @@ export default function ServiceForm(props: IServiceForm) {
           max={30}
         />
       </FormItem>
-      <FormItem label="Monto" sm={24} md={12}>
+      <FormItem label="Monto" sm={24} md={8}>
         <Input
           required={true}
           name="amount"
@@ -82,6 +71,26 @@ export default function ServiceForm(props: IServiceForm) {
           value={service.amount}
           type="number"
         />
+      </FormItem>
+      <FormItem label="Mora" sm={12} md={8}>
+        <Input
+          required={true}
+          name="lateFee"
+          onChange={changer}
+          suffix={service.percent ? <Icon type="percentage" /> : <span />}
+          value={service.lateFee}
+          type="number"
+        />
+      </FormItem>
+      <FormItem label="" sm={12} md={8}>
+        <br />
+        <Checkbox
+          name="percent"
+          checked={service.percent}
+          onChange={e => onServiceChange("percent", e.target.checked)}
+        >
+          Porcentaje
+        </Checkbox>
       </FormItem>
     </>
   );

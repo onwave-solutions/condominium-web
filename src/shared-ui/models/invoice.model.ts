@@ -61,7 +61,7 @@ export class Invoice {
   public status?: KeylistType;
 
   @Field({ transformer: new DateTimeTransformer() })
-  createdAt?: string;
+  createdAt?: Date;
   @Field()
   updatedAt?: string;
 

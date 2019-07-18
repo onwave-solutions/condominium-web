@@ -34,15 +34,19 @@ const tenantState = select(tenantSelector);
 const ticketState = select(ticketSelector);
 const appState = select(appSelector);
 
-function buildQuery(condominiumId: number) {
+function buildQuery(condominiumId: number, apartmentId?: number) {
   return ({ state, query }: IQuery): Partial<AdvanceQuery<Ticket>>[] => {
     if (!condominiumId) return [];
-    const base: Partial<Ticket> = { condominiumId, statusType: state };
+    const base: Partial<Ticket> = {
+      condominiumId,
+      statusType: state,
+      apartmentId
+    };
     if (!query) return [base];
     return [
-      { ...base, description: { like: query } },
-      { ...base, solution: query.toUpperCase() },
-      { ...base, title: { like: query } }
+      { ...base, description: { like: query }, apartmentId },
+      { ...base, solution: query.toUpperCase(), apartmentId },
+      { ...base, title: { like: query }, apartmentId }
     ];
   };
 }
@@ -60,7 +64,7 @@ export default function TicketView(props: IModule) {
 
   const condominiumId =
     _.get(condominium, "id") || _.get(apartment, "building.condominium.id");
-  const queryBuilder = buildQuery(condominiumId!);
+  const queryBuilder = buildQuery(condominiumId!, apartment.id);
 
   const onCreateTicket = useReduxAction(createTicketAction(props.id));
   const onUpdateTicket = useReduxAction(updateTicketAction(props.id));
@@ -77,6 +81,12 @@ export default function TicketView(props: IModule) {
   };
 
   const handleCreateTicket = async (ticket: Ticket) => {
+    if (apartment.id) {
+      ticket.apartmentId = apartment.id;
+      if (!ticket.apartmentKeys || !ticket.apartmentKeys.length) {
+        ticket.apartmentKeys = [`${apartment.building!.id}-${apartment.id}`];
+      }
+    }
     await onCreateTicket({ ...ticket, condominiumId }, onCb);
     handleCreateTicketModal(false)();
   };
@@ -103,6 +113,14 @@ export default function TicketView(props: IModule) {
   }, [condominiumId]);
   return (
     <>
+      <TicketCreateForm
+        visible={createTicketVisible}
+        condominiumId={condominiumId}
+        buildingId={apartment.id ? apartment.building!.id! : undefined}
+        isTenant={Boolean(apartment.id)}
+        onCreate={handleCreateTicket}
+        onClose={handleCreateTicketModal(false)}
+      />
       <WrapperTemplate>
         <TicketWrapper className="isomorphicNoteComponent">
           <div style={{ width: "320px" }} className="isoNoteListSidebar">
@@ -200,6 +218,13 @@ export default function TicketView(props: IModule) {
                         {ticket.userCreatedBy!.lastName}
                       </p>
 
+                      {ticket.apartmentId && (
+                        <>
+                          <h3>Apartamento</h3>
+                          <p>{ticket.apartment!.name}</p>
+                        </>
+                      )}
+
                       {ticket.solution && (
                         <>
                           <h3>Solución</h3>
@@ -224,11 +249,6 @@ export default function TicketView(props: IModule) {
           </Layout>
         </TicketWrapper>
       </WrapperTemplate>
-      <TicketCreateForm
-        visible={createTicketVisible}
-        onCreate={handleCreateTicket}
-        onClose={handleCreateTicketModal(false)}
-      />
     </>
   );
 }

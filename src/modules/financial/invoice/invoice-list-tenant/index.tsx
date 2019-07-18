@@ -1,21 +1,14 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import React from "react";
+import moment from "moment";
 
 import { invoiceSelector } from "../../../../shared-ui/store/selectors/invoice.selector";
 import { select } from "../../../../shared-ui/store/selectors";
-import { managerSelector } from "../../../../shared-ui/store/selectors/manager.selector";
 import {
   useReduxState,
   useReduxAction
 } from "../../../../shared-ui/store/hooks";
 import { IModule } from "../../../../shared-ui/models/module";
-import {
-  getInvoiceListAction,
-  setInvoiceAction,
-  resetInvoiceAction,
-  updateInvoiceServiceAction,
-  getInvoicesByApartmentIdAction
-} from "../../../../shared-ui/store/actions/invoice.actions";
+import { getInvoicesByQueryAction } from "../../../../shared-ui/store/actions/invoice.actions";
 import { Invoice } from "../../../../shared-ui/models/invoice.model";
 
 import { appSelector } from "../../../../shared-ui/store/selectors/app";
@@ -31,27 +24,37 @@ export default function InvoiceModule(props: IModule) {
   const invoices = useReduxState(invoiceState("invoices"));
   const keylist = useReduxState(appState("keylist"));
 
-  const getInvoiceList = useReduxAction(getInvoicesByApartmentIdAction);
-  const setInvoice = useReduxAction(setInvoiceAction);
-  const onResetInvoice = useReduxAction(resetInvoiceAction);
-  const updateInvoice = useReduxAction(updateInvoiceServiceAction(props.id));
-
+  const getInvoiceList = useReduxAction(getInvoicesByQueryAction);
   const onClickViewInvoice = (invoice: Invoice) => () => {
-    //setInvoice({ ...invoice });
     props.history.push(`/invoice-view/${invoice.id}`);
   };
 
-  useEffect(() => {
-    getInvoiceList(apartment.id!);
-  }, [apartment.id]);
+  const refetch = (startDate: moment.Moment, endDate: moment.Moment) => () => {
+    getInvoiceList({
+      apartmentId: apartment.id,
+      createdAt: {
+        between: {
+          end: endDate.toDate(),
+          start: startDate.toDate()
+        }
+      }
+    });
+  };
+
+  const onClickPayInvoice = (invoice: Invoice) => () => {
+    props.history.push(`/payment/${invoice.id}`);
+  };
 
   return (
     <InvoiceListView
       invoices={invoices}
+      resetKey={apartment.id}
       keylist={keylist}
+      isTenant={true}
       onClickViewInvoice={onClickViewInvoice}
       hideInvoiceEditor={true}
-      refetch={() => getInvoiceList(apartment.id!)}
+      refetch={refetch}
+      onClickPayInvoice={onClickPayInvoice}
     />
   );
 }

@@ -1,7 +1,7 @@
 import { IModule } from "../../shared-ui/models/module";
 
 export default {
-  title: "Cuentas Bancarias",
+  title: "Cajas",
   id: "bank-account",
   iconType: "lock",
   route: "bank-account"

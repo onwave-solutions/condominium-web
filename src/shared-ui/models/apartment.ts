@@ -26,8 +26,8 @@ export class Apartment {
   floor?: number;
   @Field({ type: "decimal", fixed: 2 })
   mt2?: number;
-  @Field({ type: "array", factory: String })
-  parkingLots?: string[];
+  @Field({ type: "number", default: 0 })
+  parkingLots?: number;
   @Field()
   createdAt?: string;
   @Field()

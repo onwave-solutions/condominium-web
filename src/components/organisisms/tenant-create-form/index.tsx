@@ -24,6 +24,7 @@ const { Option } = AutoComplete;
 
 export interface ITenantCreateForm {
   visible?: boolean;
+  tenant?: User;
   onClose?(): void;
   onAction?(tenant: User): void;
   keylist?: Keylist;
@@ -36,12 +37,17 @@ export default function TenantCreateForm({
   visible,
   onClose,
   keylist,
+  tenant,
   onAction,
   onSearchTenant
 }: ITenantCreateForm) {
   const [users, setUsers] = useState<User[]>([]);
   const [user, setUser] = useState<User>({});
   const changer = changeHandler(user, setUser);
+
+  const editMode: boolean = Boolean(tenant) && Boolean(tenant!.id);
+  const createModeDisable: boolean = Boolean(user.id);
+
   const onItemSelect = (name: string, value: any) => {
     setUser({ ...user, [name]: value });
   };
@@ -64,10 +70,14 @@ export default function TenantCreateForm({
   }, [user.document]);
 
   useEffect(() => {
-    if (visible) return;
+    if (visible || editMode) return;
     setUser({});
     setUsers([]);
   }, [visible]);
+
+  useEffect(() => {
+    setUser({ ...tenant });
+  }, [tenant]);
 
   const onSelectTenant = (id: any) => {
     const tenant = users.find(x => x.id === id);
@@ -90,8 +100,8 @@ export default function TenantCreateForm({
       visible={visible}
       onOk={() => onAction!(user)}
       cancelText="Cancelar"
-      okText="Crear Inquilino"
-      title="Crear Inquilino"
+      okText={user.id ? "Actualizar Inquilino" : "Crear Inquilino"}
+      title={user.id ? "Actualizar Inquilino" : "Crear Inquilino"}
     >
       <Row>
         <Form className="isoCardInfoForm">
@@ -99,7 +109,7 @@ export default function TenantCreateForm({
             <Select
               name="documentId"
               onChangeItem={onItemSelect}
-              disabled={Boolean(user.id)}
+              disabled={createModeDisable || editMode}
               value={user!.documentId || ""}
               data={keylist!.documentTypes!}
             />
@@ -109,6 +119,7 @@ export default function TenantCreateForm({
               value={user!.document || ""}
               backfill={false}
               allowClear={true}
+              disabled={editMode}
               onSelect={onSelectTenant}
               onChange={value => {
                 if (user.id) {
@@ -131,31 +142,55 @@ export default function TenantCreateForm({
               ))}
             </AutoComplete>
           </FormItem>
-          <FormItem label="Nombre">
-            <Input
-              name="name"
-              onChange={changer}
-              disabled={Boolean(user.id)}
-              value={user!.name || ""}
-              //disabled={disabledAll}
-            />
-          </FormItem>
-          <FormItem label="Apellido">
-            <Input
-              name="lastName"
-              onChange={changer}
-              value={user!.lastName || ""}
-              disabled={Boolean(user.id)}
-            />
-          </FormItem>
           <FormItem label={"Usuario"} sm={24} md={24}>
             <Input
               name="username"
               required={true}
               onChange={changer}
               value={user!.username || ""}
-              disabled={Boolean(user.id)}
-              //disabled={Boolean(user!.id) || disabledAll}
+              disabled={createModeDisable || editMode}
+            />
+          </FormItem>
+          <FormItem label="Nombre">
+            <Input
+              name="name"
+              onChange={changer}
+              disabled={createModeDisable && !editMode}
+              value={user!.name || ""}
+            />
+          </FormItem>
+          <FormItem label="Apellido">
+            <Input
+              name="lastName"
+              onChange={changer}
+              disabled={createModeDisable && !editMode}
+              value={user!.lastName || ""}
+            />
+          </FormItem>
+          <FormItem label="Teléfono">
+            <Input
+              name="phone"
+              type="number"
+              disabled={createModeDisable && !editMode}
+              onChange={changer}
+              value={user!.phone}
+            />
+          </FormItem>
+          <FormItem label="Celular">
+            <Input
+              name="cellphone"
+              type="number"
+              onChange={changer}
+              disabled={createModeDisable && !editMode}
+              value={user!.cellphone}
+            />
+          </FormItem>
+          <FormItem label="Dirección" md={24} sm={24}>
+            <Input
+              name="address"
+              onChange={changer}
+              value={user!.address}
+              disabled={createModeDisable && !editMode}
             />
           </FormItem>
         </Form>

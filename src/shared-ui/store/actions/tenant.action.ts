@@ -37,6 +37,23 @@ export function setTenantAction(payload: Partial<User>) {
   return createAction(TenantActions.SetTenant, payload);
 }
 
+export function removeApartmentFromTenant(id?: string, condominiumId?: number) {
+  return (tenantId: number, apartmentId: number, cb?: () => void) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        await apartmentService.removeTenant(tenantId, apartmentId);
+        const tenant = await tenantService.findOne(tenantId);
+        dispatch(setTenantAction(tenant));
+        dispatch(loadTenantAction(id)(condominiumId!));
+        toast.success("Apartamento Removido correctamente");
+        cb && cb();
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
+}
+
 export function addApartmentToTenant(id?: string, condominiumId?: number) {
   return (tenantId: number, apartmentId: number, cb?: () => void) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
@@ -107,22 +124,26 @@ export function loadTenantAction(id?: string) {
     });
 }
 
-export function updateTenantAction(id?: string) {
-  return (user: Partial<User>) => async (
-    dispatch: ThunkDispatch<any, any, any>
-  ) => {
-    // try {
-    //   const data = await service.update(user.id!, user);
-    //   dispatch(setTenantAction(data));
-    //   dispatch(loadTenantAction(id)());
-    //   dispatch(loadTenantAction(id)());
-    //   toast.success("Inquilino Actualizado Correctamente.");
-    // } catch (e) {}
-  };
+export function updateTenantAction(id?: string, condominiumId?: number) {
+  return (user: Partial<User>, cb?: () => void) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        const data = await service.update(user.id!, user);
+        dispatch(setTenantAction(data));
+        dispatch(loadTenantAction(id)(condominiumId!));
+        toast.success("Inquilino Actualizado Correctamente.");
+        const tenant = await tenantService.findOne(user.id!);
+        dispatch(setTenantAction(tenant));
+        cb && cb();
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
 }
 
 export function signUpTenantAction(id?: string, condominiumId?: number) {
-  return (user: Partial<User>) =>
+  return (user: Partial<User>, cb?: () => void) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         if (!user.id) {
@@ -133,6 +154,7 @@ export function signUpTenantAction(id?: string, condominiumId?: number) {
         }
         dispatch(loadTenantAction(id)(condominiumId!));
         toast.success("Inquilino Creado Correctamente.");
+        cb && cb();
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);

@@ -1,4 +1,5 @@
 import { Field } from "@rijudev/parseus";
+import { BankAccount } from "./bank-account";
 
 export class Transaction {
   @Field()
@@ -22,12 +23,18 @@ export class Transaction {
   @Field()
   public accountId?: number;
 
-  @Field()
+  @Field({ type: "decimal", fixed: 2 })
   public income?: number;
 
-  @Field()
+  @Field({ type: "decimal", fixed: 2 })
+  public balance?: number;
+
+  @Field({ type: "decimal", fixed: 2 })
   public outcome?: number;
 
   @Field()
   public paymentId?: number;
+
+  @Field({ type: "object", factory: BankAccount })
+  public account?: BankAccount;
 }

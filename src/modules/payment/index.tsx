@@ -25,17 +25,22 @@ import { paymentSelector } from "../../shared-ui/store/selectors/payment.selecto
 import InvoiceComponent from "../financial/invoice/invoice-view/component";
 import { appSelector } from "../../shared-ui/store/selectors/app";
 import { Payment } from "../../shared-ui/models/payment.model";
+import { tenantSelector } from "../../shared-ui/store/selectors/tenant.selector";
 
 const managerState = select(managerSelector);
+const tenantState = select(tenantSelector);
 const paymentState = select(paymentSelector);
 const appState = select(appSelector);
 
 const PaymentView: React.FC<IModule> = props => {
   const { match } = props;
+  const apartment = useReduxState(tenantState("apartment"));
   const [payment, setPayment] = useState<Payment>({});
   const keylist = useReduxState(appState("keylist"));
   //const condominium = useReduxState(managerState("condominium"));
   const invoice = useReduxState(paymentState("invoice"));
+
+  const isTenant = Boolean(apartment.id);
 
   const loadPayment = useReduxAction(getPaymentInvoiceAction);
   const proceedPayment = useReduxAction(proceedPaymentAction);
@@ -67,7 +72,18 @@ const PaymentView: React.FC<IModule> = props => {
               <Card>
                 <FormItem label="Método de Pago" sm={24} md={24}>
                   <Select
-                    data={keylist.paymentMethods}
+                    data={keylist.paymentMethods!.map(x => {
+                      if (!isTenant) return x;
+
+                      if (["TC", "TR", "BF"].includes(x.type!)) {
+                        return x;
+                      }
+
+                      return {
+                        ...x,
+                        disabled: true
+                      };
+                    })}
                     name="paymentMethod"
                     disabled={!["PE", "MO"].includes(invoice.statusType!)}
                     value={payment.methodTypeId}

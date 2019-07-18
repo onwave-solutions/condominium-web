@@ -5,6 +5,7 @@ import { createAction } from "../../utils/redux";
 import { ServiceService } from "../../services/service.service";
 import { getErrorResponse } from "../../utils/objects";
 import { loadingWrapper } from "./app";
+import { ApartmentService } from "../../services/apartment";
 
 export enum ServiceActions {
   SetService = "SERVICE_SET_SERVICE",
@@ -12,6 +13,7 @@ export enum ServiceActions {
 }
 
 const service = new ServiceService();
+const apartmentService = new ApartmentService();
 
 export function setServiceAction(payload: Partial<Service>) {
   return createAction(ServiceActions.SetService, payload);
@@ -44,6 +46,23 @@ export function createServiceAction(id?: string) {
         );
         dispatch(setServiceAction({}));
         toast.success("Servicio creado Correctamente.");
+      } catch (e) {
+        const error = getErrorResponse(e);
+        toast.error(error.message);
+      }
+    });
+}
+
+export function bulkAssignServiceAction(id?: string) {
+  return (payload: Partial<Service>) =>
+    loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+      try {
+        await apartmentService.bulk(payload);
+        dispatch(setServiceAction({ condominiumId: payload.condominiumId }));
+        dispatch(
+          loadServicesAction(id)({ condominiumId: payload.condominiumId })
+        );
+        toast.success("Servicio Actualizado Correctamente.");
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);

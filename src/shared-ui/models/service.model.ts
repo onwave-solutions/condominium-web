@@ -17,9 +17,6 @@ export class Service {
   @Field()
   public cutoffDay?: number;
 
-  @Field({ type: "decimal", fixed: 2 })
-  public mt2?: number;
-
   @Field()
   public dueDay?: number;
 
@@ -29,6 +26,12 @@ export class Service {
   @Field({ type: "decimal", fixed: 2 })
   public amount?: number;
 
+  @Field({ type: "decimal", fixed: 2 })
+  public lateFee?: number;
+
+  @Field({ type: "boolean", default: false })
+  public percent?: boolean;
+
   @Field()
   createdAt?: string;
   @Field()
@@ -36,4 +39,7 @@ export class Service {
 
   @Field({ type: "object", factory: KeylistType })
   serviceTypeRaw?: KeylistType;
+
+  @Field({ type: "array", factory: String })
+  public apartmentKeys?: string[];
 }

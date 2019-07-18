@@ -9,6 +9,7 @@ import {
 import { InvoiceService } from "../../services/invoice.service";
 import { closeBlade, addBlade, loadingWrapper } from "./app";
 import { getErrorResponse } from "../../utils/objects";
+import { AdvanceQuery } from '../../models/keylist';
 
 export enum InvoiceActions {
   ResetInvoice = "INVOICE_RESET_INVOICE",
@@ -79,16 +80,29 @@ export function setInvoicesAction(payload: Invoice[]) {
 }
 
 export function getInvoiceListAction(id?: string) {
-  return (condominiumId: number) =>
+  return (condominiumId: number, query?: AdvanceQuery<Invoice>) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
-        const invoices = await service.getByCondominiumId(condominiumId);
+        const invoices = await service.getByCondominiumId(condominiumId, query);
         dispatch(setInvoicesAction(invoices));
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
       }
     });
+}
+
+export function getInvoicesByQueryAction(query: AdvanceQuery<Invoice>) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      if(!Object.keys(query).length) return
+      const invoices = await service.query(query);
+      dispatch(setInvoicesAction(invoices));
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
 }
 
 export function getInvoicesByApartmentIdAction(apartmentId: number) {

@@ -3,6 +3,7 @@ import { Field } from "@rijudev/parseus";
 import { Supplier } from "./supplier.model";
 import { Transaction } from "./transaction.model";
 import { User } from "./user";
+import { BankAccount } from './bank-account';
 
 export class Expense {
   @Field()
@@ -24,6 +25,9 @@ export class Expense {
   public supplierId?: number;
 
   @Field()
+  public bankAccountId?: number;
+
+  @Field()
   public condominiumId?: number;
 
   @Field()
@@ -40,4 +44,7 @@ export class Expense {
 
   @Field({ factory: User, type: "object" })
   userCreatedBy?: User;
+
+  @Field({ factory: BankAccount, type: "object" })
+  public bankAccount?: BankAccount;
 }

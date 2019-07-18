@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import moment from "moment";
 import styled from "styled-components";
 
 import Scrollbars from "../../../../components/atoms/scrollbar";
@@ -59,14 +60,10 @@ export default function InvoiceModule(props: IModule) {
   };
 
   const onClickViewInvoice = (invoice: Invoice) => () => {
-    //setInvoice({ ...invoice });
     props.history.push(`/invoice-view/${invoice.id}`);
   };
 
   const onClickEditInvoice = (invoice: Invoice) => () => {
-    //handleAddBlade(invoiceEditorModule.id);
-    //handleCloseBlade(invoiceViewModule.id);
-    //setInvoice({ ...invoice });
     props.history.push(`/invoice-builder-detail/${invoice.id}`);
   };
 
@@ -79,38 +76,31 @@ export default function InvoiceModule(props: IModule) {
     props.history.push(`/payment/${invoice.id}`);
   };
 
-  const [searchText, setSearchText] = useState("");
-
-  const handleSearch = (selectedKeys: string[], confirm: Function) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
+  const refetch = (
+    startDate: moment.Moment,
+    endDate: moment.Moment
+  ) => () => {
+    getInvoiceList(condominium.id!, {
+      createdAt: {
+        between: {
+          end: endDate.toDate(),
+          start: startDate.toDate(),
+        }
+      }
+    })
   };
-
-  const handleReset = (clearFilters: Function) => {
-    clearFilters();
-    setSearchText("");
-  };
-
-  const onFilter = (fn: (record: any) => any) => (value: any, record: any) =>
-    fn(record)
-      .toString()
-      .toLowerCase()
-      .includes(value.toLowerCase());
-
-  useEffect(() => {
-    getInvoiceList(condominium.id!);
-  }, [condominium.id]);
 
   return (
     <InvoiceListView
       invoices={invoices}
+      resetKey={condominium.id}
       keylist={keylist}
       onClickPayInvoice={onClickPayInvoice}
       onAddInvoice={onAddInvoice}
       onClickEditInvoice={onClickEditInvoice}
       onClickViewInvoice={onClickViewInvoice}
       onVoidInvoice={onVoidInvoice}
-      refetch={() => getInvoiceList(condominium.id!)}
+      refetch={refetch}
     />
   );
 }
