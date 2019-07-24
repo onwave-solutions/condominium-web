@@ -53,25 +53,7 @@ export default function Tenant(props: IModule) {
   }, []);
 
   return (
-    <BladeTemplate
-      footer={
-        <>
-          {!tenant.id && (
-            <Button size={"small"} onClick={() => create(tenant)}>
-              Crear
-            </Button>
-          )}
-          {tenant.id && (
-            <Button size={"small"} onClick={() => update(tenant)}>
-              Guardar
-            </Button>
-          )}
-          <Button size={"small"} onClick={clear} style={{ marginLeft: 5 }}>
-            Limpiar
-          </Button>
-        </>
-      }
-    >
+    <BladeTemplate>
       <UserForm user={tenant} userChanged={setTenant} keylist={keylist} />
       {tenant.id && tenant.apartments!.length && (
         <Col sm={24} md={24}>

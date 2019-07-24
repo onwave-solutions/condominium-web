@@ -5,7 +5,7 @@ import { DateRangepicker } from "../../atoms/datepicker";
 import BladeTemplate from "../../templates/blade-template";
 import ScrollbarWrapper from "../../atoms/scrollbar";
 import Table, { Column } from "../../atoms/table";
-import Button from "../../atoms/button";
+import Button, { ButtonGroup } from "../../atoms/button";
 import { Wrapper, StatusTag } from "./style";
 import { Invoice } from "../../../shared-ui/models/invoice.model";
 import ColumnInputFilter from "../../molecules/column-input-filter";
@@ -19,8 +19,9 @@ export interface IInvoiceListView {
   invoices: Invoice[];
   onClickPayInvoice?: (invoice: Invoice) => () => void;
   keylist: Keylist;
+  formatter?: (amount: number) => string;
   resetKey?: number;
-  isTenant?: boolean
+  isTenant?: boolean;
   onClickViewInvoice?: (invoice: Invoice) => () => void;
   onClickEditInvoice?: (invoice: Invoice) => () => void;
   onVoidInvoice?: (invoice: Invoice) => () => void;
@@ -37,7 +38,8 @@ export default function InvoiceListView({
   onClickViewInvoice,
   onVoidInvoice,
   onAddInvoice,
-  resetKey
+  resetKey,
+  formatter
 }: IInvoiceListView) {
   const [searchText, setSearchText] = useState("");
   const [startDate, setStartDate] = useState<moment.Moment>(
@@ -99,16 +101,20 @@ export default function InvoiceListView({
     <BladeTemplate
       header={
         <>
-          <Button icon="sync" onClick={refetch(startDate, endDate)} />
           <DateRangepicker
             format="DD/MMM/YYYY"
             onChange={onChange as any}
             value={[startDate, endDate]}
           />
           <div style={{ flex: 1 }} />
-          {!hideInvoiceEditor && (
-            <Button onClick={onAddInvoice}>Agregar Factura</Button>
-          )}
+          <ButtonGroup>
+            <Button icon="sync" onClick={refetch(startDate, endDate)} />
+            {!hideInvoiceEditor && (
+              <Button type="primary" onClick={onAddInvoice}>
+                Agregar Factura
+              </Button>
+            )}
+          </ButtonGroup>
         </>
       }
     >
@@ -220,28 +226,28 @@ export default function InvoiceListView({
                 title={"Total"}
                 dataIndex={"total"}
                 width={"20%"}
-                render={(text: string) => <strong>RD$ {text}</strong>}
+                render={(text: number) => (
+                  <strong>{formatter ? formatter(text) : text}</strong>
+                )}
               />
               <Column
                 title={"Acciones"}
                 dataIndex={"view"}
                 width={"5%"}
                 render={(_: string, invoice: Invoice) => (
-                  <div className="isoInvoiceBtnView">
+                  <ButtonGroup className="isoInvoiceBtnView">
                     <Button
-                      shape="circle"
                       onClick={onClickViewInvoice!(invoice)}
                       className="invoiceDltBtn"
-                      ghost={true}
+                      type="primary"
                       size="default"
                       icon="eye"
                     />
                     {["PA", "AN"].includes(invoice.statusType!) ||
                     hideInvoiceEditor ? null : (
                       <Button
-                        shape="circle"
                         className="invoiceDltBtn"
-                        type="primary"
+                        type="default"
                         onClick={
                           onClickEditInvoice && onClickEditInvoice!(invoice)
                         }
@@ -253,14 +259,13 @@ export default function InvoiceListView({
                     hideInvoiceEditor ? null : (
                       <Button
                         className="invoiceDltBtn"
-                        shape="circle"
                         onClick={onVoidInvoice && onVoidInvoice!(invoice)}
                         type="danger"
                         size="default"
                         icon="delete"
                       />
                     )}
-                  </div>
+                  </ButtonGroup>
                 )}
               />
               <Column

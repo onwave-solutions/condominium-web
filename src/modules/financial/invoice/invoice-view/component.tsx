@@ -5,10 +5,12 @@ import { ViewTable } from "../../../../components/molecules/edit-table";
 
 export interface IInvoiceViewComponent {
   invoice: Invoice;
+  formatter: (amount: number) => string;
 }
 
 export default function InvoiceViewComponent({
-  invoice
+  invoice,
+  formatter
 }: IInvoiceViewComponent) {
   return (
     <InvoicePageWrapper className="InvoicePageWrapper">
@@ -48,13 +50,13 @@ export default function InvoiceViewComponent({
           <ViewTable invoices={invoice.invoiceDetails!} />
           <div className="TotalBill">
             <p>
-              Sub-total : <span>{`${invoice.subTotal}`}</span>
+              Sub-total : <span>{formatter(invoice.subTotal!)}</span>
             </p>
             <p>
-              Descuento : <span>{`${invoice.discount}`}</span>
+              Descuento : <span>{formatter(invoice.discount!)}</span>
             </p>
             <h3>
-              Total : <span>{`${invoice.total}`}</span>
+              Total : <span>{formatter(invoice.total!)}</span>
             </h3>
           </div>
         </div>

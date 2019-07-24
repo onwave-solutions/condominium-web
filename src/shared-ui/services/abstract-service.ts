@@ -18,7 +18,6 @@ export abstract class AbstractService<T extends object> {
 
   async create(payload: T): Promise<T> {
     const value = Parseus.encode(payload, this.model);
-    console.log(value, this.model)
     const { data } = await this.service.post<T>(this.prefix, value);
 
     return Parseus.decode(data).to(this.model);

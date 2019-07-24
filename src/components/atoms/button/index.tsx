@@ -6,3 +6,5 @@ import withButtonStyle from "../../hoc/with-button-style";
 export default withButtonStyle(Button as any) as ComponentType<
   Partial<ButtonProps>
 >;
+
+export const ButtonGroup = Button.Group

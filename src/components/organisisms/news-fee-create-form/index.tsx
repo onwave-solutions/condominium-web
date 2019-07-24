@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 
+import moment from "moment";
+
 import AntdModal from "../../atoms/modal";
 import Modals from "./modal.style";
+import DatePicker from "../../atoms/datepicker";
 import withDirection from "../../hoc/with-direction";
 import { NewsFee } from "../../../shared-ui/models/news-fee.model";
 import Form from "../../atoms/form";
@@ -29,6 +32,10 @@ const NewsFeeModal: React.FC<INewsFeeModal> = ({
   const [form, setForm] = useState<NewsFee>({ apartmentKeys: [] });
   const handleChange = (event: any) =>
     setForm({ ...form, [event.target.name]: event.target.value });
+
+  const onItemSelect = (name: string, value: any) => {
+    setForm({ ...form, [name]: value });
+  };
 
   useEffect(() => {
     if (!visible) setForm({ apartmentKeys: [] });
@@ -59,9 +66,22 @@ const NewsFeeModal: React.FC<INewsFeeModal> = ({
               onChange={handleChange}
             />
           </FormItem>
-          <FormItem label="Descripción" sm={24} md={24}>
+          <FormItem label="Fecha de Expiración" sm={24} md={24}>
+            <DatePicker
+              allowClear={false}
+              style={{ width: "100%" }}
+              format="DD/MM/YYYY"
+              onChange={(_: moment.Moment, dateStr: string) =>
+                onItemSelect("date", dateStr)
+              }
+              value={
+                form.endDate ? moment(form.endDate, "DD/MM/YYYY") : undefined
+              }
+            />
+          </FormItem>
+          <FormItem label="Contenido" sm={24} md={24}>
             <InputArea
-              placeholder="Descripción"
+              placeholder="Contenido"
               className="isoCardInput"
               name="description"
               value={form.description}

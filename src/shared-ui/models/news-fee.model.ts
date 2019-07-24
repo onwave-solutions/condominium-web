@@ -1,7 +1,7 @@
 import { Field } from "@rijudev/parseus";
 import { Condominium } from "./condominium";
 import { User } from "./user";
-import { DateTimeTransformer } from "../utils/dates";
+import { DateTimeTransformer, DateTransformer } from "../utils/dates";
 
 export class NewsFee {
   @Field()
@@ -25,8 +25,13 @@ export class NewsFee {
   @Field({ type: "object", factory: User })
   public userCreatedBy?: User;
 
+
   @Field({ transformer: new DateTimeTransformer() })
   createdAt?: string;
+
+  @Field({ transformer: new DateTransformer() })
+  endDate?: string;
+
   @Field()
   updatedAt?: string;
 }

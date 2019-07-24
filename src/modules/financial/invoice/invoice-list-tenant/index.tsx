@@ -14,6 +14,7 @@ import { Invoice } from "../../../../shared-ui/models/invoice.model";
 import { appSelector } from "../../../../shared-ui/store/selectors/app";
 import InvoiceListView from "../../../../components/organisisms/invoice-list-view";
 import { tenantSelector } from "../../../../shared-ui/store/selectors/tenant.selector";
+import { currencyFormat } from '../../../../shared-ui/utils/currency';
 
 const invoiceState = select(invoiceSelector);
 const tenantState = select(tenantSelector);
@@ -45,12 +46,18 @@ export default function InvoiceModule(props: IModule) {
     props.history.push(`/payment/${invoice.id}`);
   };
 
+  let formatter: any;
+  if (apartment && apartment.building! && apartment.building!.condominium!) {
+    formatter = currencyFormat(apartment.building!.condominium!);
+  }
+
   return (
     <InvoiceListView
       invoices={invoices}
       resetKey={apartment.id}
       keylist={keylist}
       isTenant={true}
+      formatter={formatter}
       onClickViewInvoice={onClickViewInvoice}
       hideInvoiceEditor={true}
       refetch={refetch}

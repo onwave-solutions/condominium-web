@@ -1,4 +1,5 @@
 import { Field } from "@rijudev/parseus";
+import { BooleanTransformer } from "../utils/boolean";
 
 export class Supplier {
   @Field()
@@ -16,7 +17,7 @@ export class Supplier {
   @Field()
   public document?: string;
 
-  @Field()
+  @Field({ transformer: new BooleanTransformer() })
   public disabled?: boolean;
 
   @Field()

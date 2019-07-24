@@ -15,6 +15,8 @@ export class Condominium {
   createdAt?: string;
   @Field()
   updatedAt?: string;
+  @Field()
+  currencySymbol?: string
 }
 
 export class CondominiumManager {

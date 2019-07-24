@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { IModule } from "../../shared-ui/models/module";
 import BladeTemplate from "../../components/templates/blade-template";
 import Table, { Column } from "../../components/atoms/table";
-import Button from "../../components/atoms/button";
+import Button, { ButtonGroup } from "../../components/atoms/button";
 import SupplierModal from "../../components/organisisms/supplier-create-form";
 import { select } from "../../shared-ui/store/selectors";
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
@@ -68,6 +68,7 @@ export default function SupplierView(props: IModule) {
       <BladeTemplate
         header={
           <>
+            <div style={{ flex: 1 }} />
             <Button onClick={onCreateSupplier} type="primary">
               Crear Suplidor
             </Button>
@@ -83,7 +84,9 @@ export default function SupplierView(props: IModule) {
           <Column
             title="Tipo de Documento"
             dataIndex="documentId"
-            render={(_: string, supplier: Supplier) => <span>{supplier.documentId}</span>}
+            render={(_: string, supplier: Supplier) => (
+              <span>{supplier.documentId}</span>
+            )}
           />
           <Column
             title="Documento"
@@ -104,16 +107,30 @@ export default function SupplierView(props: IModule) {
             width={"150px"}
             render={(_: string, supplier: Supplier) => {
               return (
-                <>
+                <ButtonGroup>
                   <Button
-                    shape="circle"
                     className="invoiceDltBtn"
                     onClick={onUpdateSupplier(supplier)}
                     type="primary"
                     size="default"
                     icon="edit"
                   />
-                </>
+                  {supplier.disabled ? (
+                    <Button
+                      onClick={() => onAction({ ...supplier, disabled: false })}
+                      type="default"
+                      size="default"
+                      icon="check"
+                    />
+                  ) : (
+                    <Button
+                      onClick={() => onAction({ ...supplier, disabled: true })}
+                      type="danger"
+                      size="default"
+                      icon="close"
+                    />
+                  )}
+                </ButtonGroup>
               );
             }}
           />

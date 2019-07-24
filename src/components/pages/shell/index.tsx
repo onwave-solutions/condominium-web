@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import _ from "lodash";
 import debounce from "lodash/fp/debounce";
 
@@ -48,9 +48,11 @@ function formatApartment(apartment: Apartment) {
 
 export default function Shell(props: any) {
   const { url } = props.match;
+  const [role, setRole] = useState<string | undefined>(undefined);
+  const [lastRole, setLastRole] = useState<string | undefined>(undefined);
   const user = useReduxState(appState("user"));
   const visivility = useReduxState(appState("visibility"));
-  const modules = modulesByPermissions[user.roleId!];
+  const modules = modulesByPermissions[role || ""] || [];
 
   const handleAddBlade = useReduxAction(addBlade);
   const loadKeylist = useReduxAction(loadKeylistAction);
@@ -81,6 +83,20 @@ export default function Shell(props: any) {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    setRole(user.roleId);
+    setLastRole(user.roleId);
+  }, [user.roleId]);
+
+  const onToggleView = () => {
+    if (role === "TE") {
+      setRole(lastRole);
+    } else {
+      setRole("TE");
+    }
+    props.history.push("/dashboard");
+  };
+
   const isValid =
     Boolean(selectedApartment.id) ||
     Boolean(condominiumSelected.id) ||
@@ -91,10 +107,13 @@ export default function Shell(props: any) {
       topBar={
         <Topbar
           collapsed={visivility}
+          role={role}
+          onToggleView={onToggleView}
+          hasApartments={Boolean(apartments.length) && user.roleId !== "TE"}
           onCollapsedChange={handleSetVisibility}
           onCloseSession={onLogOut}
         >
-          {user.roleId === "TE" && (
+          {role === "TE" && (
             <Dropdown
               overlay={() => (
                 <Menu
@@ -134,7 +153,7 @@ export default function Shell(props: any) {
               </Button>
             </Dropdown>
           )}
-          {user.roleId === "MA" && (
+          {role === "MA" && (
             <>
               <Dropdown
                 overlay={() => (

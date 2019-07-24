@@ -60,4 +60,4 @@ export type Query<T> = {
   isNull?: boolean;
 };
 
-export type AdvanceQuery<T> = { [P in keyof T]?: Query<T[P]> | T[P] };
+export type AdvanceQuery<T> = { [P in keyof T]?: Query<T[P]> | T[P] | T[P][] };

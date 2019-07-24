@@ -35,6 +35,7 @@ import ColumnInputFilter from "../../../../components/molecules/column-input-fil
 import ColumnSelectFilter from "../../../../components/molecules/column-select-filter";
 import { appSelector } from "../../../../shared-ui/store/selectors/app";
 import InvoiceListView from "../../../../components/organisisms/invoice-list-view";
+import { currencyFormat } from "../../../../shared-ui/utils/currency";
 
 const ScrollbarWrapper = styled(Scrollbars)``;
 
@@ -76,18 +77,17 @@ export default function InvoiceModule(props: IModule) {
     props.history.push(`/payment/${invoice.id}`);
   };
 
-  const refetch = (
-    startDate: moment.Moment,
-    endDate: moment.Moment
-  ) => () => {
+  const formatter = currencyFormat(condominium);
+
+  const refetch = (startDate: moment.Moment, endDate: moment.Moment) => () => {
     getInvoiceList(condominium.id!, {
       createdAt: {
         between: {
           end: endDate.toDate(),
-          start: startDate.toDate(),
+          start: startDate.toDate()
         }
       }
-    })
+    });
   };
 
   return (
@@ -95,6 +95,7 @@ export default function InvoiceModule(props: IModule) {
       invoices={invoices}
       resetKey={condominium.id}
       keylist={keylist}
+      formatter={formatter}
       onClickPayInvoice={onClickPayInvoice}
       onAddInvoice={onAddInvoice}
       onClickEditInvoice={onClickEditInvoice}

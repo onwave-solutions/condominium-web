@@ -26,8 +26,7 @@ export async function findTenantBy(
   tenant: AdvanceQuery<User>
 ): Promise<User[]> {
   const data = await service.query({
-    ...tenant,
-    roleId: "TE"
+    ...tenant
   });
 
   return data;

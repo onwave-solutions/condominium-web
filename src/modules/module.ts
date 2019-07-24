@@ -18,7 +18,6 @@ import supplier from "./supplier/module";
 import payment from "./payment/module";
 import dashboard from "./dashboard/module";
 import newsFee from "./news-fee/module";
-import transactions from "./transaction/module";
 
 import { IModule } from "../shared-ui/models/module";
 
@@ -46,7 +45,6 @@ export const modules = [
   company,
   condominium,
   tenant,
-  transactions,
   condominumManager,
   ...financial.children,
   ...serviceAndProducts.children,
@@ -63,7 +61,6 @@ export const modulesByPermissions: { [id: string]: IModule[] } = {
     tenantList,
     ticket,
     newsFee,
-    transactions,
     financial,
     serviceAndProducts,
     editorDetail,

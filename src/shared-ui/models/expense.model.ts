@@ -3,7 +3,10 @@ import { Field } from "@rijudev/parseus";
 import { Supplier } from "./supplier.model";
 import { Transaction } from "./transaction.model";
 import { User } from "./user";
-import { BankAccount } from './bank-account';
+import { BankAccount } from "./bank-account";
+
+
+
 
 export class Expense {
   @Field()
@@ -32,6 +35,9 @@ export class Expense {
 
   @Field()
   public amount?: number;
+
+  @Field()
+  public date?: string;
 
   @Field()
   public description?: number;

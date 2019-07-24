@@ -54,11 +54,12 @@ ViewTable.defaultProps = {
 
 export interface IEditTable {
   invoices: InvoiceDetail[];
+  formatter: (amount:number) => string
   invoiceChange: (key: number, name: string, value: any) => void;
   removeInvoice: (key: number) => void;
 }
 
-const EditTable = ({ invoices, invoiceChange, removeInvoice }: IEditTable) => {
+const EditTable = ({ invoices,formatter, invoiceChange, removeInvoice }: IEditTable) => {
   const editColumns: ColumnProps<InvoiceDetail>[] = [
     {
       title: "#",
@@ -136,7 +137,8 @@ const EditTable = ({ invoices, invoiceChange, removeInvoice }: IEditTable) => {
     {
       title: "Precio",
       dataIndex: "price",
-      width: "12%"
+      width: "12%",
+      render: (text:number) => formatter(text)
     },
     {
       title: "",
@@ -148,6 +150,7 @@ const EditTable = ({ invoices, invoiceChange, removeInvoice }: IEditTable) => {
         ) : (
           <Button
             type="danger"
+
             onClick={() => removeInvoice(singleInvoice.key!)}
           >
             Eliminar

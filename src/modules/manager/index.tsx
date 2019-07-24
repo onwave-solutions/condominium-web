@@ -193,26 +193,6 @@ export default function Manager(props: IModule) {
               value={manager!.address}
             />
           </FormItem>
-          <FormItem label="Dia de Pago">
-            <Input
-              name="dueDay"
-              type="number"
-              onChange={(event: any) =>
-                onItemSelect(event.target.name, event.target.value)
-              }
-              value={manager!.dueDay}
-            />
-          </FormItem>
-          <FormItem label="Monto">
-            <Input
-              name="monthlyFee"
-              type="number"
-              onChange={(event: any) =>
-                onItemSelect(event.target.name, event.target.value)
-              }
-              value={manager!.monthlyFee}
-            />
-          </FormItem>
           <FormItem label="Compañia" sm={24} md={24}>
             <Select
               name="companyId"

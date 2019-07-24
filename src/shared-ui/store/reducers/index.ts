@@ -17,9 +17,11 @@ import ticketReducer from "./ticket.reducer";
 import expenseReducer from "./expense.reducer";
 import newsFeeReducer from "./news-fee.reducer";
 import transactionReducer from "./transaction.reducer";
+import dashboardReducer from "./dashboard.reducer";
 
 const reducer = combineReducers({
   app: appReducer,
+  dashboard: dashboardReducer,
   newsFee: newsFeeReducer,
   expense: expenseReducer,
   bankAccount: bankAccountReducer,

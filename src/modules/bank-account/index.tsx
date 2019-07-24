@@ -25,6 +25,7 @@ import BankAccountForm from "../../components/organisisms/bank-account-form";
 import { appSelector } from "../../shared-ui/store/selectors/app";
 import { Wrapper } from "../../components/atoms/body-wrapper";
 import { BankAccount } from "../../shared-ui/models/bank-account";
+import { currencyFormat } from '../../shared-ui/utils/currency';
 
 const bankAccountState = select(bankAccountSelector);
 const managerState = select(managerSelector);
@@ -42,6 +43,9 @@ export default function BankAccountView(props: IModule) {
   const create = useReduxAction(createBankAccountAction(props.id));
   const update = useReduxAction(updateBankAccountAction(props.id));
   const clear = () => setBankAccount({});
+
+
+  const formatter = currencyFormat(condominium);
 
   useEffect(() => {
     if (condominium.id === bankAccount.condominiumId) return;
@@ -122,21 +126,13 @@ export default function BankAccountView(props: IModule) {
                 title="Balance"
                 dataIndex="balance"
                 width="80px"
-                render={(text: string) => <span>{text}</span>}
+                render={(text: number) => <span>{formatter(text)}</span>}
               />
               <Column
                 title="Descripción"
                 dataIndex="description"
                 width="80px"
                 render={(text: string) => <span>{text}</span>}
-              />
-              <Column
-                title="Transacciones"
-                dataIndex={"view"}
-                width={"5%"}
-                render={(_: string, bank: BankAccount) => (
-                  <Button onClick={showTransactions(bank)} icon="eye" />
-                )}
               />
               <Column
                 title="Editar"

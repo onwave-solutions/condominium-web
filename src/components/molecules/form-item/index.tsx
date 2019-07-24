@@ -23,7 +23,7 @@ export default function FormItem(props: IFormItem) {
   const { sm, md, label, children } = props;
   return (
     <Wrapper xs={sm} sm={sm} md={md}>
-      <label style={{ width: "100%" }}>{label}:</label>
+      {label ? <label style={{ width: "100%" }}>{label}:</label> : <br />}
       {children}
     </Wrapper>
   );

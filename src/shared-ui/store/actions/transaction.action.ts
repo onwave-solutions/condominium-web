@@ -18,9 +18,15 @@ export function setTransactionsAction(payload: Transaction[]) {
   return createAction(TransactionActions.SetTransactions, payload);
 }
 
-export function loadTransactionsByQueryAction(query: AdvanceQuery<Transaction>) {
+export function loadTransactionsByQueryAction(
+  query: AdvanceQuery<Transaction>
+) {
   return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
+      if (!query.accountId) {
+        dispatch(setTransactionsAction([]));
+        return;
+      }
       const data = await service.query(query);
       dispatch(setTransactionsAction(data));
     } catch (e) {

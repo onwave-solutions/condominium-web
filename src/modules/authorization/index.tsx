@@ -5,7 +5,7 @@ import { IModule } from "../../shared-ui/models/module";
 import BladeTemplate from "../../components/templates/blade-template";
 import { Wrapper } from "../../components/atoms/body-wrapper";
 import Table, { Column } from "../../components/atoms/table";
-import Button from "../../components/atoms/button";
+import Button, { ButtonGroup } from "../../components/atoms/button";
 import ScrollbarWrapper from "../../components/atoms/scrollbar";
 import { Payment } from "../../shared-ui/models/payment.model";
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
@@ -21,6 +21,7 @@ import { bankAccountSelector } from "../../shared-ui/store/selectors/bank-accoun
 
 import BankAccountSelector from "../../components/organisisms/bank-account-selector-form";
 import { refreshBankAccountsAction } from "../../shared-ui/store/actions/bank-account.actions";
+import { currencyFormat } from "../../shared-ui/utils/currency";
 
 const managerState = select(managerSelector);
 const paymentState = select(paymentSelector);
@@ -39,6 +40,8 @@ const AuthorizationView: React.FC<IModule> = props => {
       isNull: true
     }
   };
+
+  const formatter = currencyFormat(condominium);
 
   const loadPayments = useReduxAction(loadPaymentsByQueryAction);
   const loadBankAccounts = useReduxAction(refreshBankAccountsAction());
@@ -102,7 +105,12 @@ const AuthorizationView: React.FC<IModule> = props => {
                     })`}</span>
                   )}
                 />
-                <Column title="Monto" dataIndex="amount" width="80px" />
+                <Column
+                  title="Monto"
+                  dataIndex="amount"
+                  width="80px"
+                  render={(text: number) => formatter(text)}
+                />
                 <Column
                   title="Creado Por"
                   dataIndex="createdBy"
@@ -141,31 +149,31 @@ const AuthorizationView: React.FC<IModule> = props => {
                   dataIndex="actions"
                   width="100px"
                   render={(_: string, payment: Payment) => (
-                    <div className="isoInvoiceBtnView">
-                      <Button
-                        shape="circle"
-                        type="primary"
-                        onClick={handleVisibility(payment.id!)}
-                        className="invoiceDltBtn"
-                        icon="check"
-                        size="default"
-                      />
+                    <>
+                      <ButtonGroup className="isoInvoiceBtnView">
+                        <Button
+                          type="primary"
+                          onClick={handleVisibility(payment.id!)}
+                          className="invoiceDltBtn"
+                          icon="check"
+                          size="default"
+                        />
+                        <Button
+                          type="danger"
+                          onClick={onReject(payment)}
+                          className="invoiceDltBtn"
+                          icon="close"
+                          size="default"
+                        />
+                      </ButtonGroup>
                       <BankAccountSelector
                         accounts={bankAccounts}
+                        formatter={formatter}
                         visible={visible === payment.id}
                         onAction={onAuthorize(payment)}
                         onClose={handleVisibility(0)}
                       />
-
-                      <Button
-                        shape="circle"
-                        type="danger"
-                        onClick={onReject(payment)}
-                        className="invoiceDltBtn"
-                        icon="close"
-                        size="default"
-                      />
-                    </div>
+                    </>
                   )}
                 />
               </Table>

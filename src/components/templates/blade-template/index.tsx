@@ -55,6 +55,7 @@ export const HeaderWrapper = styled.header`
   background: white;
   max-height: 70px;
   min-height: 70px;
+  justify-content: flex-end;
   display: flex;
   overflow: hidden;
   overflow-x: auto;
@@ -85,6 +86,7 @@ export const FooterWrapper = styled.footer`
 `;
 
 export interface IBladeTemplate {
+  style?: React.CSSProperties;
   children?: React.ReactNode;
   header?: React.ReactNode;
   footer?: React.ReactNode;
@@ -93,13 +95,13 @@ export interface IBladeTemplate {
 const appState = select(appSelector);
 
 export default function BladeTemplate(props: IBladeTemplate) {
-  const { children, header } = props;
+  const { children, header, style } = props;
   const loading = useReduxState(appState("loading"));
   return (
-    <LayoutContentWrapper className="isoLayoutContentWrapper">
+    <LayoutContentWrapper  className="isoLayoutContentWrapper">
       <Spin tip="Cargando Favor Espere..." spinning={loading}>
         {header && <HeaderWrapper>{header}</HeaderWrapper>}
-        <Wrapper>{children}</Wrapper>
+        <Wrapper style={style}>{children}</Wrapper>
       </Spin>
       {/* <FooterWrapper>{footer}</FooterWrapper> */}
     </LayoutContentWrapper>

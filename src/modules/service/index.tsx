@@ -23,6 +23,7 @@ import { Wrapper } from "../../components/atoms/body-wrapper";
 import { Service } from "../../shared-ui/models/service.model";
 import { appSelector } from "../../shared-ui/store/selectors/app";
 import BuildingTreeModal from "../../components/organisisms/building-tree-form";
+import { currencyFormat } from '../../shared-ui/utils/currency';
 
 const serviceState = select(serviceSelector);
 const managerState = select(managerSelector);
@@ -41,6 +42,9 @@ export default function ServiceView(props: IModule) {
   const create = useReduxAction(createServiceAction(props.id));
   const update = useReduxAction(updateServiceAction(props.id));
   const bulk = useReduxAction(bulkAssignServiceAction(props.id));
+
+  const formatter = currencyFormat(condominium);
+
 
   const handleAction = async () => {
     if (service.id) {
@@ -150,7 +154,7 @@ export default function ServiceView(props: IModule) {
                   title="Monto"
                   dataIndex="amount"
                   width="80px"
-                  render={(text: string) => <span>{text} </span>}
+                  render={(text: number) => <span>{formatter(text)} </span>}
                 />
                 <Column
                   title="Mora"

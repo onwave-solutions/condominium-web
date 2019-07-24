@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+import moment from "moment";
+
 import { IModule } from "../../shared-ui/models/module";
 import { select } from "../../shared-ui/store/selectors";
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
@@ -23,6 +25,8 @@ import { loadSuppliersAction } from "../../shared-ui/store/actions/supplier.acti
 import { Expense } from "../../shared-ui/models/expense.model";
 import { bankAccountSelector } from "../../shared-ui/store/selectors/bank-account.selector";
 import { refreshBankAccountsAction } from "../../shared-ui/store/actions/bank-account.actions";
+import { currencyFormat } from "../../shared-ui/utils/currency";
+import { formatWithOptions } from "util";
 
 const managerState = select(managerSelector);
 const expenseState = select(expenseSelector);
@@ -55,6 +59,8 @@ export default function ExpenseModule(props: IModule) {
 
   const bankAccounts = useReduxState(bankAccountState("bankAccounts"));
 
+  const formatter = currencyFormat(condominium);
+
   const payload = {
     condominiumId: condominium.id
   };
@@ -65,7 +71,7 @@ export default function ExpenseModule(props: IModule) {
   const createExpense = useReduxAction(createExpenseAction(props.id));
 
   const handleLoadSuppliers = () =>
-    loadSupplierList({ condominiumId: condominium.id });
+    loadSupplierList({ condominiumId: condominium.id, disabled: false });
 
   useEffect(() => {
     loadExpenses(payload);
@@ -99,7 +105,9 @@ export default function ExpenseModule(props: IModule) {
       <BladeTemplate
         header={
           <>
-            <Button onClick={() => setVisibility(true)}> Agregar Gasto </Button>
+            <Button type="primary" onClick={() => setVisibility(true)}>
+              Agregar Gasto{" "}
+            </Button>
           </>
         }
       >
@@ -155,7 +163,7 @@ export default function ExpenseModule(props: IModule) {
                   )}
                   width="80px"
                   render={(_: string, expense: Expense) => (
-                    <span>{expense.amount}</span>
+                    <span>{formatter(expense.amount!)}</span>
                   )}
                 />
                 <Column
@@ -182,6 +190,16 @@ export default function ExpenseModule(props: IModule) {
                   width="80px"
                   render={(_: string, expense: Expense) => (
                     <span>{expense.description}</span>
+                  )}
+                />
+                <Column
+                  title="Fecha Efectiva"
+                  dataIndex="date"
+                  width="80px"
+                  render={(_: string, expense: Expense) => (
+                    <span>
+                      {moment(expense.date, "YYYY-MM-DD").format("DD/MM/YYYY")}
+                    </span>
                   )}
                 />
                 <Column

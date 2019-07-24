@@ -19,6 +19,14 @@ export default function CondominiumForm(props: ICondominiumForm) {
       <FormItem label="Nombre" sm={24} md={24}>
         <Input name="name" onChange={changer} value={condominium.name} />
       </FormItem>
+      <FormItem label="Moneda" sm={24} md={24}>
+        <Input
+          name="currencySymbol"
+          maxLength={3}
+          onChange={changer}
+          value={condominium.currencySymbol}
+        />
+      </FormItem>
       <FormItem label="Dirección" sm={24} md={24}>
         <Input name="address" onChange={changer} value={condominium.address} />
       </FormItem>

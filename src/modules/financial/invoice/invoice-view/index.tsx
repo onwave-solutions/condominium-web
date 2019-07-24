@@ -11,13 +11,17 @@ import { getInvoiceByIdAction } from "../../../../shared-ui/store/actions/invoic
 
 import InvoiceComponent from "./component";
 import Button from "../../../../components/atoms/button";
+import { managerSelector } from "../../../../shared-ui/store/selectors/manager.selector";
+import { currencyFormat } from "../../../../shared-ui/utils/currency";
 
 const invoiceState = select(invoiceSelector);
+const managerState = select(managerSelector);
 
 export default function InvoiceView(props: IModule) {
   const { match } = props;
   const invoice = useReduxState(invoiceState("invoice"));
   const getInvoiceById = useReduxAction(getInvoiceByIdAction(props.id));
+  const condominium = useReduxState(managerState("condominium"));
 
   const onClickPayInvoice = () => {
     props.history.push(`/payment/${invoice.id}`);
@@ -29,6 +33,8 @@ export default function InvoiceView(props: IModule) {
     }
   }, []);
 
+  const formatter = currencyFormat(condominium);
+
   return (
     <BladeTemplate
       header={
@@ -37,7 +43,9 @@ export default function InvoiceView(props: IModule) {
         </>
       }
     >
-      {invoice.id && <InvoiceComponent invoice={invoice} />}
+      {invoice.id && (
+        <InvoiceComponent invoice={invoice} formatter={formatter} />
+      )}
     </BladeTemplate>
   );
 }

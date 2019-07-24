@@ -175,7 +175,9 @@ export default function TenantList(props: IModule) {
                   >
                     <List
                       header={<h4>Apartamentos Asignados</h4>}
-                      dataSource={tenant.apartments || []}
+                      dataSource={(tenant.apartments || []).filter(
+                        x => x.building!.condominiumId === condominium.id
+                      )}
                       renderItem={(item: Apartment) => {
                         return (
                           <List.Item

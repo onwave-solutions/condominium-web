@@ -14,6 +14,7 @@ const Modal = withDirection(WDModal);
 export interface IBankAccountSelector {
   accounts?: BankAccount[];
   onAction?(accountId: number): void;
+  formatter?: (value: number) => string;
   visible?: boolean;
   onClose?(): void;
 }
@@ -22,6 +23,7 @@ const BankAccountSelector: React.FC<IBankAccountSelector> = ({
   visible = false,
   accounts = [],
   onAction,
+  formatter,
   onClose
 }) => {
   const [accountId, setBankAccountId] = useState<number | undefined>();
@@ -47,8 +49,8 @@ const BankAccountSelector: React.FC<IBankAccountSelector> = ({
             typeName="id"
             renderNode={(account: BankAccount) => {
               return `${account.account} [${account.bank!.name}] (${
-                account.balance
-              } RD$)`;
+                formatter ? formatter(account.balance!) : account.balance
+              })`;
             }}
             onChangeItem={onItemSelect}
             value={accountId}

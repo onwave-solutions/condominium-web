@@ -77,9 +77,15 @@ export default function NewsFeeView(props: IModule) {
                   render={(text: string) => <span>{text}</span>}
                 />
                 <Column
-                  title="Descripción"
+                  title="Contenido"
                   dataIndex="description"
                   width="55%"
+                  render={(text: string) => <span>{text}</span>}
+                />
+                <Column
+                  title="Fecha de Expiración"
+                  dataIndex="endDate"
+                  width="25%"
                   render={(text: string) => <span>{text}</span>}
                 />
                 <Column

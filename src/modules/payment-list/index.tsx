@@ -12,6 +12,8 @@ import { managerSelector } from "../../shared-ui/store/selectors/manager.selecto
 import { select } from "../../shared-ui/store/selectors";
 import { loadPaymentsByQueryAction } from "../../shared-ui/store/actions/payment.action";
 import { paymentSelector } from "../../shared-ui/store/selectors/payment.selector";
+import { AdvanceQuery } from "../../shared-ui/models/keylist";
+import { currencyFormat } from "../../shared-ui/utils/currency";
 
 const managerState = select(managerSelector);
 const paymentState = select(paymentSelector);
@@ -20,11 +22,16 @@ const PaymentList: React.FC<IModule> = props => {
   const condominium = useReduxState(managerState("condominium"));
   const payments = useReduxState(paymentState("payments"));
 
-  const payload = {
-    condominiumId: condominium.id
+  const payload: AdvanceQuery<Payment> = {
+    condominiumId: condominium.id,
+    bankAccount: {
+      isNull: false
+    },
+    statusTypeId: "AP"
   };
 
   const loadPayments = useReduxAction(loadPaymentsByQueryAction);
+  const formatter = currencyFormat(condominium);
 
   useEffect(() => {
     if (!payload.condominiumId) return;
@@ -92,7 +99,12 @@ const PaymentList: React.FC<IModule> = props => {
                     })`}</span>
                   )}
                 />
-                <Column title="Monto" dataIndex="amount" width="80px" />
+                <Column
+                  title="Monto"
+                  dataIndex="amount"
+                  width="80px"
+                  render={(text: number) => formatter(text)}
+                />
                 <Column
                   title="Pagado Por"
                   dataIndex="createdBy"

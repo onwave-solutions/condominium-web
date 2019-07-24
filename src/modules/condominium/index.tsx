@@ -116,11 +116,18 @@ export default function CondominiumBlade(props: IModule) {
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
+                title="Moneda"
+                dataIndex="currencySymbol"
+                width="80px"
+                render={(text: string) => <span>{text}</span>}
+              />
+              <Column
                 title="Dirección"
                 dataIndex="address"
                 width="80px"
                 render={(text: string) => <span>{text}</span>}
               />
+
               <Column
                 title="Edificios"
                 dataIndex={"buildings"}

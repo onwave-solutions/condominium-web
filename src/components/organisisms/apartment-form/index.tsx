@@ -24,7 +24,7 @@ export default function ApartmentForm(props: IApartmentForm) {
 
   return (
     <>
-      <FormItem label="Nombre" sm={24} md={24}>
+      <FormItem label="Identificador" sm={24} md={24}>
         <Input name="name" value={apartment.name} onChange={changer} />
       </FormItem>
       <FormItem label="Piso">

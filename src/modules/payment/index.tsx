@@ -26,6 +26,7 @@ import InvoiceComponent from "../financial/invoice/invoice-view/component";
 import { appSelector } from "../../shared-ui/store/selectors/app";
 import { Payment } from "../../shared-ui/models/payment.model";
 import { tenantSelector } from "../../shared-ui/store/selectors/tenant.selector";
+import { currencyFormat } from "../../shared-ui/utils/currency";
 
 const managerState = select(managerSelector);
 const tenantState = select(tenantSelector);
@@ -44,6 +45,11 @@ const PaymentView: React.FC<IModule> = props => {
 
   const loadPayment = useReduxAction(getPaymentInvoiceAction);
   const proceedPayment = useReduxAction(proceedPaymentAction);
+
+  let formatter = (amount: number) => `${amount}`;
+  if (apartment && apartment.building && apartment.building.condominium) {
+    formatter = currencyFormat(apartment.building!.condominium!);
+  }
 
   useEffect(() => {
     if (match && match.params && match.params.id) {
@@ -124,7 +130,9 @@ const PaymentView: React.FC<IModule> = props => {
             </Col>
             <Col md={1} sm={0} />
             <Col md={17} sm={24}>
-              {invoice.id && <InvoiceComponent invoice={invoice} />}
+              {invoice.id && (
+                <InvoiceComponent invoice={invoice} formatter={formatter} />
+              )}
             </Col>
           </Row>
         </Scrollbar>
