@@ -109,6 +109,9 @@ export default function ExpenseCreateForm({
               onChange={(_: moment.Moment, dateStr: string) =>
                 onItemSelect("date", dateStr)
               }
+              disabledDate={(current?: moment.Moment) =>
+                current ? current.isAfter(moment()) : false
+              }
               value={
                 expense.date ? moment(expense.date, "DD/MM/YYYY") : undefined
               }

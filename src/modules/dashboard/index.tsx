@@ -37,7 +37,9 @@ const DashboardView: React.FC<IModule> = () => {
 
   useEffect(() => {
     if (!condominium || !condominium.id) return;
-    loadDashboard();
+    setTimeout(() => {
+      loadDashboard();
+    }, 1500);
   }, [condominium.id]);
 
   return (

@@ -72,7 +72,7 @@ const NewsFeeModal: React.FC<INewsFeeModal> = ({
               style={{ width: "100%" }}
               format="DD/MM/YYYY"
               onChange={(_: moment.Moment, dateStr: string) =>
-                onItemSelect("date", dateStr)
+                onItemSelect("endDate", dateStr)
               }
               value={
                 form.endDate ? moment(form.endDate, "DD/MM/YYYY") : undefined

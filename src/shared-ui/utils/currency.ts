@@ -6,5 +6,5 @@ export const currencyFormat = ({ currencySymbol }: Condominium) => {
     currency: "USD",
     minimumFractionDigits: 2
   });
-  return (amount: number) => formatter.format(amount || 0) + currencySymbol;
+  return (amount: number) => currencySymbol + formatter.format(amount || 0);
 };

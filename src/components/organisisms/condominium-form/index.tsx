@@ -1,6 +1,7 @@
 import React from "react";
 
 import Input from "../../atoms/input";
+import Select from "../../atoms/select";
 import FormItem from "../../molecules/form-item";
 import { Condominium } from "../../../shared-ui/models/condominium";
 import { changeHandler } from "../../../shared-ui/utils/input";
@@ -20,10 +21,16 @@ export default function CondominiumForm(props: ICondominiumForm) {
         <Input name="name" onChange={changer} value={condominium.name} />
       </FormItem>
       <FormItem label="Moneda" sm={24} md={24}>
-        <Input
+        <Select
           name="currencySymbol"
-          maxLength={3}
-          onChange={changer}
+          data={[
+            { type: "DOP", name: "DOP" },
+            { type: "USD", name: "USD" },
+            { type: "EUR", name: "EUR" }
+          ]}
+          onChangeItem={(name, value) =>
+            condominiumChanged!({ ...condominium, [name]: value })
+          }
           value={condominium.currencySymbol}
         />
       </FormItem>

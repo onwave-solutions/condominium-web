@@ -124,6 +124,7 @@ export function changePasswordAction(auth: IAuthorization, cb?: () => void) {
   return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
       const data = await service.changePassword(auth);
+      setAuthorization(data.token!);
       dispatch(setUser(data));
       toast.success("Contraseña cambiada con exito.");
       cb && cb();

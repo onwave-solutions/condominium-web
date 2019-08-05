@@ -76,7 +76,7 @@ export function Login(props: any) {
                   }
                   disabled={!["A", undefined].includes(user.status)}
                   size="large"
-                  placeholder="Usuario"
+                  placeholder="Email"
                 />
               )}
             </Form.Item>

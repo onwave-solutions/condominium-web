@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import moment from "moment";
+
+import ReactToPrint from "react-to-print";
 
 import { DateRangepicker } from "../../atoms/datepicker";
 import BladeTemplate from "../../templates/blade-template";
@@ -11,6 +13,10 @@ import { Invoice } from "../../../shared-ui/models/invoice.model";
 import ColumnInputFilter from "../../molecules/column-input-filter";
 import ColumnSelectFilter from "../../molecules/column-select-filter";
 import { Keylist } from "../../../shared-ui/models/keylist";
+import { InvoiceService } from "../../../shared-ui/services/invoice.service";
+import { createPdf } from "../../../shared-ui/utils/pdf";
+
+const service = new InvoiceService();
 
 export interface IInvoiceListView {
   refetch: (startDate: moment.Moment, endDate: moment.Moment) => () => void;
@@ -41,6 +47,7 @@ export default function InvoiceListView({
   resetKey,
   formatter
 }: IInvoiceListView) {
+  const componentRef = useRef<any>();
   const [searchText, setSearchText] = useState("");
   const [startDate, setStartDate] = useState<moment.Moment>(
     moment()
@@ -76,13 +83,13 @@ export default function InvoiceListView({
 
   const onChange = ([startDate, endDate]: moment.Moment[]) => {
     const start = startDate
-      .startOf("month")
+      .startOf("days")
       .startOf("hours")
       .startOf("minutes")
       .startOf("seconds");
 
     const end = endDate
-      .endOf("month")
+      .endOf("days")
       .endOf("hours")
       .endOf("minutes")
       .endOf("seconds");
@@ -96,6 +103,12 @@ export default function InvoiceListView({
     if (!resetKey) return;
     refetch(startDate, endDate)();
   }, [resetKey]);
+
+  const openPDF = ({ id }: Invoice) => async () => {
+    const invoiceTpl = await service.pdfById(id!);
+    const pdf = createPdf(invoiceTpl);
+    pdf.open();
+  };
 
   return (
     <BladeTemplate
@@ -243,7 +256,14 @@ export default function InvoiceListView({
                       size="default"
                       icon="eye"
                     />
-                    {["PA", "AN"].includes(invoice.statusType!) ||
+                    <Button
+                      className="invoiceDltBtn"
+                      onClick={openPDF(invoice)}
+                      type="primary"
+                      size="default"
+                      icon="printer"
+                    />
+                    {["PA", "AN", "PP"].includes(invoice.statusType!) ||
                     hideInvoiceEditor ? null : (
                       <Button
                         className="invoiceDltBtn"
@@ -255,7 +275,7 @@ export default function InvoiceListView({
                         icon="edit"
                       />
                     )}
-                    {["AN", "PA"].includes(invoice.statusType!) ||
+                    {["AN", "PA", "PP"].includes(invoice.statusType!) ||
                     hideInvoiceEditor ? null : (
                       <Button
                         className="invoiceDltBtn"

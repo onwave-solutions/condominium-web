@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import { useReduxState, useReduxAction } from "../../shared-ui/store/hooks";
 import { IModule } from "../../shared-ui/models/module";
-import Button from "../../components/atoms/button";
+import Button, { ButtonGroup } from "../../components/atoms/button";
 import BladeTemplate from "../../components/templates/blade-template";
 import { Wrapper } from "../../components/atoms/body-wrapper";
 import Table, { Column } from "../../components/atoms/table";
@@ -14,9 +14,13 @@ import { loadPaymentsByQueryAction } from "../../shared-ui/store/actions/payment
 import { paymentSelector } from "../../shared-ui/store/selectors/payment.selector";
 import { AdvanceQuery } from "../../shared-ui/models/keylist";
 import { currencyFormat } from "../../shared-ui/utils/currency";
+import { PaymentService } from "../../shared-ui/services/payment.service";
+import { createPdf } from "../../shared-ui/utils/pdf";
 
 const managerState = select(managerSelector);
 const paymentState = select(paymentSelector);
+
+const service = new PaymentService();
 
 const PaymentList: React.FC<IModule> = props => {
   const condominium = useReduxState(managerState("condominium"));
@@ -37,6 +41,12 @@ const PaymentList: React.FC<IModule> = props => {
     if (!payload.condominiumId) return;
     loadPayments(payload);
   }, [condominium.id]);
+
+  const openPDF = ({ id }: Payment) => async () => {
+    const tpl = await service.pdfById(id!);
+    const pdf = createPdf(tpl);
+    pdf.open();
+  };
 
   return (
     <>
@@ -74,12 +84,14 @@ const PaymentList: React.FC<IModule> = props => {
                   title="Caja"
                   dataIndex="bankAccountId"
                   width="180px"
-                  render={(_: string, payment: Payment) => (
-                    <span>
-                      {payment.bankAccount!.bank!.name}-
-                      {payment.bankAccount!.account}
-                    </span>
-                  )}
+                  render={(_: string, payment: Payment) =>
+                    payment.bankAccountId ? (
+                      <span>
+                        {payment.bankAccount!.bank!.name}-
+                        {payment.bankAccount!.account}
+                      </span>
+                    ) : null
+                  }
                 />
                 <Column
                   title="Estado"
@@ -121,13 +133,15 @@ const PaymentList: React.FC<IModule> = props => {
                   title="Aprobado Por"
                   dataIndex="updatedBy"
                   width="80px"
-                  render={(_: string, payment: Payment) => (
-                    <span>
-                      {payment.userUpdatedBy!.name +
-                        " " +
-                        payment.userUpdatedBy!.lastName}
-                    </span>
-                  )}
+                  render={(_: string, payment: Payment) =>
+                    payment.approved ? (
+                      <span>
+                        {payment.approved!.name +
+                          " " +
+                          payment.approved!.lastName}
+                      </span>
+                    ) : null
+                  }
                 />
                 <Column
                   title={"Fecha de Pago"}
@@ -137,29 +151,35 @@ const PaymentList: React.FC<IModule> = props => {
                 />
                 <Column
                   title={"Fecha de Autorización"}
-                  dataIndex={"updatedAt"}
+                  dataIndex={"approvedAt"}
                   width={"120px"}
                   render={(text: string) => <strong>{text}</strong>}
                 />
                 <Column
-                  title="Ver Factura"
+                  title="Accciones"
                   dataIndex="view"
                   width="100px"
                   render={(_: string, payment: Payment) => (
-                    <div className="isoInvoiceBtnView">
+                    <ButtonGroup className="isoInvoiceBtnView">
                       <Button
-                        shape="circle"
                         onClick={() =>
                           props.history.push(
                             `/invoice-view/${payment.invoiceId}`
                           )
                         }
                         className="invoiceDltBtn"
-                        ghost={true}
                         size="default"
+                        type="primary"
                         icon="eye"
                       />
-                    </div>
+                      <Button
+                        className="invoiceDltBtn"
+                        onClick={openPDF(payment)}
+                        type="primary"
+                        size="default"
+                        icon="printer"
+                      />
+                    </ButtonGroup>
                   )}
                 />
               </Table>

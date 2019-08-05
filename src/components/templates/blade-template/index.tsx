@@ -31,6 +31,15 @@ const LayoutContentWrapper = styled(Row)`
     width: 100% !important;
   }
 
+  & .ant-table-body {
+    margin-right: 0px !important;
+    margin-left: 0px !important;
+  }
+
+  & .ant-table-thead > tr > th {
+    background: #f7f7f7 !important;
+  }
+
   & tr:nth-child(even) {
     background: #f7f7f7;
   }
@@ -98,7 +107,7 @@ export default function BladeTemplate(props: IBladeTemplate) {
   const { children, header, style } = props;
   const loading = useReduxState(appState("loading"));
   return (
-    <LayoutContentWrapper  className="isoLayoutContentWrapper">
+    <LayoutContentWrapper className="isoLayoutContentWrapper">
       <Spin tip="Cargando Favor Espere..." spinning={loading}>
         {header && <HeaderWrapper>{header}</HeaderWrapper>}
         <Wrapper style={style}>{children}</Wrapper>

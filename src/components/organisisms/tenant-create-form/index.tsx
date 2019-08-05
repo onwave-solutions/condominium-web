@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AutoComplete, Spin } from "antd";
 
+import { Rifm } from "rifm";
 import AntdModal from "../../atoms/modal";
 import Form from "../../atoms/form";
 import Row from "../../atoms/row";
@@ -15,7 +16,7 @@ import {
   AdvanceQuery,
   Query
 } from "../../../shared-ui/models/keylist";
-import { changeHandler } from "../../../shared-ui/utils/input";
+import { changeHandler, phoneFormat } from "../../../shared-ui/utils/input";
 
 const WDModal = Modals(AntdModal);
 const Modal = withDirection(WDModal);
@@ -142,7 +143,7 @@ export default function TenantCreateForm({
               ))}
             </AutoComplete>
           </FormItem>
-          <FormItem label={"Usuario"} sm={24} md={24}>
+          <FormItem label={"Correo"} sm={24} md={24}>
             <Input
               name="username"
               required={true}
@@ -168,22 +169,38 @@ export default function TenantCreateForm({
             />
           </FormItem>
           <FormItem label="Teléfono">
-            <Input
-              name="phone"
-              type="number"
-              disabled={createModeDisable && !editMode}
-              onChange={changer}
-              value={user!.phone}
-            />
+            <Rifm
+              value={user!.phone!}
+              format={phoneFormat}
+              accept={/\d+/g}
+              onChange={str => setUser!({ ...user, phone: str })}
+            >
+              {({ value, onChange }) => (
+                <Input
+                  name="phone"
+                  disabled={createModeDisable && !editMode}
+                  onChange={onChange}
+                  value={value}
+                />
+              )}
+            </Rifm>
           </FormItem>
           <FormItem label="Celular">
-            <Input
-              name="cellphone"
-              type="number"
-              onChange={changer}
-              disabled={createModeDisable && !editMode}
-              value={user!.cellphone}
-            />
+            <Rifm
+              value={user!.cellphone!}
+              format={phoneFormat}
+              accept={/\d+/g}
+              onChange={str => setUser!({ ...user, cellphone: str })}
+            >
+              {({ value, onChange }) => (
+                <Input
+                  name="cellphone"
+                  onChange={onChange}
+                  disabled={createModeDisable && !editMode}
+                  value={value}
+                />
+              )}
+            </Rifm>
           </FormItem>
           <FormItem label="Dirección" md={24} sm={24}>
             <Input

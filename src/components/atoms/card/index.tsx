@@ -1,5 +1,4 @@
-import Card from 'antd/lib/card'
-import 'antd/lib/card/style/css'
+import AntdCard from "antd/lib/card";
+import "antd/lib/card/style/css";
 
-export default Card
-
+export default AntdCard;

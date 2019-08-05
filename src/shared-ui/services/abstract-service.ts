@@ -38,15 +38,27 @@ export abstract class AbstractService<T extends object> {
     return Parseus.decode(data).to(this.model);
   }
 
-  async query(payload: AdvanceQuery<T> | AdvanceQuery<T>[]): Promise<T[]> {
-    const { data } = await axiosInstance.post<T[]>(
-      `${this.prefix}/find`,
-      payload
-      // Array.isArray(payload)
-      //   ? payload.map(item => Parseus.encode(item, this.model))
-      //   : Parseus.encode(payload, this.model)
-    );
+  async query(
+    payload: AdvanceQuery<T> | AdvanceQuery<T>[],
+    sortBy?: any
+  ): Promise<T[]> {
+    const { data } = await axiosInstance.post<T[]>(`${this.prefix}/find`, {
+      query: payload,
+      sortBy
+    });
 
     return data.map(item => Parseus.decode(item).to(this.model));
+  }
+
+  async report(
+    payload: AdvanceQuery<T> | AdvanceQuery<T>[],
+    sortBy?: any
+  ): Promise<any> {
+    const { data } = await axiosInstance.post<any>(`${this.prefix}/report`, {
+      query: payload,
+      sortBy
+    });
+
+    return data;
   }
 }

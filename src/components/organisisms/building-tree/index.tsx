@@ -28,14 +28,19 @@ export default function BuildingTree(props: IBuildingTree) {
     } = data;
     try {
       const building: Building = dataRef;
-      const data = await apartmentService.query({ buildingId: building.id });
+      const data = await apartmentService.query(
+        { buildingId: building.id },
+        { name: "ASC" }
+      );
       building.apartments = data;
       setBuildings([...buildings]);
     } catch (e) {}
   };
 
   useEffect(() => {
-    buildingService.query({ condominiumId }).then(setBuildings);
+    buildingService
+      .query({ condominiumId }, { name: "ASC" })
+      .then(setBuildings);
   }, [condominiumId]);
 
   const checkedAll = buildings.map(building => `${building.id}`);

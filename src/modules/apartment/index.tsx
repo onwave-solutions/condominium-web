@@ -67,7 +67,12 @@ export default function ApartmentView({
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   <Information title={"Piso"} name={apartment.floor} />
                   <Information title={"Área (mts2)"} name={apartment.mt2} />
-                  <Information title={"Plan"} name={apartment.service!.name} />
+                  <Information
+                    title={"Plan"}
+                    name={
+                      apartment.service ? apartment.service!.name : undefined
+                    }
+                  />
                   <Information
                     title={"Parqueos"}
                     name={apartment.parkingLots!}

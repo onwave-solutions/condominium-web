@@ -168,13 +168,6 @@ export default function BuildingView(props: IModule) {
                       <h3>{"Edificio " + building.name}</h3>
                     </div>
                     <div style={{ flex: 1 }} />
-                    <div className="isoNoteText">
-                      <Icon
-                        type="edit"
-                        style={{ fontSize: 20 }}
-                        onClick={() => onOpenBuilding(building)()}
-                      />
-                    </div>
                   </div>
                 );
               }}
@@ -193,14 +186,24 @@ export default function BuildingView(props: IModule) {
                 Crear Edificio
               </Button>
               {selected.id && (
-                <Button
-                  onClick={onOpenApartment({ buildingId: selected.id })}
-                  type="primary"
-                  className="isoAddNoteBtn"
-                  style={{ marginLeft: "0.5rem" }}
-                >
-                  Crear Apartamento
-                </Button>
+                <>
+                  <Button
+                    onClick={onOpenBuilding(selected)}
+                    type="primary"
+                    className="isoAddNoteBtn"
+                    style={{ marginLeft: "0.5rem" }}
+                  >
+                    Editar Edificio
+                  </Button>
+                  <Button
+                    onClick={onOpenApartment({ buildingId: selected.id })}
+                    type="primary"
+                    className="isoAddNoteBtn"
+                    style={{ marginLeft: "0.5rem" }}
+                  >
+                    Crear Apartamento
+                  </Button>
+                </>
               )}
             </Layout.Header>
             <Layout.Content

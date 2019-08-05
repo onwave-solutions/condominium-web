@@ -25,7 +25,7 @@ import BankAccountForm from "../../components/organisisms/bank-account-form";
 import { appSelector } from "../../shared-ui/store/selectors/app";
 import { Wrapper } from "../../components/atoms/body-wrapper";
 import { BankAccount } from "../../shared-ui/models/bank-account";
-import { currencyFormat } from '../../shared-ui/utils/currency';
+import { currencyFormat } from "../../shared-ui/utils/currency";
 
 const bankAccountState = select(bankAccountSelector);
 const managerState = select(managerSelector);
@@ -43,7 +43,6 @@ export default function BankAccountView(props: IModule) {
   const create = useReduxAction(createBankAccountAction(props.id));
   const update = useReduxAction(updateBankAccountAction(props.id));
   const clear = () => setBankAccount({});
-
 
   const formatter = currencyFormat(condominium);
 
@@ -139,7 +138,11 @@ export default function BankAccountView(props: IModule) {
                 dataIndex={"edit"}
                 width={"5%"}
                 render={(_: string, bank: BankAccount) => (
-                  <Button onClick={handleOpenModal(bank)} icon="edit" />
+                  <Button
+                    type="primary"
+                    onClick={handleOpenModal(bank)}
+                    icon="edit"
+                  />
                 )}
               />
             </Table>

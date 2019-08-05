@@ -31,6 +31,9 @@ export default function OrderDetailInfo(props: IOrderDetailInfo) {
             onChange={(_: moment.Moment, dateStr: string) =>
               setInvoice({ ...invoice, dueDate: dateStr })
             }
+            disabledDate={(current?: moment.Moment) =>
+              current ? current.isBefore(moment()) : false
+            }
             value={moment(invoice.dueDate, "DD/MM/YYYY")}
           />
         </div>

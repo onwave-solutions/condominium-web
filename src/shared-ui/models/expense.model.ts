@@ -4,9 +4,7 @@ import { Supplier } from "./supplier.model";
 import { Transaction } from "./transaction.model";
 import { User } from "./user";
 import { BankAccount } from "./bank-account";
-
-
-
+import { DateTransformer } from "../utils/dates";
 
 export class Expense {
   @Field()
@@ -36,7 +34,7 @@ export class Expense {
   @Field()
   public amount?: number;
 
-  @Field()
+  @Field({ transformer: new DateTransformer() })
   public date?: string;
 
   @Field()

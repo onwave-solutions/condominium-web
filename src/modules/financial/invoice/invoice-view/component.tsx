@@ -2,6 +2,7 @@ import React from "react";
 import InvoicePageWrapper from "../invoice-editor/invoice-editor.style";
 import { Invoice } from "../../../../shared-ui/models/invoice.model";
 import { ViewTable } from "../../../../components/molecules/edit-table";
+import { StatusTag } from "./style";
 
 export interface IInvoiceViewComponent {
   invoice: Invoice;
@@ -12,6 +13,16 @@ export default function InvoiceViewComponent({
   invoice,
   formatter
 }: IInvoiceViewComponent) {
+  let className;
+  const text = invoice.statusType;
+  if (text === "PA") {
+    className = "delivered";
+  } else if (text === "MO") {
+    className = "shipped";
+  } else if (text === "AN") {
+    className = "pending";
+  }
+
   return (
     <InvoicePageWrapper className="InvoicePageWrapper">
       <div className="PageContent">
@@ -29,7 +40,11 @@ export default function InvoiceViewComponent({
           <div className="RightSideContent">
             <p>
               <span className="orderStatusSpan">Estado: </span>
-              <span className="orderStatus">{invoice.status!.name}</span>
+              <span className="orderStatus">
+                <StatusTag className={className}>
+                  {invoice.status!.name}
+                </StatusTag>
+              </span>
             </p>
             <p>
               <span className="orderDateSpan">Fecha de Facturación: </span>

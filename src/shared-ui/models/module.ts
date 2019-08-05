@@ -1,6 +1,7 @@
 export interface IModule {
   id: string;
   title: string;
+  isTenant?: boolean
   route?: string;
   loading?: boolean;
   iconType: string;

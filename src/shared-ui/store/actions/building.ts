@@ -6,13 +6,14 @@ import { Building } from "../../models/building";
 import {
   updateBuilding,
   createBuilding,
-  getBuilding
+  getBuilding,
+  BuildingService
 } from "../../services/building";
 import { getErrorResponse } from "../../utils/objects";
 import { loadingWrapper } from "./app";
 
 import { CondominiumService } from "../../services/condominium.service";
-import { Condominium } from '../../models/condominium';
+import { Condominium } from "../../models/condominium";
 
 export enum BuildingActions {
   SetCondominium = "building/SET_CONDOMINIUM",
@@ -21,6 +22,7 @@ export enum BuildingActions {
 }
 
 const condominiumService = new CondominiumService();
+const service = new BuildingService();
 
 export function setBuildingAction(payload: Partial<Building>) {
   return createAction(BuildingActions.SetBuilding, payload);
@@ -38,7 +40,7 @@ export function findCondominiumByIdAction(id: number) {
   return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
       const data = await condominiumService.findOne(id);
-      dispatch(setCondominiumAction(data))
+      dispatch(setCondominiumAction(data));
     } catch (e) {
       const error = getErrorResponse(e);
       toast.error(error.message);
@@ -88,9 +90,12 @@ export function refreshBuildingsAction(id?: string) {
   return (payload: Partial<Building>) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
-        const data = await getBuilding({
-          condominiumId: parseInt(`${payload.condominiumId}`, 10)
-        });
+        const data = await service.query(
+          {
+            condominiumId: parseInt(`${payload.condominiumId}`, 10)
+          },
+          { name: "ASC" }
+        );
         dispatch(setBuildingsAction(data));
       } catch (e) {
         const error = getErrorResponse(e);

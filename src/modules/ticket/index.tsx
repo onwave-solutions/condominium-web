@@ -52,6 +52,7 @@ function buildQuery(condominiumId: number, apartmentId?: number) {
 }
 
 export default function TicketView(props: IModule) {
+  const { isTenant } = props;
   const [query, setQuery] = useState<IQuery>({});
   const condominium = useReduxState(managerState("condominium"));
   const apartment = useReduxState(tenantState("apartment"));
@@ -62,8 +63,10 @@ export default function TicketView(props: IModule) {
     false
   );
 
-  const condominiumId =
-    _.get(condominium, "id") || _.get(apartment, "building.condominium.id");
+  const condominiumId = isTenant
+    ? _.get(apartment, "building.condominium.id")
+    : _.get(condominium, "id");
+
   const queryBuilder = buildQuery(condominiumId!, apartment.id);
 
   const onCreateTicket = useReduxAction(createTicketAction(props.id));
@@ -81,7 +84,7 @@ export default function TicketView(props: IModule) {
   };
 
   const handleCreateTicket = async (ticket: Ticket) => {
-    if (apartment.id) {
+    if (isTenant) {
       ticket.apartmentId = apartment.id;
       if (!ticket.apartmentKeys || !ticket.apartmentKeys.length) {
         ticket.apartmentKeys = [`${apartment.building!.id}-${apartment.id}`];
@@ -117,7 +120,7 @@ export default function TicketView(props: IModule) {
         visible={createTicketVisible}
         condominiumId={condominiumId}
         buildingId={apartment.id ? apartment.building!.id! : undefined}
-        isTenant={Boolean(apartment.id)}
+        isTenant={isTenant}
         onCreate={handleCreateTicket}
         onClose={handleCreateTicketModal(false)}
       />
@@ -214,8 +217,8 @@ export default function TicketView(props: IModule) {
                       <p>{ticket.description}</p>
                       <h3>Creado por</h3>
                       <p>
-                        {ticket.userCreatedBy!.name}{" "}
-                        {ticket.userCreatedBy!.lastName}
+                        {_.get(ticket, "userCreatedBy.name")}{" "}
+                        {_.get(ticket, "userCreatedBy.lastName")}
                       </p>
 
                       {ticket.apartmentId && (

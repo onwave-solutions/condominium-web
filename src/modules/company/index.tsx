@@ -21,6 +21,7 @@ import {
   updateCompanyAction
 } from "../../shared-ui/store/actions/company.action";
 import { Company } from "../../shared-ui/models/company.model";
+import { phoneFormat } from "../../shared-ui/utils/input";
 
 const companyState = select(companySelector);
 const appState = select(appSelector);
@@ -116,13 +117,13 @@ export default function CompanyView(props: IModule) {
                 title="Teléfono"
                 dataIndex="phone"
                 width="80px"
-                render={(text: string) => <span>{text}</span>}
+                render={(text: string) => <span>{phoneFormat(text)}</span>}
               />
               <Column
                 title="Celular"
                 dataIndex="cellphone"
                 width="80px"
-                render={(text: string) => <span>{text}</span>}
+                render={(text: string) => <span>{phoneFormat(text)}</span>}
               />
               <Column
                 title="Dirección"

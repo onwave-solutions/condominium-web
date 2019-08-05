@@ -6,10 +6,12 @@ import { Apartment } from "../../models/apartment";
 import {
   updateApartment,
   createApartment,
-  getApartment
+  getApartment,
+  ApartmentService
 } from "../../services/apartment";
-import { getErrorResponse } from "../../utils/objects";
+import { getErrorResponse, KeyOf } from "../../utils/objects";
 import { loadingWrapper } from "./app";
+import { AdvanceQuery } from '../../models/keylist';
 
 export enum ApartmentActions {
   SetApartment = "APARTMENT_SET_APARTMENT",
@@ -23,6 +25,8 @@ export function setApartmentAction(payload: Partial<Apartment>) {
 export function setApartmentsAction(payload: Apartment[]) {
   return createAction(ApartmentActions.SetApartments, payload);
 }
+
+const service = new ApartmentService();
 
 export function updateApartmentAction(id?: string) {
   return (apartment: Partial<Apartment>) =>
@@ -63,11 +67,14 @@ export function createApartmentAction(id?: string) {
 }
 
 export function refreshApartmentsAction(id?: string) {
-  return (payload: Partial<Apartment>) =>
+  return (
+    payload: AdvanceQuery<Apartment>,
+    sortBy?: { [P in KeyOf<Apartment>]?: "ASC" | "DESC" | 1 | -1 }
+  ) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         dispatch(setApartmentsAction([]));
-        const data = await getApartment({ buildingId: payload.buildingId });
+        const data = await service.query(payload, sortBy);
         dispatch(setApartmentsAction(data));
       } catch (e) {
         const error = getErrorResponse(e);

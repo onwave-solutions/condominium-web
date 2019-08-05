@@ -79,16 +79,6 @@ export default function SupplierForm({
               value={form!.document}
             />
           </FormItem>
-          <FormItem label="" sm={12} md={8}>
-            <br />
-            <Checkbox
-              name="disabled"
-              checked={form!.disabled}
-              onChange={e => onItemSelect("disabled", e.target.checked)}
-            >
-              Deshabilitar
-            </Checkbox>
-          </FormItem>
         </Form>
       </Row>
     </Modal>

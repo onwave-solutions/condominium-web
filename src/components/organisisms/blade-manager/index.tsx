@@ -7,6 +7,7 @@ import { IModule } from "../../../shared-ui/models/module";
 
 export interface IBladeManager {
   url: string;
+  isTenant?: boolean;
   modules: IModule[];
 }
 
@@ -37,7 +38,12 @@ function renderBlade(props: IBladeManager & { fromParent?: boolean }) {
                 onClick={() => newProps.history.goBack()}
               />
             )}
-            <Blade {...blade} {...newProps} fromParent={fromParent} />
+            <Blade
+              {...blade}
+              {...newProps}
+              isTenant={props.isTenant}
+              fromParent={fromParent}
+            />
           </>
         </Suspense>
       );

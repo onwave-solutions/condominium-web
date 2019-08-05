@@ -196,7 +196,7 @@ export default function Shell(props: any) {
       }
     >
       {isValid ? (
-        <BladeManager url={url} modules={isValid ? modules : []} />
+        <BladeManager url={url} modules={isValid ? modules : []} isTenant={role === 'TE'} />
       ) : (
         <WrapperTemplate />
       )}

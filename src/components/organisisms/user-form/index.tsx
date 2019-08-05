@@ -31,7 +31,7 @@ export default function UserForm(props: IUserForm) {
   };
   return (
     <>
-      <FormItem label={"Usuario"}>
+      <FormItem label={"Email"}>
         <Input
           name="username"
           onChange={changer}

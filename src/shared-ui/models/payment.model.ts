@@ -2,9 +2,20 @@ import { Field } from "@rijudev/parseus";
 import { KeylistType } from "./keylist";
 import { Transaction } from "./transaction.model";
 import { BankAccount } from "./bank-account";
-import { Invoice } from './invoice.model';
-import { User } from './user';
-import { DateTimeTransformer } from '../utils/dates';
+import { Invoice } from "./invoice.model";
+import { User } from "./user";
+import { DateTimeTransformer } from "../utils/dates";
+
+export class Attachment {
+  @Field()
+  public id?: number;
+
+  @Field()
+  public url?: string;
+
+  @Field()
+  public description?: string;
+}
 
 export class Payment {
   @Field()
@@ -24,6 +35,9 @@ export class Payment {
 
   @Field()
   public invoiceId?: number;
+
+  @Field({ transformer: new DateTimeTransformer() })
+  public approvedAt?: string;
 
   @Field()
   public methodTypeId?: string;
@@ -56,6 +70,11 @@ export class Payment {
   public userCreatedBy?: User;
 
   @Field({ type: "object", factory: User })
+  public approved?: User;
+
+  @Field({ type: "object", factory: User })
   public userUpdatedBy?: User;
 
+  @Field({ type: "array", factory: Attachment })
+  public attachments?: Attachment[];
 }

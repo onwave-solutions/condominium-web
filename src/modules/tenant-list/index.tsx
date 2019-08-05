@@ -1,3 +1,4 @@
+import { idFormat } from "../../shared-ui/utils/input";
 import React, { useState, useEffect } from "react";
 
 import { Layout, List } from "antd";
@@ -28,6 +29,7 @@ import { BuildingService } from "../../shared-ui/services/building";
 import { ApartmentService } from "../../shared-ui/services/apartment";
 import WrapperTemplate from "../../components/templates/wrapper-template";
 import { Apartment } from "../../shared-ui/models/apartment";
+import { phoneFormat } from "../../shared-ui/utils/input";
 
 const { Content } = Layout;
 
@@ -153,18 +155,24 @@ export default function TenantList(props: IModule) {
                         value: tenant => tenant.documentRaw!.name!,
                         title: "Tipo de Documento"
                       },
-                      { value: "document", title: "Documento" },
+                      {
+                        value: tenant =>
+                          tenant.documentId === "CE"
+                            ? idFormat(tenant.document!)
+                            : tenant.document!,
+                        title: "Documento"
+                      },
                       { value: "username", title: "Correo Eléctronico" },
                       {
                         value: tenant => tenant.statusRaw!.name!,
                         title: "Estado"
                       },
                       {
-                        value: "phone",
+                        value: tenant => phoneFormat(tenant.phone!),
                         title: "Teléfono"
                       },
                       {
-                        value: "cellphone",
+                        value: tenant => phoneFormat(tenant.cellphone!),
                         title: "Celular"
                       },
                       {
@@ -224,8 +232,12 @@ export default function TenantList(props: IModule) {
         condominiumId={condominium.id}
         visible={apartmentVisible}
         onClose={handleApartmentModalVisibility(false)}
-        getBuildings={id => buildingService.query({ condominiumId: id })}
-        getApartments={id => apartmentService.query({ buildingId: id })}
+        getBuildings={id =>
+          buildingService.query({ condominiumId: id }, { name: "ASC" })
+        }
+        getApartments={id =>
+          apartmentService.query({ buildingId: id }, { name: "ASC" })
+        }
         onAction={handleAddApartment}
       />
     </>

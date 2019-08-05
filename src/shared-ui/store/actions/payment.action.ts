@@ -4,7 +4,7 @@ import { ThunkDispatch } from "redux-thunk";
 import { createAction } from "../../utils/redux";
 import { Invoice } from "../../models/invoice.model";
 import { InvoiceService } from "../../services/invoice.service";
-import { getErrorResponse } from "../../utils/objects";
+import { getErrorResponse, KeyOf } from "../../utils/objects";
 import { loadingWrapper } from "./app";
 import { PaymentService } from "../../services/payment.service";
 import { AdvanceQuery } from "../../models/keylist";
@@ -56,10 +56,13 @@ export function rejectPaymentAction(query: AdvanceQuery<Payment>) {
     });
 }
 
-export function loadPaymentsByQueryAction(payment: AdvanceQuery<Payment>) {
+export function loadPaymentsByQueryAction(
+  payment: AdvanceQuery<Payment>,
+  sortBy?: { [P in KeyOf<Payment>]?: "ASC" | "DESC" | 1 | -1 }
+) {
   return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
-      const data = await service.query(payment);
+      const data = await service.query(payment, sortBy);
       dispatch(setPaymentsAction(data));
     } catch (e) {
       const error = getErrorResponse(e);

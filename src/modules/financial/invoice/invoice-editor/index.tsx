@@ -44,6 +44,7 @@ export default function InvoiceEditor(props: IModule) {
   const condominium = useReduxState(managerState("condominium"));
   const invoice = useReduxState(invoiceEditorState("invoice"));
   const { invoiceDetails } = invoice;
+  console.log(invoiceDetails);
 
   const setInvoice = useReduxAction(updateInvoiceAction);
   const setInvoiceDetails = useReduxAction(setInvoiceDetailsAction);

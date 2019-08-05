@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-import { Radio } from "antd";
+import { Radio, Divider } from "antd";
 import Col from "../../components/atoms/col";
+import Upload from "../../components/atoms/upload";
+import Icon from "../../components/atoms/icon";
 import Row from "../../components/atoms/col";
 import Card from "../../components/atoms/card";
 import Button from "../../components/atoms/button";
@@ -27,6 +29,8 @@ import { appSelector } from "../../shared-ui/store/selectors/app";
 import { Payment } from "../../shared-ui/models/payment.model";
 import { tenantSelector } from "../../shared-ui/store/selectors/tenant.selector";
 import { currencyFormat } from "../../shared-ui/utils/currency";
+import { uploadToS3 } from "../../shared-ui/utils/s3";
+import { UploadFile } from "antd/lib/upload/interface";
 
 const managerState = select(managerSelector);
 const tenantState = select(tenantSelector);
@@ -34,14 +38,12 @@ const paymentState = select(paymentSelector);
 const appState = select(appSelector);
 
 const PaymentView: React.FC<IModule> = props => {
-  const { match } = props;
+  const { match, isTenant } = props;
   const apartment = useReduxState(tenantState("apartment"));
-  const [payment, setPayment] = useState<Payment>({});
+  const [payment, setPayment] = useState<Payment>({ attachments: [] });
   const keylist = useReduxState(appState("keylist"));
   //const condominium = useReduxState(managerState("condominium"));
   const invoice = useReduxState(paymentState("invoice"));
-
-  const isTenant = Boolean(apartment.id);
 
   const loadPayment = useReduxAction(getPaymentInvoiceAction);
   const proceedPayment = useReduxAction(proceedPaymentAction);
@@ -126,6 +128,47 @@ const PaymentView: React.FC<IModule> = props => {
                 >
                   PAGAR
                 </Button>
+                <Divider />
+                <Upload
+                  accept="image/*,application/pdf"
+                  fileList={(payment.attachments || []).map<UploadFile>(
+                    file => ({
+                      url: file.url!,
+                      uid: file.url!,
+                      size: 0,
+                      type: '',
+                      status: "success",
+                      name: file.description!
+                    })
+                  )}
+                  beforeUpload={async file => {
+                    try {
+                      const data = await uploadToS3({
+                        file,
+                        is3File: {
+                          name: file.name
+                        }
+                      });
+                      setPayment({
+                        ...payment,
+                        attachments: [
+                          ...(payment.attachments || []),
+                          {
+                            description: data.name,
+                            url: data.url
+                          }
+                        ]
+                      });
+                    } catch (e) {
+                      console.log(e);
+                    }
+                    return false;
+                  }}
+                >
+                  <Button>
+                    <Icon type="upload" /> Agregar Documento
+                  </Button>
+                </Upload>
               </Card>
             </Col>
             <Col md={1} sm={0} />

@@ -88,7 +88,7 @@ export default function Admin(props: IModule) {
           <Scrollbar style={{ width: "100%" }}>
             <Table dataSource={admins} rowKey="id" pagination={{ pageSize: 5 }}>
               <Column
-                title="Usuario"
+                title="Email"
                 dataIndex="username"
                 width="80px"
                 render={(text: string) => <span>{text}</span>}

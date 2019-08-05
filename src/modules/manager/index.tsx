@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import _ from 'lodash'
+import _ from "lodash";
 import { ColDef } from "ag-grid-community";
-import { Tag, Layout, List} from "antd";
+import { Tag, Layout, List } from "antd";
 
 import Table, { Column } from "../../components/atoms/table";
 import Col from "../../components/atoms/col";
@@ -199,9 +199,7 @@ export default function Manager(props: IModule) {
               data={companies}
               typeName="id"
               renderNode={(data: Company) => {
-                return (
-                  <>{`${data.name} [${data.documentId}-${data.document}]`}</>
-                );
+                return `${data.name} [${data.documentId}-${data.document}]`;
               }}
               value={manager!.companyId}
               onChangeItem={onItemSelect}
@@ -243,6 +241,7 @@ export default function Manager(props: IModule) {
                       </Tag>
                     </div>
                     <div style={{ flex: 1 }} />
+                    {/*
                     <div className="isoNoteText">
                       <Icon
                         type="edit"
@@ -250,6 +249,7 @@ export default function Manager(props: IModule) {
                         onClick={handleOpenModal(user)}
                       />
                     </div>
+                      */}
                   </div>
                 );
               }}
@@ -267,14 +267,24 @@ export default function Manager(props: IModule) {
                 Crear Manager
               </Button>
               {manager.id && (
-                <Button
-                  onClick={handleOpenCondoModal}
-                  type="primary"
-                  className="isoAddNoteBtn"
-                  style={{ marginLeft: "0.5rem" }}
-                >
-                  Agregar Condominio
-                </Button>
+                <>
+                  <Button
+                    onClick={handleOpenModal(manager)}
+                    type="primary"
+                    className="isoAddNoteBtn"
+                    style={{ marginLeft: "0.5rem" }}
+                  >
+                    Editar Manager
+                  </Button>
+                  <Button
+                    onClick={handleOpenCondoModal}
+                    type="primary"
+                    className="isoAddNoteBtn"
+                    style={{ marginLeft: "0.5rem" }}
+                  >
+                    Asignar Condominio
+                  </Button>
+                </>
               )}
             </Layout.Header>
             {manager.id && (
@@ -301,7 +311,7 @@ export default function Manager(props: IModule) {
                         tenant={manager}
                         otherAttributes={[
                           {
-                            value: tenant => _.get(tenant, 'company.name'),
+                            value: tenant => _.get(tenant, "company.name"),
                             title: "Compañia"
                           },
                           {

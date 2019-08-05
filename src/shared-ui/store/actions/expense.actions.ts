@@ -3,8 +3,9 @@ import { toast } from "react-toastify";
 import { createAction } from "../../utils/redux";
 import { Expense } from "../../models/expense.model";
 import { ExpenseService } from "../../services/expense.service";
-import { getErrorResponse } from "../../utils/objects";
+import { getErrorResponse, KeyOf } from "../../utils/objects";
 import { loadingWrapper } from "./app";
+import { AdvanceQuery } from "../../models/keylist";
 
 export enum ExpenseActions {
   SetExpense = "EXPENSE_SET_EXPENSE",
@@ -33,7 +34,7 @@ export function createExpenseAction(id?: string) {
             condominiumId: expense.condominiumId
           })
         );
-        cb && cb()
+        cb && cb();
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
@@ -42,12 +43,18 @@ export function createExpenseAction(id?: string) {
 }
 
 export function refreshExpensesAction(id?: string) {
-  return (payload: Partial<Expense>) =>
+  return (
+    payload: AdvanceQuery<Expense>,
+    sortBy?: { [P in KeyOf<Expense>]?: "ASC" | "DESC" | 1 | -1 }
+  ) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
-        const data = await service.query({
-          condominiumId: payload.condominiumId,
-        });
+        const data = await service.query(
+          {
+            ...payload,
+          },
+          sortBy
+        );
         dispatch(setExpensesAction(data));
       } catch (e) {
         const error = getErrorResponse(e);

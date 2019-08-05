@@ -8,8 +8,8 @@ import {
 } from "../../models/invoice.model";
 import { InvoiceService } from "../../services/invoice.service";
 import { closeBlade, addBlade, loadingWrapper } from "./app";
-import { getErrorResponse } from "../../utils/objects";
-import { AdvanceQuery } from '../../models/keylist';
+import { getErrorResponse, KeyOf } from "../../utils/objects";
+import { AdvanceQuery } from "../../models/keylist";
 
 export enum InvoiceActions {
   ResetInvoice = "INVOICE_RESET_INVOICE",
@@ -80,10 +80,14 @@ export function setInvoicesAction(payload: Invoice[]) {
 }
 
 export function getInvoiceListAction(id?: string) {
-  return (condominiumId: number, query?: AdvanceQuery<Invoice>) =>
+  return (
+    condominiumId: number,
+    query?: AdvanceQuery<Invoice>,
+    sortBy?: { [P in KeyOf<Invoice>]?: "ASC" | "DESC" | 1 | -1 }
+  ) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
-        const invoices = await service.getByCondominiumId(condominiumId, query);
+        const invoices = await service.getByCondominiumId(condominiumId, query, sortBy);
         dispatch(setInvoicesAction(invoices));
       } catch (e) {
         const error = getErrorResponse(e);
@@ -95,7 +99,7 @@ export function getInvoiceListAction(id?: string) {
 export function getInvoicesByQueryAction(query: AdvanceQuery<Invoice>) {
   return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
-      if(!Object.keys(query).length) return
+      if (!Object.keys(query).length) return;
       const invoices = await service.query(query);
       dispatch(setInvoicesAction(invoices));
     } catch (e) {

@@ -63,9 +63,12 @@ export function refreshBankAccountsAction(id?: string) {
   return (payload: Partial<BankAccount>) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
-        const data = await service.query({
-          condominiumId: payload.condominiumId
-        });
+        const data = await service.query(
+          {
+            condominiumId: payload.condominiumId
+          },
+          { account: "ASC" }
+        );
         dispatch(setBankAccountsAction(data));
       } catch (e) {
         const error = getErrorResponse(e);

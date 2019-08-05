@@ -36,7 +36,7 @@ export default function TicketCreateForm(props: ITicketCreateForm) {
     setForm({ ...form, [event.target.name]: event.target.value });
 
   useEffect(() => {
-    if (!visible) setForm({});
+    if (!visible) setForm({ apartmentKeys: [] });
   }, [visible]);
 
   return (
@@ -45,7 +45,9 @@ export default function TicketCreateForm(props: ITicketCreateForm) {
       onOk={() => onCreate!(form)}
       okButtonProps={{
         disabled:
-          !form.title || !form.description || !form.apartmentKeys!.length
+          !form.title ||
+          !form.description ||
+          (!isTenant && !form.apartmentKeys!.length)
       }}
       visible={visible}
       cancelText="Cancelar"

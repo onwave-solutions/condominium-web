@@ -3,6 +3,7 @@ import { IModule } from "../../shared-ui/models/module";
 import BladeTemplate from "../../components/templates/blade-template";
 import Table, { Column } from "../../components/atoms/table";
 import Button, { ButtonGroup } from "../../components/atoms/button";
+import PopConfirm from "../../components/atoms/pop-confirm";
 import SupplierModal from "../../components/organisisms/supplier-create-form";
 import { select } from "../../shared-ui/store/selectors";
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
@@ -116,19 +117,23 @@ export default function SupplierView(props: IModule) {
                     icon="edit"
                   />
                   {supplier.disabled ? (
-                    <Button
-                      onClick={() => onAction({ ...supplier, disabled: false })}
-                      type="default"
-                      size="default"
-                      icon="check"
-                    />
+                    <PopConfirm
+                      title="Desea activar este suplidor?"
+                      onConfirm={() =>
+                        onAction({ ...supplier, disabled: false })
+                      }
+                    >
+                      <Button type="default" size="default" icon="check" />
+                    </PopConfirm>
                   ) : (
-                    <Button
-                      onClick={() => onAction({ ...supplier, disabled: true })}
-                      type="danger"
-                      size="default"
-                      icon="close"
-                    />
+                    <PopConfirm
+                      title="Desea Inhabilitar este suplidor?"
+                      onConfirm={() =>
+                        onAction({ ...supplier, disabled: true })
+                      }
+                    >
+                      <Button type="danger" size="default" icon="close" />
+                    </PopConfirm>
                   )}
                 </ButtonGroup>
               );

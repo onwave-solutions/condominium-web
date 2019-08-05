@@ -7,6 +7,11 @@ export class PaymentService extends AbstractService<Payment> {
     super(Payment, "payment");
   }
 
+  async pdfById(id: number) {
+    const { data } = await this.service.get<any>(`${this.prefix}/pdf/${id}`);
+    return data;
+  }
+
   async accept(payment: Payment) {
     await this.service.post(
       `${this.prefix}/accept`,

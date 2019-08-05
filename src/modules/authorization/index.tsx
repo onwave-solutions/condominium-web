@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useReduxState, useReduxAction } from "../../shared-ui/store/hooks";
 import { IModule } from "../../shared-ui/models/module";
 import BladeTemplate from "../../components/templates/blade-template";
+import PopConfirm from "../../components/atoms/pop-confirm";
 import { Wrapper } from "../../components/atoms/body-wrapper";
 import Table, { Column } from "../../components/atoms/table";
 import Button, { ButtonGroup } from "../../components/atoms/button";
@@ -158,13 +159,17 @@ const AuthorizationView: React.FC<IModule> = props => {
                           icon="check"
                           size="default"
                         />
-                        <Button
-                          type="danger"
-                          onClick={onReject(payment)}
-                          className="invoiceDltBtn"
-                          icon="close"
-                          size="default"
-                        />
+                        <PopConfirm
+                          title="Esta seguro de rechazar este pago?"
+                          onConfirm={onReject(payment)}
+                        >
+                          <Button
+                            type="danger"
+                            className="invoiceDltBtn"
+                            icon="close"
+                            size="default"
+                          />
+                        </PopConfirm>
                       </ButtonGroup>
                       <BankAccountSelector
                         accounts={bankAccounts}
