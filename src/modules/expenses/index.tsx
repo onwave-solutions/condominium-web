@@ -7,7 +7,11 @@ import { select } from "../../shared-ui/store/selectors";
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
 import { useReduxState, useReduxAction } from "../../shared-ui/store/hooks";
 import BladeTemplate from "../../components/templates/blade-template";
-import Button from "../../components/atoms/button";
+import Button, { ButtonGroup } from "../../components/atoms/button";
+import PopConfirm from "../../components/atoms/pop-confirm";
+import Dropdown from "../../components/atoms/dropdown";
+import Icon from "../../components/atoms/icon";
+import Menu from "../../components/atoms/menu";
 import { Wrapper } from "../../components/atoms/body-wrapper";
 import Table, { Column } from "../../components/atoms/table";
 import ScrollbarWrapper from "../../components/atoms/scrollbar";
@@ -17,7 +21,8 @@ import ColumnInputFilter from "../../components/molecules/column-input-filter";
 import { expenseSelector } from "../../shared-ui/store/selectors/expense.selector";
 import {
   refreshExpensesAction,
-  createExpenseAction
+  createExpenseAction,
+  undoExpenseAction
 } from "../../shared-ui/store/actions/expense.actions";
 import ExpenseCreateForm from "../../components/organisisms/expense-create-form";
 import { supplierSelector } from "../../shared-ui/store/selectors/supplier.selector";
@@ -25,7 +30,7 @@ import { loadSuppliersAction } from "../../shared-ui/store/actions/supplier.acti
 import { Expense } from "../../shared-ui/models/expense.model";
 import { bankAccountSelector } from "../../shared-ui/store/selectors/bank-account.selector";
 import { refreshBankAccountsAction } from "../../shared-ui/store/actions/bank-account.actions";
-import { currencyFormat } from "../../shared-ui/utils/currency";
+import { currencyFormat, getSum } from "../../shared-ui/utils/currency";
 import { formatWithOptions } from "util";
 
 const managerState = select(managerSelector);
@@ -69,6 +74,7 @@ export default function ExpenseModule(props: IModule) {
   const loadExpenses = useReduxAction(refreshExpensesAction(props.id));
   const loadSupplierList = useReduxAction(loadSuppliersAction(props.id));
   const createExpense = useReduxAction(createExpenseAction(props.id));
+  const undoExpense = useReduxAction(undoExpenseAction);
 
   const handleLoadSuppliers = () =>
     loadSupplierList({ condominiumId: condominium.id, disabled: false });
@@ -92,6 +98,8 @@ export default function ExpenseModule(props: IModule) {
       }
     );
   };
+
+  const sumBy = getSum(expenses);
 
   return (
     <>
@@ -119,6 +127,13 @@ export default function ExpenseModule(props: IModule) {
                 rowKey="id"
                 pagination={{ pageSize: 5, showSizeChanger: true }}
                 className="invoiceListTable"
+                footer={() => {
+                  return (
+                    <>
+                      <h3>Total: {formatter!(sumBy("amount"))}</h3>
+                    </>
+                  );
+                }}
               >
                 <Column
                   title="ID"
@@ -163,7 +178,9 @@ export default function ExpenseModule(props: IModule) {
                   )}
                   width="80px"
                   render={(_: string, expense: Expense) => (
-                    <span>{formatter(expense.amount!)}</span>
+                    <strong>
+                      {!expense.undo ? formatter(expense.amount!) : "ANULADA"}
+                    </strong>
                   )}
                 />
                 <Column
@@ -192,16 +209,7 @@ export default function ExpenseModule(props: IModule) {
                     <span>{expense.description}</span>
                   )}
                 />
-                <Column
-                  title="Fecha Efectiva"
-                  dataIndex="date"
-                  width="80px"
-                  render={(_: string, expense: Expense) => (
-                    <span>
-                      {moment(expense.date, "YYYY-MM-DD").format("DD/MM/YYYY")}
-                    </span>
-                  )}
-                />
+                <Column title="Fecha Efectiva" dataIndex="date" width="80px" />
                 <Column
                   title="Creado Por"
                   dataIndex="createdBy"
@@ -226,6 +234,56 @@ export default function ExpenseModule(props: IModule) {
                         (expense.userCreatedBy!.lastName || "")}
                     </span>
                   )}
+                />
+                <Column
+                  title="Acciones"
+                  dataIndex="actions"
+                  width="80px"
+                  render={(_: string, expense: Expense) => {
+                    const menu = (
+                      <Menu>
+                        {(expense.attachments || []).map(file => (
+                          <Menu.Item key={file.id}>
+                            <a href={file.url}>{file.description}</a>
+                          </Menu.Item>
+                        ))}
+                      </Menu>
+                    );
+                    return (
+                      <>
+                        <ButtonGroup>
+                          {(expense.attachments || []).length > 0 && (
+                            <Button type="primary">
+                              <Dropdown overlay={menu} trigger={["click"]}>
+                                <a href="#">
+                                  <Icon
+                                    type="file"
+                                    style={{ color: "white" }}
+                                  />
+                                </a>
+                              </Dropdown>
+                            </Button>
+                          )}
+                          {!expense.undo && (
+                            <PopConfirm
+                              title="Esta seguro de anular este gasto?"
+                              onConfirm={() => {
+                                undoExpense(expense, () => {
+                                  loadBankAccounts(payload);
+                                });
+                              }}
+                            >
+                              <Button
+                                type="danger"
+                                size="default"
+                                icon="close"
+                              />
+                            </PopConfirm>
+                          )}
+                        </ButtonGroup>
+                      </>
+                    );
+                  }}
                 />
               </Table>
             </ScrollbarWrapper>

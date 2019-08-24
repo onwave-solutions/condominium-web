@@ -35,13 +35,14 @@ export function loadCompaniesAction(id?: string) {
 }
 
 export function createCompanyAction(id?: string) {
-  return (payload: Partial<Company>) =>
+  return (payload: Partial<Company>, cb?: () => void) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.create(payload);
         dispatch(setCompanyAction({}));
         dispatch(loadCompaniesAction(id)());
         toast.success("Compañia Actualizada Correctamente.");
+        cb && cb();
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
@@ -50,13 +51,14 @@ export function createCompanyAction(id?: string) {
 }
 
 export function updateCompanyAction(id?: string) {
-  return (payload: Partial<Company>) =>
+  return (payload: Partial<Company>, cb?: () => void) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.update(payload.id!, payload);
         dispatch(setCompanyAction(data));
         dispatch(loadCompaniesAction(id)());
         toast.success("Compañia Actualizada Correctamente.");
+        cb && cb();
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);

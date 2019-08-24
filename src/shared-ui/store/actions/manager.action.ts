@@ -91,7 +91,7 @@ export function setManagerByIdAction(id: number) {
 }
 
 export function updateManagerAction(id?: string) {
-  return (user: Partial<User>) =>
+  return (user: Partial<User>, cb?: () => void) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.update(user.id!, user);
@@ -99,6 +99,7 @@ export function updateManagerAction(id?: string) {
         dispatch(loadManagerAction(id)());
         dispatch(setManagerByIdAction(user.id!));
         toast.success("Manager Actualizado Correctamente.");
+        cb && cb();
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
@@ -107,13 +108,14 @@ export function updateManagerAction(id?: string) {
 }
 
 export function signUpManagerAction(id?: string) {
-  return (user: Partial<User>) =>
+  return (user: Partial<User>, cb?: () => void) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.signUp({ ...user, roleId: "MA" });
         dispatch(setManagerAction({}));
         dispatch(loadManagerAction(id)());
         toast.success("Manager Creado Correctamente.");
+        cb && cb();
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);

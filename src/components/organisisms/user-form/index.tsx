@@ -1,12 +1,16 @@
 import React from "react";
 
+import { Rifm } from "rifm";
 import Input from "../../atoms/input";
 import Select from "../../atoms/select";
 import FormItem from "../../molecules/form-item";
 
 import { User } from "../../../shared-ui/models/user";
 import { Keylist, KeylistType } from "../../../shared-ui/models/keylist";
-import { changeHandler } from "../../../shared-ui/utils/input";
+import {
+  changeHandler,
+  identificationFormat
+} from "../../../shared-ui/utils/input";
 
 export interface IUserForm {
   user?: Partial<User>;
@@ -29,6 +33,8 @@ export default function UserForm(props: IUserForm) {
 
     return status;
   };
+
+  const formatID = identificationFormat(user!.documentId);
   return (
     <>
       <FormItem label={"Email"}>
@@ -80,12 +86,21 @@ export default function UserForm(props: IUserForm) {
             />
           </FormItem>
           <FormItem label="Documento">
-            <Input
-              name="document"
-              onChange={changer}
-              value={user!.document}
-              disabled={disabledAll}
-            />
+            <Rifm
+              value={user!.document!}
+              format={formatID}
+              accept={/\d+/g}
+              onChange={value => onItemSelect("document", value)}
+            >
+              {({ value, onChange }) => (
+                <Input
+                  name="document"
+                  value={value}
+                  onChange={onChange}
+                  disabled={disabledAll}
+                />
+              )}
+            </Rifm>
           </FormItem>
         </>
       ) : null}

@@ -88,14 +88,28 @@ export function setCondominiumsAction(payload: Condominium[]) {
   return createAction(CondominiumActions.SetCondominiums, payload);
 }
 
+export function deleteCondominiumAction(condominium: Partial<Condominium>) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      await service.delete(condominium.id!);
+      toast.success("Condominio Eliminado Correctamente");
+      dispatch(refreshCondominiumsAction()());
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
+}
+
 export function updateCondominiumAction(id?: string) {
-  return (condominium: Partial<Condominium>) =>
+  return (condominium: Partial<Condominium>, cb?:any) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.update(condominium.id!, condominium);
         dispatch(setCondominiumAction(data));
         toast.success("Condominio Actualizado Correctamente");
         dispatch(refreshCondominiumsAction(id)());
+        cb && cb()
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
@@ -104,13 +118,14 @@ export function updateCondominiumAction(id?: string) {
 }
 
 export function createCondominiumAction(id?: string) {
-  return (condominium: Partial<Condominium>) =>
+  return (condominium: Partial<Condominium>, cb?: any) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.create(condominium);
         dispatch(setCondominiumAction({}));
         toast.success("Condominio Creado Correctamente");
         dispatch(refreshCondominiumsAction(id)());
+        cb && cb()
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
@@ -122,7 +137,7 @@ export function refreshCondominiumsAction(id?: string) {
   return () =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
-        const data = await service.query({});
+        const data = await service.query({ deprecated: false });
         dispatch(setCondominiumsAction(data));
       } catch (e) {
         const error = getErrorResponse(e);

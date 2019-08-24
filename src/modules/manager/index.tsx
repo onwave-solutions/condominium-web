@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
 import _ from "lodash";
+
+import get from "lodash/get";
+
+import { Rifm } from "rifm";
 import { ColDef } from "ag-grid-community";
 import { Tag, Layout, List } from "antd";
 
@@ -45,6 +49,13 @@ import {
   dropCondominiumManagerAction
 } from "../../shared-ui/store/actions/condominium.action";
 import WrapperTemplate from "../../components/templates/wrapper-template";
+import {
+  idFormat,
+  phoneFormat,
+  isValidDocument
+} from "../../shared-ui/utils/input";
+import { validateEmail } from "../../shared-ui/utils/strings";
+import { KeyOf } from "../../shared-ui/utils/objects";
 
 const managerState = select(managerSelector);
 const companyState = select(companySelector);
@@ -111,12 +122,12 @@ export default function Manager(props: IModule) {
   };
 
   const handleAction = async () => {
+    const cb = () => setVisibility(false);
     if (manager.id) {
-      await update(manager);
+      await update(manager, cb);
     } else {
-      await create(manager);
+      await create(manager, cb);
     }
-    setVisibility(false);
   };
   const handleActionCondo = async () => {
     await addCondominiumManager(
@@ -136,11 +147,23 @@ export default function Manager(props: IModule) {
     setManager(user);
   };
 
+  const getInUser = (path: KeyOf<User> | [KeyOf<User>], def?: any) =>
+    get(manager, path, def);
+
+  const isDocumentValid = isValidDocument(manager.documentId);
+  const isValid =
+    validateEmail(getInUser("username", "")) &&
+    isDocumentValid(getInUser("document")) &&
+    getInUser("documentId") &&
+    getInUser("name");
+
   return (
     <>
       <Modal
         visible={condoVisible}
-        okButtonProps={{ disabled: !condominium.id }}
+        okButtonProps={{
+          disabled: !condominium.id
+        }}
         onCancel={() => setCondoVisibility(false)}
         onOk={handleActionCondo}
         closable={false}
@@ -160,29 +183,36 @@ export default function Manager(props: IModule) {
         onCancel={() => setVisibility(false)}
         onOk={handleAction}
         closable={false}
+        okButtonProps={{
+          disabled: props.loading || !isValid
+        }}
         title={`${manager.id ? "Actualizar" : "Crear"} Manager`}
       >
         <Row>
           <UserForm user={manager} userChanged={setManager} keylist={keylist} />
           <FormItem label="Teléfono">
-            <Input
-              name="phone"
-              type="number"
-              onChange={(event: any) =>
-                onItemSelect(event.target.name, event.target.value)
-              }
-              value={manager!.phone}
-            />
+            <Rifm
+              value={manager!.phone!}
+              format={phoneFormat}
+              accept={/\d+/g}
+              onChange={(value: string) => onItemSelect("phone", value)}
+            >
+              {({ value, onChange }) => (
+                <Input value={value} onChange={onChange} name="phone" />
+              )}
+            </Rifm>
           </FormItem>
           <FormItem label="Celular">
-            <Input
-              name="cellphone"
-              type="number"
-              onChange={(event: any) =>
-                onItemSelect(event.target.name, event.target.value)
-              }
-              value={manager!.cellphone}
-            />
+            <Rifm
+              value={manager!.cellphone!}
+              format={phoneFormat}
+              accept={/\d+/g}
+              onChange={(value: string) => onItemSelect("cellphone", value)}
+            >
+              {({ value, onChange }) => (
+                <Input value={value} onChange={onChange} name="cellphone" />
+              )}
+            </Rifm>
           </FormItem>
           <FormItem label="Dirección" md={24} sm={24}>
             <Input
@@ -318,21 +348,34 @@ export default function Manager(props: IModule) {
                             value: tenant => tenant.documentRaw!.name!,
                             title: "Tipo de Documento"
                           },
-                          { value: "document", title: "Documento" },
+                          {
+                            value: manager =>
+                              manager.documentId === "CE"
+                                ? idFormat(manager.document!)
+                                : manager.document,
+                            title: "Documento"
+                          },
                           { value: "username", title: "Correo Eléctronico" },
                           { value: "address", title: "Dirección" },
-                          { value: "phone", title: "Teléfono" },
-                          { value: "cellphone", title: "Celular" },
                           {
-                            value: tenant => tenant.statusRaw!.name!,
+                            value: manager => phoneFormat(manager.phone!),
+                            title: "Teléfono"
+                          },
+                          {
+                            value: manager => phoneFormat(manager.cellphone!),
+                            title: "Celular"
+                          },
+
+                          {
+                            value: manager => manager.statusRaw!.name!,
                             title: "Estado"
                           },
                           {
-                            value: tenant => tenant.dueDay!,
+                            value: manager => manager.dueDay!,
                             title: "Día de pago"
                           },
                           {
-                            value: tenant => tenant.monthlyFee!,
+                            value: manager => manager.monthlyFee!,
                             title: "Monto"
                           }
                         ]}

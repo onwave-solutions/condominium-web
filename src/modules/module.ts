@@ -54,20 +54,25 @@ export const modules = [
   newsFee
 ];
 
+const toInitialSetup = (mod: IModule): IModule => ({
+  ...mod,
+  isInitialSetup: true
+});
+
 export const modulesByPermissions: { [id: string]: IModule[] } = {
   SA: modules,
   AD: [admin, company, condominium, manager, building],
   MA: [
-    dashboard,
-    tenantList,
-    ticket,
-    newsFee,
-    financial,
-    reports,
+    toInitialSetup(dashboard),
+    toInitialSetup(tenantList),
+    toInitialSetup(ticket),
+    toInitialSetup(newsFee),
+    toInitialSetup(financial),
+    toInitialSetup(reports),
     serviceAndProducts,
-    editorDetail,
-    invoiceView,
-    payment
+    toInitialSetup(editorDetail),
+    toInitialSetup(invoiceView),
+    toInitialSetup(payment)
   ],
   TE: [dashboard, ticket, invoiceListTenant, invoiceView, payment, reports]
 };

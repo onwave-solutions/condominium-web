@@ -61,7 +61,11 @@ export default function InvoiceModule(props: IModule) {
   };
 
   const onClickViewInvoice = (invoice: Invoice) => () => {
-    props.history.push(`/invoice-view/${invoice.id}`);
+    window.open(
+      `/invoice-view/${invoice.id}`,
+      "winname",
+      "directories=0,titlebar=0,toolbar=0,location=0,status=0,menubar=0,scrollbars=no,resizable=no,width=600,height=550"
+    );
   };
 
   const onClickEditInvoice = (invoice: Invoice) => () => {

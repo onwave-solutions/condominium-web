@@ -20,5 +20,5 @@ export default function useSearch() {
     setSearchText("");
   };
 
-  return [searchText, { onFilter, handleSearch, handleReset }];
+  return { searchText, onFilter, handleSearch, handleReset };
 }

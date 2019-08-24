@@ -29,7 +29,7 @@ import { BuildingService } from "../../shared-ui/services/building";
 import { ApartmentService } from "../../shared-ui/services/apartment";
 import WrapperTemplate from "../../components/templates/wrapper-template";
 import { Apartment } from "../../shared-ui/models/apartment";
-import { phoneFormat } from "../../shared-ui/utils/input";
+import { phoneFormat, identificationFormat } from "../../shared-ui/utils/input";
 
 const { Content } = Layout;
 
@@ -101,6 +101,8 @@ export default function TenantList(props: IModule) {
     setTenant({});
   }, [condominium.id]);
 
+  const formatID = identificationFormat(tenant.documentId);
+
   return (
     <>
       <WrapperTemplate>
@@ -156,10 +158,7 @@ export default function TenantList(props: IModule) {
                         title: "Tipo de Documento"
                       },
                       {
-                        value: tenant =>
-                          tenant.documentId === "CE"
-                            ? idFormat(tenant.document!)
-                            : tenant.document!,
+                        value: tenant => formatID(tenant.document),
                         title: "Documento"
                       },
                       { value: "username", title: "Correo Eléctronico" },

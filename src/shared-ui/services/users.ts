@@ -43,6 +43,18 @@ export class UserService extends AbstractService<User> {
     return Parseus.decode(data).to(User);
   }
 
+  async forgotPassword(payload: IAuthorization): Promise<void> {
+    await this.service.post<User>(`${this.prefix}/forgotpassword`, payload);
+  }
+
+  async forgotPasswordSubmit(payload: IAuthorization): Promise<User> {
+    const { data } = await this.service.post<User>(
+      `${this.prefix}/forgotpasswordsubmit`,
+      payload
+    );
+    return Parseus.decode(data).to(User);
+  }
+
   async changePassword(payload: IAuthorization): Promise<User> {
     const { data } = await this.service.post<User>(
       `${this.prefix}/changepassword`,

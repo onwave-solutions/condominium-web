@@ -19,8 +19,8 @@ export function loadDashboardAction() {
       const data = await dashboardByManager();
       dispatch(setDashboardAction(data));
     } catch (e) {
-      const error = getErrorResponse(e);
-      toast.error(error.message);
+      // const error = getErrorResponse(e);
+      // toast.error(error.message);
     }
   });
 }

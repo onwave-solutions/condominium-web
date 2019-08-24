@@ -1,5 +1,6 @@
 import { Field } from "@rijudev/parseus";
 import { KeylistType } from "./keylist";
+import { BooleanTransformer } from "../utils/boolean";
 
 export class Service {
   @Field()
@@ -42,4 +43,7 @@ export class Service {
 
   @Field({ type: "array", factory: String })
   public apartmentKeys?: string[];
+
+  @Field({ transformer: new BooleanTransformer() })
+  public deprecated?: boolean;
 }

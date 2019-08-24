@@ -5,6 +5,8 @@ import { Transaction } from "./transaction.model";
 import { User } from "./user";
 import { BankAccount } from "./bank-account";
 import { DateTransformer } from "../utils/dates";
+import { Attachment } from "./payment.model";
+import { BooleanTransformer } from "../utils/boolean";
 
 export class Expense {
   @Field()
@@ -51,4 +53,10 @@ export class Expense {
 
   @Field({ factory: BankAccount, type: "object" })
   public bankAccount?: BankAccount;
+
+  @Field({ type: "array", factory: Attachment })
+  public attachments?: Attachment[];
+
+  @Field({ transformer: new BooleanTransformer() })
+  public undo?: boolean;
 }

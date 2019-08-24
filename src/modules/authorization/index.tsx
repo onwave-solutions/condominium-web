@@ -22,7 +22,7 @@ import { bankAccountSelector } from "../../shared-ui/store/selectors/bank-accoun
 
 import BankAccountSelector from "../../components/organisisms/bank-account-selector-form";
 import { refreshBankAccountsAction } from "../../shared-ui/store/actions/bank-account.actions";
-import { currencyFormat } from "../../shared-ui/utils/currency";
+import { currencyFormat, getSum } from "../../shared-ui/utils/currency";
 
 const managerState = select(managerSelector);
 const paymentState = select(paymentSelector);
@@ -64,6 +64,8 @@ const AuthorizationView: React.FC<IModule> = props => {
     loadPayments(payload);
   }, [condominium.id]);
 
+  const sumBy = getSum(payments);
+
   return (
     <>
       <BladeTemplate
@@ -81,6 +83,13 @@ const AuthorizationView: React.FC<IModule> = props => {
                 rowKey="id"
                 pagination={{ pageSize: 5, showSizeChanger: true }}
                 className="invoiceListTable"
+                footer={() => {
+                  return (
+                    <>
+                      <h3>Total: {formatter!(sumBy("amount"))}</h3>
+                    </>
+                  );
+                }}
               >
                 <Column
                   title="ID"

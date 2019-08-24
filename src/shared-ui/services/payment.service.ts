@@ -12,6 +12,14 @@ export class PaymentService extends AbstractService<Payment> {
     return data;
   }
 
+  async financialReport(query: any) {
+    const { data } = await this.service.post<any>(
+      `${this.prefix}/financial-report`,
+      query
+    );
+    return data;
+  }
+
   async accept(payment: Payment) {
     await this.service.post(
       `${this.prefix}/accept`,

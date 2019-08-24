@@ -1,6 +1,7 @@
 import { Field } from "@rijudev/parseus";
 import { Building } from "./building";
 import { Service } from "./service.model";
+import { BooleanTransformer } from "../utils/boolean";
 
 export class ApartmentUser {
   @Field()
@@ -33,6 +34,9 @@ export class Apartment {
   @Field()
   updatedAt?: string;
 
+  @Field({ type: "decimal", fixed: 2 })
+  invoiceBalance?: number;
+
   @Field({ factory: Building, type: "object" })
   building?: Building;
 
@@ -41,6 +45,9 @@ export class Apartment {
 
   @Field({ factory: ApartmentUser, type: "array" })
   tenants?: ApartmentUser[];
+
+  @Field({ transformer: new BooleanTransformer() })
+  public deprecated?: boolean;
 }
 
 export class ApartmentTenant {

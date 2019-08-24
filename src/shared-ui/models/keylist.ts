@@ -30,6 +30,9 @@ export class Keylist {
   paymentMethods?: KeylistType[];
 
   @Field({ type: "array", factory: KeylistType })
+  paymentStatus?: KeylistType[];
+
+  @Field({ type: "array", factory: KeylistType })
   transactionStatus?: KeylistType[];
 
   @Field({ type: "array", factory: KeylistType })
@@ -58,6 +61,7 @@ export type Query<T> = {
   };
   not?: T;
   isNull?: boolean;
+  in?: T[];
 };
 
 export type AdvanceQuery<T> = { [P in keyof T]?: Query<T[P]> | T[P] | T[P][] };

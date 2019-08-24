@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import BladeTemplate from "../../components/templates/blade-template";
 import Col from "../../components/atoms/col";
-import Button from "../../components/atoms/button";
+import Button, { ButtonGroup } from "../../components/atoms/button";
 import Modal from "../../components/atoms/modal";
+import PopConfirm from "../../components/atoms/pop-confirm";
 import Row from "../../components/atoms/row";
 import Scrollbar from "../../components/atoms/scrollbar";
 import Table, { Column } from "../../components/atoms/table";
@@ -18,7 +19,8 @@ import {
   refreshBankAccountsAction,
   setBankAccountAction,
   createBankAccountAction,
-  updateBankAccountAction
+  updateBankAccountAction,
+  deleteBankAccountAction
 } from "../../shared-ui/store/actions/bank-account.actions";
 import { closeChildBladeAction } from "../../shared-ui/store/actions/app";
 import BankAccountForm from "../../components/organisisms/bank-account-form";
@@ -42,13 +44,17 @@ export default function BankAccountView(props: IModule) {
   const setBankAccount = useReduxAction(setBankAccountAction);
   const create = useReduxAction(createBankAccountAction(props.id));
   const update = useReduxAction(updateBankAccountAction(props.id));
+  const onDelete = useReduxAction(deleteBankAccountAction);
   const clear = () => setBankAccount({});
 
   const formatter = currencyFormat(condominium);
 
   useEffect(() => {
     if (condominium.id === bankAccount.condominiumId) return;
-    const payload = { condominiumId: condominium.id };
+    const payload: Partial<BankAccount> = {
+      condominiumId: condominium.id,
+      disabled: false
+    };
     setBankAccount(payload);
     loadBankAccounts(payload);
   }, [condominium.id]);
@@ -63,12 +69,12 @@ export default function BankAccountView(props: IModule) {
   };
 
   const handleAction = async () => {
+    const cb = () => setBankModal(false);
     if (bankAccount.id) {
-      await update(bankAccount);
+      await update(bankAccount, cb);
     } else {
-      await create(bankAccount);
+      await create(bankAccount, cb);
     }
-    setBankModal(false);
   };
 
   return (
@@ -134,15 +140,23 @@ export default function BankAccountView(props: IModule) {
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
-                title="Editar"
+                title="Acciones"
                 dataIndex={"edit"}
                 width={"5%"}
                 render={(_: string, bank: BankAccount) => (
-                  <Button
-                    type="primary"
-                    onClick={handleOpenModal(bank)}
-                    icon="edit"
-                  />
+                  <ButtonGroup>
+                    <Button
+                      type="primary"
+                      onClick={handleOpenModal(bank)}
+                      icon="edit"
+                    />
+                    <PopConfirm
+                      title="Esta seguro de eliminar esta caja?"
+                      onConfirm={() => onDelete(bank)}
+                    >
+                      <Button type="danger" icon="delete" />
+                    </PopConfirm>
+                  </ButtonGroup>
                 )}
               />
             </Table>

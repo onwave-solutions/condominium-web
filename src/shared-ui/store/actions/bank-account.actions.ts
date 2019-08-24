@@ -21,8 +21,25 @@ export function setBankAccountsAction(payload: BankAccount[]) {
   return createAction(BankAccountActions.SetBankAccounts, payload);
 }
 
+export function deleteBankAccountAction(payload: Partial<BankAccount>) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      await service.delete(payload.id!);
+      toast.success("Caja Eliminada Correctamente");
+      dispatch(
+        refreshBankAccountsAction()({
+          condominiumId: payload.condominiumId
+        })
+      );
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
+}
+
 export function updateBankAccountAction(id?: string) {
-  return (bankAccount: Partial<BankAccount>) =>
+  return (bankAccount: Partial<BankAccount>, cb?: any) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.update(bankAccount.id!, bankAccount);
@@ -30,9 +47,11 @@ export function updateBankAccountAction(id?: string) {
         toast.success("Caja Actualizada Correctamente");
         dispatch(
           refreshBankAccountsAction(id)({
-            condominiumId: bankAccount.condominiumId
+            condominiumId: bankAccount.condominiumId,
+            disabled: false
           })
         );
+        cb && cb();
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
@@ -41,7 +60,7 @@ export function updateBankAccountAction(id?: string) {
 }
 
 export function createBankAccountAction(id?: string) {
-  return (bankAccount: Partial<BankAccount>) =>
+  return (bankAccount: Partial<BankAccount>, cb?: any) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.create(bankAccount);
@@ -49,9 +68,11 @@ export function createBankAccountAction(id?: string) {
         toast.success("Caja Creada Correctamente");
         dispatch(
           refreshBankAccountsAction(id)({
-            condominiumId: bankAccount.condominiumId
+            condominiumId: bankAccount.condominiumId,
+            disabled: false
           })
         );
+        cb && cb();
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
@@ -65,7 +86,8 @@ export function refreshBankAccountsAction(id?: string) {
       try {
         const data = await service.query(
           {
-            condominiumId: payload.condominiumId
+            condominiumId: payload.condominiumId,
+            disabled: false
           },
           { account: "ASC" }
         );

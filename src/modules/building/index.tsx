@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Layout } from "antd";
-import { ColDef } from "ag-grid-community/dist/lib/entities/colDef";
-import { AgGridReact } from "ag-grid-react";
 
+import Table, { Column } from "../../components/atoms/table";
 import Col from "../../components/atoms/col";
 import Row from "../../components/atoms/row";
 import Icon from "../../components/atoms/icon";
-import Button from "../../components/atoms/button";
+import Button, { ButtonGroup } from "../../components/atoms/button";
 import Modal from "../../components/atoms/modal";
 import Scrollbar from "../../components/atoms/scrollbar";
 import BuildingForm from "../../components/organisisms/building-form";
+import PopConfirm from "../../components/atoms/pop-confirm";
 import BuildingWrapper from "../../components/molecules/ticket-wrapper";
 import BladeTemplate from "../../components/templates/blade-template";
 import apartmentModule from "../apartment/module";
@@ -22,7 +22,8 @@ import {
   createBuildingAction,
   updateBuildingAction,
   refreshBuildingsAction,
-  findCondominiumByIdAction
+  findCondominiumByIdAction,
+  deleteBuildingAction
 } from "../../shared-ui/store/actions/building";
 import { IModule } from "../../shared-ui/models/module";
 import { closeChildBladeAction } from "../../shared-ui/store/actions/app";
@@ -37,7 +38,8 @@ import { serviceSelector } from "../../shared-ui/store/selectors/service.selecto
 import {
   setApartmentAction,
   createApartmentAction,
-  updateApartmentAction
+  updateApartmentAction,
+  deleteApartmentAction
 } from "../../shared-ui/store/actions/apartment";
 import { Apartment } from "../../shared-ui/models/apartment";
 import WrapperTemplate from "../../components/templates/wrapper-template";
@@ -69,8 +71,10 @@ export default function BuildingView(props: IModule) {
 
   const create = useReduxAction(createBuildingAction());
   const update = useReduxAction(updateBuildingAction());
+  const onDelete = useReduxAction(deleteBuildingAction);
   const createApartment = useReduxAction(createApartmentAction());
   const updateApartment = useReduxAction(updateApartmentAction());
+  const deleteApartment = useReduxAction(deleteApartmentAction);
   const findCondominium = useReduxAction(findCondominiumByIdAction);
 
   const loadBuilding = useReduxAction(refreshBuildingsAction());
@@ -123,7 +127,7 @@ export default function BuildingView(props: IModule) {
     if (condominium.id === selected.condominiumId) return;
     const payload = { condominiumId: condominium.id };
     setSelected(payload);
-    loadBuilding(payload);
+    loadBuilding({ ...payload, deprecated: false });
     loadServices(payload);
   }, [condominium.id]);
 
@@ -165,7 +169,7 @@ export default function BuildingView(props: IModule) {
                   >
                     <div className="isoNoteBGColor" style={{ width: "5px" }} />
                     <div className="isoNoteText">
-                      <h3>{"Edificio " + building.name}</h3>
+                      <h3>{building.name}</h3>
                     </div>
                     <div style={{ flex: 1 }} />
                   </div>
@@ -177,34 +181,37 @@ export default function BuildingView(props: IModule) {
           <Layout className="isoNotepadWrapper">
             <Layout.Header className="isoHeader">
               <div style={{ flex: 1 }} />
-              <Button
-                type="primary"
-                className="isoAddNoteBtn"
-                style={{ marginLeft: "0.5rem" }}
-                onClick={onOpenBuilding({ condominiumId: condominium.id })}
-              >
-                Crear Edificio
-              </Button>
-              {selected.id && (
-                <>
-                  <Button
-                    onClick={onOpenBuilding(selected)}
-                    type="primary"
-                    className="isoAddNoteBtn"
-                    style={{ marginLeft: "0.5rem" }}
-                  >
-                    Editar Edificio
-                  </Button>
-                  <Button
-                    onClick={onOpenApartment({ buildingId: selected.id })}
-                    type="primary"
-                    className="isoAddNoteBtn"
-                    style={{ marginLeft: "0.5rem" }}
-                  >
-                    Crear Apartamento
-                  </Button>
-                </>
-              )}
+              <ButtonGroup>
+                <Button
+                  type="primary"
+                  onClick={onOpenBuilding({ condominiumId: condominium.id })}
+                >
+                  Crear Edificio
+                </Button>
+                {selected.id && (
+                  <>
+                    <Button onClick={onOpenBuilding(selected)} type="primary">
+                      Editar Edificio
+                    </Button>
+                    <PopConfirm
+                      title="Esta seguro de eliminar este edificio?"
+                      onConfirm={() => {
+                        onDelete(selected, () => {
+                          setSelected({});
+                        });
+                      }}
+                    >
+                      <Button type="danger">Eliminar Edificio</Button>
+                    </PopConfirm>
+                    <Button
+                      onClick={onOpenApartment({ buildingId: selected.id })}
+                      type="primary"
+                    >
+                      Crear Apartamento
+                    </Button>
+                  </>
+                )}
+              </ButtonGroup>
             </Layout.Header>
             <Layout.Content
               style={{
@@ -219,17 +226,13 @@ export default function BuildingView(props: IModule) {
                 style={{ marginBottom: "0.7rem" }}
               >
                 <h2>{condominium.name} </h2>
-                {selected.id && (
-                  <h2 style={{ marginRight: "0.7rem" }}>
-                    {"Edificio " + selected.name}
-                  </h2>
-                )}
               </div>
               {selected.id && (
                 <Scrollbar>
                   <ApartmentView
                     buildingId={selected.id!}
                     onEditApartment={apartment => onOpenApartment(apartment)()}
+                    onDeleteApartment={deleteApartment}
                   />
                 </Scrollbar>
               )}

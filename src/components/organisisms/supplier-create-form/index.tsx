@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 
+import { Rifm } from "rifm";
 import AntdModal from "../../atoms/modal";
 import Form from "../../atoms/form";
 import Row from "../../atoms/row";
@@ -11,6 +12,7 @@ import Input from "../../atoms/input";
 import { Supplier } from "../../../shared-ui/models/supplier.model";
 import { Keylist } from "../../../shared-ui/models/keylist";
 import Checkbox from "../../atoms/checkbox";
+import { identificationFormat } from "../../../shared-ui/utils/input";
 
 const WDModal = Modals(AntdModal);
 const Modal = withDirection(WDModal);
@@ -43,6 +45,8 @@ export default function SupplierForm({
     if (!visible) setForm({});
   }, [visible]);
 
+  const formatID = identificationFormat(form!.documentId);
+
   return (
     <Modal
       onCancel={onClose}
@@ -73,11 +77,16 @@ export default function SupplierForm({
             />
           </FormItem>
           <FormItem label="Documento">
-            <Input
-              name="document"
-              onChange={handleChange}
-              value={form!.document}
-            />
+            <Rifm
+              value={form!.document!}
+              format={formatID}
+              accept={/\d+/g}
+              onChange={value => onItemSelect("document", value)}
+            >
+              {({ value, onChange }) => (
+                <Input name="document" value={value} onChange={onChange} />
+              )}
+            </Rifm>
           </FormItem>
         </Form>
       </Row>

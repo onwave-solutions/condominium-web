@@ -5,6 +5,7 @@ import { createBrowserHistory } from "history";
 
 import Shell from "./components/pages/shell";
 import Login from "./components/pages/login";
+import ForgotPassword from "./components/pages/forgot-password";
 import { useReduxState } from "./shared-ui/store/hooks";
 import { select } from "./shared-ui/store/selectors";
 import { appSelector } from "./shared-ui/store/selectors/app";
@@ -33,6 +34,7 @@ export default function App() {
     <>
       <Router history={history}>
         <Switch>
+          <Route path="/forgotpassword" component={ForgotPassword} />
           <Route path="/" component={proxy(token, user)} />
         </Switch>
       </Router>

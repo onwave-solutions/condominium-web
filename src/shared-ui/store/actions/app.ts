@@ -18,6 +18,7 @@ import { setAuthorization } from "../../services/axios";
 import { IAuthorization, User } from "../../models/user";
 import { setCondominiumToManagerAction } from "./manager.action";
 import { setApartmentAction } from "./tenant.action";
+import { RootState } from "../reducers";
 
 export enum ApplicationActions {
   SetPath = "APPLICATION_SET_PATH",
@@ -77,35 +78,42 @@ export function restoreSessionAction() {
   });
 }
 
-// export function onSendChangePassword(auth: IAuthorization) {
-//   return async (dispatch: ThunkDispatch<any, any, any>) => {
-//     dispatch(setUser({ loading: true, showCode: true }))
-//     try {
-//       await sendChangePassword(auth)
-//       toast.success('Contraseña actualizada exitosamente.')
-//       dispatch(onLogin(auth))
-//     } catch (e) {
-//       const error = getErrorResponse(e)
-//       toast.error(error.message)
-//       dispatch(setUser({ loading: false, showCode: true }))
-//     }
-//   }
-// }
+export function onSendChangePassword(auth: IAuthorization, cb?: any) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      if (auth.password !== auth.code2) {
+        toast.warn("Ambas contraseñas deben ser iguales, favor verificar.");
+        return;
+      }
 
-// export function onSendChangePasswordCode(auth: IAuthorization) {
-//   return async (dispatch: ThunkDispatch<any, any, any>) => {
-//     dispatch(setUser({ loading: true }))
-//     try {
-//       await sendChangePasswordCode(auth)
-//       toast.success('Código de verificación enviado a su email.')
-//       dispatch(setUser({ loading: false, showCode: true }))
-//     } catch (e) {
-//       const error = getErrorResponse(e)
-//       toast.error(error.message)
-//       dispatch(setUser({ loading: false }))
-//     }
-//   }
-// }
+      const data = await service.forgotPasswordSubmit(auth);
+      sessionStorage.setItem("username", data.username!);
+      sessionStorage.setItem("token", data.token!);
+      setAuthorization(data.token!);
+      dispatch(setUser(data));
+      toast.success("Contraseña cambiada con exito.");
+      cb && cb();
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+      throw e;
+    }
+  });
+}
+
+export function onSendChangePasswordCode(auth: IAuthorization, cb?: any) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      await service.forgotPassword(auth);
+      toast.success("Código de verificación enviado a su email.");
+      cb && cb();
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+      throw e;
+    }
+  });
+}
 
 export function validateCodeAction(auth: IAuthorization) {
   return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
@@ -123,6 +131,11 @@ export function validateCodeAction(auth: IAuthorization) {
 export function changePasswordAction(auth: IAuthorization, cb?: () => void) {
   return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
+      if (auth.code !== auth.code2) {
+        toast.warn("Ambas contraseñas deben ser iguales, favor verificar.");
+        return;
+      }
+
       const data = await service.changePassword(auth);
       setAuthorization(data.token!);
       dispatch(setUser(data));
@@ -204,8 +217,12 @@ let counter = 0;
 export function loadingWrapper(
   fn: (val: ThunkDispatch<any, any, any>) => void
 ) {
-  return async (dispatch: ThunkDispatch<any, any, any>) => {
+  return async (
+    dispatch: ThunkDispatch<any, any, any>,
+    getState: () => RootState
+  ) => {
     const loading = setLoadingAction("");
+    // const state = getState();
     try {
       counter++;
       dispatch(loading(true));

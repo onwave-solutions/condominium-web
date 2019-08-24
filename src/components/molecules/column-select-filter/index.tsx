@@ -1,6 +1,7 @@
 import React from "react";
 import Select from "../../atoms/select";
 import Button from "../../atoms/button";
+import { ISelect } from "../../atoms/select";
 
 export interface IColumnSelectFilter {
   selectedKeys?: string[];
@@ -10,6 +11,7 @@ export interface IColumnSelectFilter {
   handleReset?(cb: Function): void;
   clearFilters?: Function;
   setSelectedKeys?(keys: string[]): void;
+  selectProps: ISelect;
 }
 
 export default function ColumnSelectFilter(props: IColumnSelectFilter) {
@@ -20,7 +22,8 @@ export default function ColumnSelectFilter(props: IColumnSelectFilter) {
     confirm,
     handleSearch,
     clearFilters,
-    handleReset
+    handleReset,
+    selectProps
   } = props;
 
   return (
@@ -34,6 +37,7 @@ export default function ColumnSelectFilter(props: IColumnSelectFilter) {
           handleSearch!(selectedKeys!, confirm!);
         }}
         style={{ width: 188, marginBottom: 8, display: "block" }}
+        {...selectProps}
       />
       <Button
         type="primary"

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { ColDef } from "ag-grid-community/dist/lib/entities/colDef";
-import { AgGridReact } from "ag-grid-react";
 
 import Modal from "../../components/atoms/modal";
+import PopConfirm from "../../components/atoms/pop-confirm";
 import Row from "../../components/atoms/row";
 
 import Scrollbar from "../../components/atoms/scrollbar";
@@ -10,7 +9,7 @@ import Table, { Column } from "../../components/atoms/table";
 import { Wrapper } from "../../components/atoms/body-wrapper";
 
 import Col from "../../components/atoms/col";
-import Button from "../../components/atoms/button";
+import Button, { ButtonGroup } from "../../components/atoms/button";
 import CondominiumForm from "../../components/organisisms/condominium-form";
 import BladeTemplate from "../../components/templates/blade-template";
 
@@ -21,27 +20,21 @@ import {
   setCondominiumAction,
   createCondominiumAction,
   updateCondominiumAction,
-  refreshCondominiumsAction
+  refreshCondominiumsAction,
+  deleteCondominiumAction
 } from "../../shared-ui/store/actions/condominium.action";
 
 import { addChildBlade } from "../../shared-ui/store/actions/app";
 import { IModule } from "../../shared-ui/models/module";
 import { Condominium } from "../../shared-ui/models/condominium";
-
-const columns: ColDef[] = [
-  {
-    field: "name",
-    headerName: "Nombre"
-  },
-  {
-    field: "address",
-    headerName: "Dirección"
-  }
-];
+import useSearch from "../../components/hooks/use-table-search";
+import ColumnInputFilter from "../../components/molecules/column-input-filter";
+import ColumnSelectFilter from "../../components/molecules/column-select-filter";
 
 const condominiumState = select(condominiumSelector);
 
 export default function CondominiumBlade(props: IModule) {
+  const { onFilter, handleSearch, handleReset } = useSearch();
   const [visible, setVisibility] = useState<boolean>(false);
   const condominium = useReduxState(condominiumState("condominium"));
   const condominiums = useReduxState(condominiumState("condominiums"));
@@ -49,6 +42,7 @@ export default function CondominiumBlade(props: IModule) {
   const setCondominium = useReduxAction(setCondominiumAction);
   const create = useReduxAction(createCondominiumAction());
   const update = useReduxAction(updateCondominiumAction());
+  const onDelete = useReduxAction(deleteCondominiumAction);
   const loadCondominium = useReduxAction(refreshCondominiumsAction());
 
   const clear = () => {
@@ -68,12 +62,12 @@ export default function CondominiumBlade(props: IModule) {
   };
 
   const handleAction = async () => {
+    const cb = () => setVisibility(false);
     if (condominium.id) {
-      await update(condominium);
+      await update(condominium, cb);
     } else {
-      await create(condominium);
+      await create(condominium, cb);
     }
-    setVisibility(false);
   };
 
   return (
@@ -113,11 +107,27 @@ export default function CondominiumBlade(props: IModule) {
                 title="Nombre"
                 dataIndex="name"
                 width="80px"
+                onFilter={onFilter(record => record.name)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
                 title="Moneda"
                 dataIndex="currencySymbol"
+                onFilter={onFilter(record => record.currencySymbol)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 width="80px"
                 render={(text: string) => <span>{text}</span>}
               />
@@ -125,6 +135,14 @@ export default function CondominiumBlade(props: IModule) {
                 title="Dirección"
                 dataIndex="address"
                 width="80px"
+                onFilter={onFilter(record => record.address)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 render={(text: string) => <span>{text}</span>}
               />
 
@@ -148,12 +166,19 @@ export default function CondominiumBlade(props: IModule) {
                 dataIndex={"edit"}
                 width={"5%"}
                 render={(_: string, condominium: Condominium) => (
-                  <>
+                  <ButtonGroup>
                     <Button
+                      type="primary"
                       onClick={handleOpenModal(condominium)}
                       icon="edit"
                     />
-                  </>
+                    <PopConfirm
+                      title="Esta seguro de eliminar este condominio?"
+                      onConfirm={() => onDelete(condominium)}
+                    >
+                      <Button type="danger" icon="delete" />
+                    </PopConfirm>
+                  </ButtonGroup>
                 )}
               />
             </Table>

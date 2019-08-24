@@ -12,7 +12,7 @@ import { Expense } from "../../../shared-ui/models/expense.model";
 import { ColumnProps } from "antd/lib/table/interface";
 import { IModule } from "../../../shared-ui/models/module";
 import { select } from "../../../shared-ui/store/selectors";
-import { currencyFormat } from "../../../shared-ui/utils/currency";
+import { currencyFormat, getSum } from "../../../shared-ui/utils/currency";
 import { expenseSelector } from "../../../shared-ui/store/selectors/expense.selector";
 import { refreshExpensesAction } from "../../../shared-ui/store/actions/expense.actions";
 import { AdvanceQuery } from "../../../shared-ui/models/keylist";
@@ -23,10 +23,14 @@ import { refreshBankAccountsAction } from "../../../shared-ui/store/actions/bank
 import { BankAccount } from "../../../shared-ui/models/bank-account";
 import { ExpenseService } from "../../../shared-ui/services/expense.service";
 import { createPdf } from "../../../shared-ui/utils/pdf";
+import { Supplier } from "../../../shared-ui/models/supplier.model";
+import { supplierSelector } from "../../../shared-ui/store/selectors/supplier.selector";
+import { loadSuppliersAction } from "../../../shared-ui/store/actions/supplier.action";
 
 const managerState = select(managerSelector);
 const tenantState = select(tenantSelector);
 const expenseState = select(expenseSelector);
+const supplierState = select(supplierSelector);
 const bankAccountState = select(bankAccountSelector);
 
 const service = new ExpenseService();
@@ -36,9 +40,11 @@ const ExpenseReport: React.FC<IModule> = ({ isTenant, id }) => {
   const apartment = useReduxState(tenantState("apartment"));
   const expenses = useReduxState(expenseState("expenses"));
   const bankAccounts = useReduxState(bankAccountState("bankAccounts"));
+  const suppliers = useReduxState(supplierState("suppliers"));
 
   const loadExpenses = useReduxAction(refreshExpensesAction(id));
   const loadBankAccounts = useReduxAction(refreshBankAccountsAction());
+  const loadSupplierList = useReduxAction(loadSuppliersAction(id));
 
   const condominiumId = isTenant
     ? _.get(apartment, "building.condominium.id")
@@ -67,31 +73,42 @@ const ExpenseReport: React.FC<IModule> = ({ isTenant, id }) => {
   const formatter = currencyFormat(targetCondo);
 
   const columns: ColumnProps<Expense>[] = [
-    { title: "ID", dataIndex: "id", width: "80px" },
+    {
+      title: "ID",
+      dataIndex: "id",
+      width: "80px",
+      render: (text: string, expense: Expense) =>
+        (expense.id as any) === "Total" ? <strong>{text}</strong> : text
+    },
     {
       title: "Suplidor",
       dataIndex: "supplier",
       width: "120px",
-      render: (_: string, expense: Expense) => (
-        <span>{expense.supplier!.description}</span>
+      render: (text: string, expense: Expense) => (
+        <span>{_.get(expense, ["supplier", "description"], "")}</span>
       )
     },
     {
       title: "Monto",
       dataIndex: "amount",
       width: "150px",
-      render: (_: string, expense: Expense) => (
-        <span>{formatter(expense.amount!)}</span>
-      )
+      render: (text: string, expense: Expense) =>
+        (expense.id as any) === "Total" ? (
+          <strong>{formatter(_.get(expense, "amount", 0))}</strong>
+        ) : (
+          <span>{formatter(_.get(expense, "amount", 0))}</span>
+        )
     },
     {
       title: "Caja",
       dataIndex: "bankAccountId",
       width: "180px",
-      render: (_: string, expense: Expense) => (
-        <span>{`${expense.bankAccount!.bank!.name} - ${
-          expense.bankAccount!.account
-        }`}</span>
+      render: (text: string, expense: Expense) => (
+        <span>{`${_.get(
+          expense,
+          ["bankAccount", "bank", "name"],
+          ""
+        )} - ${_.get(expense, ["bankAccount", "account"], "")}`}</span>
       )
     },
     {
@@ -108,11 +125,11 @@ const ExpenseReport: React.FC<IModule> = ({ isTenant, id }) => {
       title: "Creado Por",
       dataIndex: "createdBy",
       width: "120px",
-      render: (_: string, expense: Expense) => (
+      render: (text: string, expense: Expense) => (
         <span>
-          {(expense.userCreatedBy!.name || "") +
+          {_.get(expense, ["userCreatedBy", "name"], "") +
             " " +
-            (expense.userCreatedBy!.lastName || "")}
+            _.get(expense, ["userCreatedBy", "lastName"], "")}
         </span>
       )
     }
@@ -121,12 +138,19 @@ const ExpenseReport: React.FC<IModule> = ({ isTenant, id }) => {
   useEffect(() => {
     if (!condominiumId) return;
     loadBankAccounts({ condominiumId });
+    loadSupplierList({ condominiumId });
   }, [condominiumId]);
+
+  const sumBy = getSum(expenses);
+  const summary: Expense = {
+    id: "Total" as any,
+    amount: sumBy("amount")
+  };
 
   return (
     <ReportWrapper
       resetKey={condominiumId}
-      data={expenses}
+      data={[...expenses, summary]}
       dateKey="date"
       columns={columns}
       onPrintClicked={print}
@@ -139,6 +163,7 @@ const ExpenseReport: React.FC<IModule> = ({ isTenant, id }) => {
               <Select
                 name="bankAccountId"
                 typeName="id"
+                allowClear={true}
                 placeholder="Cajas"
                 renderNode={(account: BankAccount) => {
                   return `${account.account} [${account.bank!.name}]`;
@@ -146,6 +171,20 @@ const ExpenseReport: React.FC<IModule> = ({ isTenant, id }) => {
                 onChange={value => setState({ bankAccountId: value as any })}
                 value={state.bankAccountId as number}
                 data={bankAccounts}
+              />
+            </Col>
+            <Col sm={24} md={8}>
+              <Select
+                name="supplierId"
+                typeName="id"
+                allowClear={true}
+                placeholder="Suplidor"
+                renderNode={(supplier: Supplier) => {
+                  return `${supplier.description} [${supplier.document}]`;
+                }}
+                onChange={value => setState({ supplierId: value as any })}
+                value={state.supplierId as number}
+                data={suppliers}
               />
             </Col>
           </>

@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 
 import Table, { Column } from "../../components/atoms/table";
 import Scrollbar from "../../components/atoms/scrollbar";
-import Button from "../../components/atoms/button";
+import Button, { ButtonGroup } from "../../components/atoms/button";
+import PopConfirm from "../../components/atoms/pop-confirm";
 import Modal from "../../components/atoms/modal";
 import Row from "../../components/atoms/row";
 import { IModule } from "../../shared-ui/models/module";
@@ -16,14 +17,15 @@ import {
   loadServicesAction,
   createServiceAction,
   updateServiceAction,
-  bulkAssignServiceAction
+  bulkAssignServiceAction,
+  deleteServiceAction
 } from "../../shared-ui/store/actions/service.action";
 import { managerSelector } from "../../shared-ui/store/selectors/manager.selector";
 import { Wrapper } from "../../components/atoms/body-wrapper";
 import { Service } from "../../shared-ui/models/service.model";
 import { appSelector } from "../../shared-ui/store/selectors/app";
 import BuildingTreeModal from "../../components/organisisms/building-tree-form";
-import { currencyFormat } from '../../shared-ui/utils/currency';
+import { currencyFormat } from "../../shared-ui/utils/currency";
 
 const serviceState = select(serviceSelector);
 const managerState = select(managerSelector);
@@ -41,23 +43,26 @@ export default function ServiceView(props: IModule) {
   const loadServices = useReduxAction(loadServicesAction(props.id));
   const create = useReduxAction(createServiceAction(props.id));
   const update = useReduxAction(updateServiceAction(props.id));
+  const onDelete = useReduxAction(deleteServiceAction);
   const bulk = useReduxAction(bulkAssignServiceAction(props.id));
 
   const formatter = currencyFormat(condominium);
 
-
   const handleAction = async () => {
+    const cb = () => setServiceModal(false)
     if (service.id) {
-      await update(service);
+      await update(service, cb);
     } else {
-      await create(service);
+      await create(service, cb);
     }
-    setServiceModal(false);
   };
 
   useEffect(() => {
     if (condominium.id === service.condominiumId) return;
-    const payload = { condominiumId: condominium.id };
+    const payload: Service = {
+      condominiumId: condominium.id,
+      deprecated: false
+    };
     setService(payload);
     loadServices(payload);
   }, [condominium.id]);
@@ -190,11 +195,22 @@ export default function ServiceView(props: IModule) {
                 />
 
                 <Column
-                  title="Editar"
+                  title="Acciones"
                   dataIndex={"edit"}
                   width={"5%"}
                   render={(_: string, service: Service) => (
-                    <Button onClick={handleOpenService(service)} icon="edit" />
+                    <ButtonGroup>
+                      <Button
+                        onClick={handleOpenService(service)}
+                        icon="edit"
+                      />
+                      <PopConfirm
+                        title="Esta seguro de eliminar este plan?"
+                        onConfirm={() => onDelete(service)}
+                      >
+                        <Button type="danger" icon="delete" />
+                      </PopConfirm>
+                    </ButtonGroup>
                   )}
                 />
               </Table>

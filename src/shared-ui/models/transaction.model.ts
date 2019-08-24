@@ -4,6 +4,7 @@ import { DateTimeTransformer } from "../utils/dates";
 import { Payment } from "./payment.model";
 import { Supplier } from './supplier.model';
 import { User } from './user';
+import { BooleanTransformer } from '../utils/boolean';
 
 export class ExpenseNoTransaction {
   @Field()
@@ -39,6 +40,10 @@ export class ExpenseNoTransaction {
   @Field()
   public description?: number;
 
+@Field({ transformer: new BooleanTransformer() })
+  public undo?: boolean;
+
+
 
   @Field({ factory: Supplier, type: "object" })
   public supplier?: Supplier;
@@ -68,6 +73,9 @@ export class Transaction {
 
   @Field()
   public transactionId?: string;
+
+  @Field()
+  public description?: string;
 
   @Field()
   public accountId?: number;

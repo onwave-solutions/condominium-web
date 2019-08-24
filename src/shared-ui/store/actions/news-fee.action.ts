@@ -5,6 +5,7 @@ import { createAction } from "../../utils/redux";
 import { NewsFeeService } from "../../services/news-fee.service";
 import { getErrorResponse } from "../../utils/objects";
 import { loadingWrapper } from "./app";
+import { AdvanceQuery } from '../../models/keylist';
 
 export enum NewsFeeActions {
   SetNewsFee = "newsFee/SET_NEWS_FEE",
@@ -22,7 +23,7 @@ export function setNewsFeesAction(payload: NewsFee[]) {
 }
 
 export function loadNewsFeesAction(id?: string) {
-  return (payload: Partial<NewsFee>) =>
+  return (payload: AdvanceQuery<NewsFee>) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.query(payload);

@@ -68,4 +68,5 @@ export interface IAuthorization {
   username?: string;
   password?: string;
   code?: string;
+  code2?: string
 }

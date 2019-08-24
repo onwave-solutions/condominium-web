@@ -22,11 +22,15 @@ import {
 } from "../../shared-ui/store/actions/company.action";
 import { Company } from "../../shared-ui/models/company.model";
 import { phoneFormat } from "../../shared-ui/utils/input";
+import useSearch from "../../components/hooks/use-table-search";
+import ColumnInputFilter from "../../components/molecules/column-input-filter";
+import ColumnSelectFilter from "../../components/molecules/column-select-filter";
 
 const companyState = select(companySelector);
 const appState = select(appSelector);
 
 export default function CompanyView(props: IModule) {
+  const { onFilter, handleSearch, handleReset } = useSearch();
   const [visible, setVisibility] = useState<boolean>(false);
   const company = useReduxState(companyState("company"));
   const companies = useReduxState(companyState("companies"));
@@ -51,12 +55,12 @@ export default function CompanyView(props: IModule) {
   };
 
   const handleAction = async () => {
+    const cb = () => setVisibility(false);
     if (company.id) {
-      await update(company);
+      await update(company, cb);
     } else {
-      await create(company);
+      await create(company, cb);
     }
-    setVisibility(false);
   };
 
   return (
@@ -97,12 +101,29 @@ export default function CompanyView(props: IModule) {
                 title="Compañia"
                 dataIndex="name"
                 width="80px"
+                onFilter={onFilter(record => record.name)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
                 title="Tipo de Documento"
                 dataIndex="documentId"
                 width="80px"
+                filterDropdown={(filterProps: any) => (
+                  <ColumnSelectFilter
+                    {...filterProps}
+                    data={keylist.documentTypes}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
+                onFilter={onFilter(record => record.documentId || "")}
                 render={(_: string, company: Company) => (
                   <span>{company.documentRaw!.name}</span>
                 )}
@@ -111,24 +132,56 @@ export default function CompanyView(props: IModule) {
                 title="Documento"
                 dataIndex="document"
                 width="80px"
+                onFilter={onFilter(record => record.document)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
                 title="Teléfono"
                 dataIndex="phone"
                 width="80px"
+                onFilter={onFilter(record => record.phone)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 render={(text: string) => <span>{phoneFormat(text)}</span>}
               />
               <Column
                 title="Celular"
                 dataIndex="cellphone"
                 width="80px"
+                onFilter={onFilter(record => record.cellphone)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 render={(text: string) => <span>{phoneFormat(text)}</span>}
               />
               <Column
                 title="Dirección"
                 dataIndex="address"
                 width="100px"
+                onFilter={onFilter(record => record.address)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 render={(text: string) => <span>{text}</span>}
               />
               <Column

@@ -45,6 +45,8 @@ function getInitialState<T>(dateKey?: KeyOf<T>): AdvanceQuery<T> {
   return initialState;
 }
 
+let timeout: any;
+
 export default function ReportWrapper<T extends object>({
   data = [],
   resetKey,
@@ -74,7 +76,8 @@ export default function ReportWrapper<T extends object>({
     setQuery(newState);
 
     if (refetch) {
-      refetch(newState)();
+      clearTimeout(timeout);
+      timeout = setTimeout(() => refetch(newState)(), 500);
     }
   };
 
@@ -91,7 +94,8 @@ export default function ReportWrapper<T extends object>({
 
     setQuery(newState);
     if (!refetch) return;
-    refetch(newState)();
+    clearTimeout(timeout);
+    timeout = setTimeout(() => refetch(newState)(), 500);
   };
 
   return (
@@ -136,7 +140,6 @@ export default function ReportWrapper<T extends object>({
           columns={columns as any}
           bordered={true}
           dataSource={data}
-          footer={() => <strong>{`Total de registros: ${data.length}`}</strong>}
         />
       </BladeTemplate>
     </ScrollbarWrapper>

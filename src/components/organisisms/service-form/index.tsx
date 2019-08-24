@@ -83,7 +83,6 @@ export default function ServiceForm(props: IServiceForm) {
         />
       </FormItem>
       <FormItem label="" sm={12} md={8}>
-        <br />
         <Checkbox
           name="percent"
           checked={service.percent}

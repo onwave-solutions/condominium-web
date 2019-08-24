@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext } from "react";
 import _ from "lodash";
 import debounce from "lodash/fp/debounce";
 
@@ -28,6 +28,8 @@ import CondominiumMenuDropdown from "../../molecules/condominium-menu";
 import useTenantApartment from "../../hooks/use-tenant-apartment";
 import { Apartment } from "../../../shared-ui/models/apartment";
 import WrapperTemplate from "../../templates/wrapper-template";
+import { Condominium } from "../../../shared-ui/models/condominium";
+import { IModule } from "../../../shared-ui/models/module";
 
 const appState = select(appSelector);
 
@@ -39,6 +41,10 @@ function subscribe(subscriber: any) {
   };
 }
 
+export const CondominiumContext = createContext<{
+  condominium?: Condominium;
+}>({});
+
 function formatApartment(apartment: Apartment) {
   if (!apartment.id) return "";
   return `${apartment.name} (${apartment.building!.condominium!.name} - ${
@@ -46,13 +52,27 @@ function formatApartment(apartment: Apartment) {
   }) `;
 }
 
+const filterModule = (condominium: Condominium) => (
+  mod: IModule[] = []
+): IModule[] => {
+  return mod.reduce((acc: IModule[], item: IModule) => {
+    const nextState = [...acc, item];
+    if (!item.isInitialSetup) {
+      return nextState;
+    }
+    if (condominium.isValid) {
+      return nextState;
+    }
+    return acc;
+  }, []);
+};
+
 export default function Shell(props: any) {
   const { url } = props.match;
   const [role, setRole] = useState<string | undefined>(undefined);
   const [lastRole, setLastRole] = useState<string | undefined>(undefined);
   const user = useReduxState(appState("user"));
   const visivility = useReduxState(appState("visibility"));
-  const modules = modulesByPermissions[role || ""] || [];
 
   const handleAddBlade = useReduxAction(addBlade);
   const loadKeylist = useReduxAction(loadKeylistAction);
@@ -64,6 +84,11 @@ export default function Shell(props: any) {
     condominiumSelected,
     changeCondominium
   ] = useManagerCondominium(user);
+
+  const modules = filterModule(condominiumSelected)(
+    modulesByPermissions[role || ""]
+  );
+
   const [apartments, selectedApartment, changeApartment] = useTenantApartment(
     user
   );
@@ -73,7 +98,6 @@ export default function Shell(props: any) {
       handleSetVisibility(false);
       return;
     }
-    //setCollapsed(true);
   };
   useEffect(() => {
     const debouncer = debounce(150)(handleWindowResize);
@@ -195,11 +219,17 @@ export default function Shell(props: any) {
         />
       }
     >
-      {isValid ? (
-        <BladeManager url={url} modules={isValid ? modules : []} isTenant={role === 'TE'} />
-      ) : (
-        <WrapperTemplate />
-      )}
+      <CondominiumContext.Provider value={{ condominium: condominiumSelected }}>
+        {isValid ? (
+          <BladeManager
+            url={url}
+            modules={isValid ? modules : []}
+            isTenant={role === "TE"}
+          />
+        ) : (
+          <WrapperTemplate />
+        )}
+      </CondominiumContext.Provider>
     </ShellTemplate>
   );
 }

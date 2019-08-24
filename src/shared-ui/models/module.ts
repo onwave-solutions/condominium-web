@@ -8,6 +8,7 @@ export interface IModule {
   fromParent?: boolean
   parent?: string;
   permission?: string[];
+  isInitialSetup?: boolean
   size?: "large" | "normal";
   children: IModule[];
   match?: any;

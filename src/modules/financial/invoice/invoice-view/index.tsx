@@ -174,7 +174,7 @@ export default function InvoiceView(props: IModule) {
                 render={(text: string) => <strong>{text}</strong>}
               />
             </Table>
-            {files && files.length && (
+            {files && files.length > 0 && (
               <List
                 header={<h4>Archivos Adjuntos</h4>}
                 dataSource={files}

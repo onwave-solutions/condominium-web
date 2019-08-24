@@ -2,6 +2,7 @@ import { Field } from "@rijudev/parseus";
 import { Condominium } from "./condominium";
 import { User } from "./user";
 import { DateTimeTransformer, DateTransformer } from "../utils/dates";
+import { BooleanTransformer } from '../utils/boolean';
 
 export class NewsFee {
   @Field()
@@ -25,6 +26,8 @@ export class NewsFee {
   @Field({ type: "object", factory: User })
   public userCreatedBy?: User;
 
+  @Field({ transformer: new BooleanTransformer() })
+  public deprecated?: boolean;
 
   @Field({ transformer: new DateTimeTransformer() })
   createdAt?: string;

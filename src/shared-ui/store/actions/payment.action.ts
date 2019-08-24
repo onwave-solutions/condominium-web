@@ -57,13 +57,29 @@ export function rejectPaymentAction(query: AdvanceQuery<Payment>) {
 }
 
 export function loadPaymentsByQueryAction(
-  payment: AdvanceQuery<Payment>,
+  payment: AdvanceQuery<Payment> | AdvanceQuery<Payment>[],
   sortBy?: { [P in KeyOf<Payment>]?: "ASC" | "DESC" | 1 | -1 }
 ) {
   return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
       const data = await service.query(payment, sortBy);
       dispatch(setPaymentsAction(data));
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
+}
+
+export function updateExpenseAction(
+  payment: Partial<Payment>,
+  cb?: () => void
+) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      await service.update(payment.id!, payment);
+      toast.success("Pago Anulado Correctamente.");
+      cb && cb();
     } catch (e) {
       const error = getErrorResponse(e);
       toast.error(error.message);

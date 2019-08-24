@@ -22,6 +22,28 @@ export function setExpensesAction(payload: Expense[]) {
   return createAction(ExpenseActions.SetExpenses, payload);
 }
 
+export function undoExpenseAction(expense: Partial<Expense>, cb?: () => void) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      const data = await service.update(expense.id!, {
+        ...expense,
+        undo: true
+      });
+      dispatch(setExpenseAction({ condominiumId: data.condominiumId }));
+      toast.success("Gasto Anulado Correctamente");
+      dispatch(
+        refreshExpensesAction()({
+          condominiumId: expense.condominiumId
+        })
+      );
+      cb && cb();
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
+}
+
 export function createExpenseAction(id?: string) {
   return (expense: Partial<Expense>, cb?: () => void) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
@@ -51,7 +73,7 @@ export function refreshExpensesAction(id?: string) {
       try {
         const data = await service.query(
           {
-            ...payload,
+            ...payload
           },
           sortBy
         );

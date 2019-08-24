@@ -48,6 +48,25 @@ export function findCondominiumByIdAction(id: number) {
   });
 }
 
+export function deleteBuildingAction(building: Partial<Building>, cb?: () => void) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      await service.delete(building.id!);
+      toast.success("Edificio Eliminado Correctamente");
+      dispatch(
+        refreshBuildingsAction()({
+          condominiumId: building.condominiumId,
+          deprecated: false
+        })
+      );
+      cb && cb()
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
+}
+
 export function updateBuildingAction(id?: string) {
   return (building: Partial<Building>) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
@@ -57,7 +76,8 @@ export function updateBuildingAction(id?: string) {
         toast.success("Edificio Actualizado Correctamente");
         dispatch(
           refreshBuildingsAction(id)({
-            condominiumId: building.condominiumId
+            condominiumId: building.condominiumId,
+            deprecated: false
           })
         );
       } catch (e) {
@@ -76,7 +96,8 @@ export function createBuildingAction(id?: string) {
         toast.success("Edificio Creado Correctamente");
         dispatch(
           refreshBuildingsAction(id)({
-            condominiumId: building.condominiumId
+            condominiumId: building.condominiumId,
+            deprecated: false,
           })
         );
       } catch (e) {
@@ -92,7 +113,8 @@ export function refreshBuildingsAction(id?: string) {
       try {
         const data = await service.query(
           {
-            condominiumId: parseInt(`${payload.condominiumId}`, 10)
+            condominiumId: parseInt(`${payload.condominiumId}`, 10),
+            deprecated: false,
           },
           { name: "ASC" }
         );

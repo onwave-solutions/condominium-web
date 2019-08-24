@@ -1,6 +1,7 @@
 import { Field } from "@rijudev/parseus";
 import { Condominium } from "./condominium";
 import { Apartment } from "./apartment";
+import { BooleanTransformer } from '../utils/boolean';
 
 export class Building {
   @Field()
@@ -19,4 +20,7 @@ export class Building {
 
   @Field({ isVirtual: true })
   apartments?: Apartment[];
+
+  @Field({ transformer: new BooleanTransformer() })
+  public deprecated?: boolean;
 }

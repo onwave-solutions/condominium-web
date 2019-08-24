@@ -13,6 +13,7 @@ export default function Comment({ resetId, onSend }: IComment) {
     setComment("");
   }, [resetId]);
   const handleSend = () => {
+    if (!comment) return;
     onSend(comment);
     setComment("");
   };
@@ -29,11 +30,13 @@ export default function Comment({ resetId, onSend }: IComment) {
         placeholder="Comentario"
         className="isoNoteTextbox"
         value={comment}
+        onPressEnter={handleSend}
         onChange={event => setComment(event.target.value)}
         autoFocus
       />
       <Button
         type="primary"
+        disabled={!comment}
         className="isoAddNoteBtn"
         onClick={handleSend}
         style={{ marginLeft: 5 }}

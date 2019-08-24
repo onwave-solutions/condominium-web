@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { AutoComplete, Spin } from "antd";
 
+import get from "lodash/get";
+
 import { Rifm } from "rifm";
 import AntdModal from "../../atoms/modal";
 import Form from "../../atoms/form";
@@ -16,7 +18,15 @@ import {
   AdvanceQuery,
   Query
 } from "../../../shared-ui/models/keylist";
-import { changeHandler, phoneFormat } from "../../../shared-ui/utils/input";
+import {
+  changeHandler,
+  phoneFormat,
+  identificationFormat,
+  isValidId,
+  isValidDocument
+} from "../../../shared-ui/utils/input";
+import { KeyOf } from "../../../shared-ui/utils/objects";
+import { validateEmail } from "../../../shared-ui/utils/strings";
 
 const WDModal = Modals(AntdModal);
 const Modal = withDirection(WDModal);
@@ -26,6 +36,7 @@ const { Option } = AutoComplete;
 export interface ITenantCreateForm {
   visible?: boolean;
   tenant?: User;
+  loading?: boolean;
   onClose?(): void;
   onAction?(tenant: User): void;
   keylist?: Keylist;
@@ -39,6 +50,7 @@ export default function TenantCreateForm({
   onClose,
   keylist,
   tenant,
+  loading,
   onAction,
   onSearchTenant
 }: ITenantCreateForm) {
@@ -53,13 +65,16 @@ export default function TenantCreateForm({
     setUser({ ...user, [name]: value });
   };
 
+  const getInUser = (path: KeyOf<User> | [KeyOf<User>], def?: any) =>
+    get(user, path, def);
+
   const searchByDocument = () => {
     if (!user.document || user.id || !onSearchTenant) return;
     clearTimeout(timeout);
     timeout = setTimeout(async () => {
       const data = await onSearchTenant({
         document: {
-          like: user.document
+          like: (user.document || "").replace(/[^a-zA-Z0-9]/g, "")
         }
       });
       setUsers(data);
@@ -81,7 +96,7 @@ export default function TenantCreateForm({
   }, [tenant]);
 
   const onSelectTenant = (id: any) => {
-    const tenant = users.find(x => x.id === id);
+    const tenant = users.find(x => `${x.id}${x.document}` === id);
     if (!tenant) return;
     setTimeout(() => {
       setUser({
@@ -95,11 +110,23 @@ export default function TenantCreateForm({
     });
   };
 
+  const formatID = identificationFormat(user.documentId);
+  const isDocumentValid = isValidDocument(user.documentId);
+  const isValid =
+    validateEmail(getInUser("username", "")) &&
+    isDocumentValid(getInUser("document")) &&
+    getInUser("documentId") &&
+    getInUser("name");
+
   return (
     <Modal
+      width="70%"
       onCancel={onClose}
       visible={visible}
       onOk={() => onAction!(user)}
+      okButtonProps={{
+        disabled: loading || !isValid
+      }}
       cancelText="Cancelar"
       okText={user.id ? "Actualizar Inquilino" : "Crear Inquilino"}
       title={user.id ? "Actualizar Inquilino" : "Crear Inquilino"}
@@ -116,12 +143,10 @@ export default function TenantCreateForm({
             />
           </FormItem>
           <FormItem label="Documento">
-            <AutoComplete
-              value={user!.document || ""}
-              backfill={false}
-              allowClear={true}
-              disabled={editMode}
-              onSelect={onSelectTenant}
+            <Rifm
+              value={user ? user!.document || "" : ""}
+              format={formatID}
+              accept={/\d+/g}
               onChange={value => {
                 if (user.id) {
                   setUser({ document: value as string });
@@ -133,17 +158,31 @@ export default function TenantCreateForm({
                   });
                 }
               }}
-              //placeholder="Documento"
-              style={{ width: "100%" }}
             >
-              {users.map(user => (
-                <Option key={user.id}>
-                  {user.name} {user.lastName}({user.document})
-                </Option>
-              ))}
-            </AutoComplete>
+              {({ value, onChange }) => {
+                return (
+                  <AutoComplete
+                    backfill={false}
+                    allowClear={true}
+                    dataSource={users.map(user => (
+                      <Option key={user.id + user.document!}>
+                        {user.name} {user.lastName}(
+                        {identificationFormat(user.documentId)(user.document)})
+                      </Option>
+                    ))}
+                    disabled={editMode}
+                    onSelect={onSelectTenant}
+                    onChange={(value: any) => {
+                      onChange({ target: { value, type: "string" } } as any);
+                    }}
+                    style={{ width: "100%" }}
+                    value={value}
+                  />
+                );
+              }}
+            </Rifm>
           </FormItem>
-          <FormItem label={"Correo"} sm={24} md={24}>
+          <FormItem label={"Email"} sm={24} md={24}>
             <Input
               name="username"
               required={true}

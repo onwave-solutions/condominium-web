@@ -27,7 +27,7 @@ export function loadServicesAction(id?: string) {
   return (payload: Partial<Service>) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
-        const data = await service.query(payload);
+        const data = await service.query(payload, { name: "ASC" });
         dispatch(setServicesAction(data));
       } catch (e) {
         const error = getErrorResponse(e);
@@ -37,7 +37,7 @@ export function loadServicesAction(id?: string) {
 }
 
 export function createServiceAction(id?: string) {
-  return (payload: Partial<Service>) =>
+  return (payload: Partial<Service>, cb: any) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.create(payload);
@@ -46,6 +46,7 @@ export function createServiceAction(id?: string) {
         );
         dispatch(setServiceAction({}));
         toast.success("Servicio creado Correctamente.");
+        cb && cb()
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
@@ -54,7 +55,7 @@ export function createServiceAction(id?: string) {
 }
 
 export function bulkAssignServiceAction(id?: string) {
-  return (payload: Partial<Service>) =>
+  return (payload: Partial<Service>, cb?: any) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         await apartmentService.bulk(payload);
@@ -63,6 +64,7 @@ export function bulkAssignServiceAction(id?: string) {
           loadServicesAction(id)({ condominiumId: payload.condominiumId })
         );
         toast.success("Servicio Actualizado Correctamente.");
+        cb && cb()
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
@@ -70,8 +72,31 @@ export function bulkAssignServiceAction(id?: string) {
     });
 }
 
+export function deleteServiceAction(payload: Partial<Service>) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      await service.delete(payload.id!);
+      dispatch(
+        setServiceAction({
+          condominiumId: payload.condominiumId
+        })
+      );
+      dispatch(
+        loadServicesAction()({
+          condominiumId: payload.condominiumId,
+          deprecated: false
+        })
+      );
+      toast.success("Servicio Eliminado Correctamente.");
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
+}
+
 export function updateServiceAction(id?: string) {
-  return (payload: Partial<Service>) =>
+  return (payload: Partial<Service>, cb?: any) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.update(payload.id!, payload);
@@ -80,6 +105,7 @@ export function updateServiceAction(id?: string) {
           loadServicesAction(id)({ condominiumId: payload.condominiumId })
         );
         toast.success("Servicio Actualizado Correctamente.");
+        cb && cb()
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);

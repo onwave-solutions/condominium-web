@@ -23,6 +23,10 @@ export abstract class AbstractService<T extends object> {
     return Parseus.decode(data).to(this.model);
   }
 
+  async delete(id: number): Promise<void> {
+    await this.service.delete(`${this.prefix}/${id}`);
+  }
+
   async update(id: number, payload: Partial<T>): Promise<T> {
     const { data } = await this.service.put<T>(
       `${this.prefix}/${id}`,

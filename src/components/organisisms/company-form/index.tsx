@@ -5,7 +5,11 @@ import Input from "../../atoms/input";
 import Select from "../../atoms/select";
 import FormItem from "../../molecules/form-item";
 import { Company } from "../../../shared-ui/models/company.model";
-import { changeHandler, phoneFormat } from "../../../shared-ui/utils/input";
+import {
+  changeHandler,
+  phoneFormat,
+  identificationFormat
+} from "../../../shared-ui/utils/input";
 import { Keylist } from "../../../shared-ui/models/keylist";
 import { AsYouType, parsePhoneNumberFromString } from "libphonenumber-js";
 
@@ -22,6 +26,7 @@ export default function CompanyForm(props: ICompanyForm) {
     companyChange!({ ...company, [name]: value });
   };
 
+  const formatID = identificationFormat(company!.documentId);
   return (
     <>
       <FormItem label="Nombre" sm={24} md={24}>
@@ -36,7 +41,16 @@ export default function CompanyForm(props: ICompanyForm) {
         />
       </FormItem>
       <FormItem label="Documento">
-        <Input name="document" onChange={changer} value={company!.document} />
+        <Rifm
+          value={company!.document!}
+          format={formatID}
+          accept={/\d+/g}
+          onChange={value => onItemSelect("document", value)}
+        >
+          {({ value, onChange }) => (
+            <Input name="document" onChange={onChange} value={value} />
+          )}
+        </Rifm>
       </FormItem>
       <FormItem label="Teléfono">
         <Rifm

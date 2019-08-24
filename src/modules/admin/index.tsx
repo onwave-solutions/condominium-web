@@ -20,11 +20,15 @@ import { IModule } from "../../shared-ui/models/module";
 import { appSelector } from "../../shared-ui/store/selectors/app";
 import { Wrapper } from "../../components/atoms/body-wrapper";
 import { User } from "../../shared-ui/models/user";
+import useSearch from "../../components/hooks/use-table-search";
+import ColumnInputFilter from "../../components/molecules/column-input-filter";
+import ColumnSelectFilter from "../../components/molecules/column-select-filter";
 
 const adminState = select(adminSelector);
 const appState = select(appSelector);
 
 export default function Admin(props: IModule) {
+  const { onFilter, handleSearch, handleReset } = useSearch();
   const [visible, setVisibility] = useState<boolean>(false);
   const keylist = useReduxState(appState("keylist"));
   const admin = useReduxState(adminState("admin"));
@@ -48,12 +52,12 @@ export default function Admin(props: IModule) {
   };
 
   const handleAction = async () => {
+    const cb = () => setVisibility(false);
     if (admin.id) {
-      await update(admin);
+      await update(admin, cb);
     } else {
-      await create(admin);
+      await create(admin, cb);
     }
-    setVisibility(false);
   };
 
   return (
@@ -90,6 +94,14 @@ export default function Admin(props: IModule) {
               <Column
                 title="Email"
                 dataIndex="username"
+                onFilter={onFilter(record => record.username)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 width="80px"
                 render={(text: string) => <span>{text}</span>}
               />
@@ -97,6 +109,15 @@ export default function Admin(props: IModule) {
                 title="Estado"
                 dataIndex="status"
                 width="80px"
+                filterDropdown={(filterProps: any) => (
+                  <ColumnSelectFilter
+                    {...filterProps}
+                    data={keylist.userStatus}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
+                onFilter={onFilter(record => record.status || "")}
                 render={(_: string, user: User) => (
                   <span>{user.statusRaw!.name}</span>
                 )}
@@ -105,11 +126,27 @@ export default function Admin(props: IModule) {
                 title="Nombre"
                 dataIndex="name"
                 width="80px"
+                onFilter={onFilter(record => record.name)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
                 title="Apellido"
                 dataIndex="lastName"
+                onFilter={onFilter(record => record.lastName)}
+                filterDropdown={(filterProps: any) => (
+                  <ColumnInputFilter
+                    {...filterProps}
+                    handleSearch={handleSearch}
+                    handleReset={handleReset}
+                  />
+                )}
                 width="80px"
                 render={(text: string) => <span>{text}</span>}
               />

@@ -15,6 +15,7 @@ import ColumnSelectFilter from "../../molecules/column-select-filter";
 import { Keylist } from "../../../shared-ui/models/keylist";
 import { InvoiceService } from "../../../shared-ui/services/invoice.service";
 import { createPdf } from "../../../shared-ui/utils/pdf";
+import { getSum } from "../../../shared-ui/utils/currency";
 
 const service = new InvoiceService();
 
@@ -110,6 +111,8 @@ export default function InvoiceListView({
     pdf.open();
   };
 
+  const sumBy = getSum(invoices);
+
   return (
     <BladeTemplate
       header={
@@ -141,6 +144,13 @@ export default function InvoiceListView({
               pagination={{ pageSize: 5, showSizeChanger: true }}
               scroll={{ x: 1400 }}
               className="invoiceListTable"
+              footer={() => {
+                return (
+                  <>
+                    <h3>Total: {formatter!(sumBy("total"))}</h3>
+                  </>
+                );
+              }}
             >
               <Column
                 title="Factura No."

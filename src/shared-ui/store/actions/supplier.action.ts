@@ -35,7 +35,7 @@ export function loadSuppliersAction(id?: string) {
 }
 
 export function createSupplierAction(id?: string) {
-  return (payload: Partial<Supplier>) =>
+  return (payload: Partial<Supplier>, cb?: any) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.create(payload);
@@ -44,6 +44,7 @@ export function createSupplierAction(id?: string) {
           loadSuppliersAction(id)({ condominiumId: payload.condominiumId })
         );
         toast.success("Suplidor creado Correctamente.");
+        cb && cb()
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);
@@ -52,7 +53,7 @@ export function createSupplierAction(id?: string) {
 }
 
 export function updateSupplierAction(id?: string) {
-  return (payload: Partial<Supplier>) =>
+  return (payload: Partial<Supplier>, cb?: any) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
         const data = await service.update(payload.id!, payload);
@@ -61,6 +62,7 @@ export function updateSupplierAction(id?: string) {
           loadSuppliersAction(id)({ condominiumId: payload.condominiumId })
         );
         toast.success("Suplidor Actualizado Correctamente.");
+        cb && cb()
       } catch (e) {
         const error = getErrorResponse(e);
         toast.error(error.message);

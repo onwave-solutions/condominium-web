@@ -39,7 +39,7 @@ export default function BuildingTree(props: IBuildingTree) {
 
   useEffect(() => {
     buildingService
-      .query({ condominiumId }, { name: "ASC" })
+      .query({ condominiumId, deprecated: false }, { name: "ASC" })
       .then(setBuildings);
   }, [condominiumId]);
 

@@ -1,4 +1,5 @@
 import { Field } from "@rijudev/parseus";
+import { BooleanTransformer } from "../utils/boolean";
 
 export class Condominium {
   @Field()
@@ -16,7 +17,12 @@ export class Condominium {
   @Field()
   updatedAt?: string;
   @Field()
-  currencySymbol?: string
+  currencySymbol?: string;
+
+  isValid?: boolean;
+
+  @Field({ transformer: new BooleanTransformer() })
+  public deprecated?: boolean;
 }
 
 export class CondominiumManager {

@@ -47,6 +47,14 @@ export function stringToPositiveDecimal(value: string, defValue: number = 0) {
   return val > -1 ? val : defValue;
 }
 
+export const identificationFormat = (type: string = "CE") => {
+  return (str: string = "") => {
+    const value = str.substr(0, 13);
+    if (type === "CE") return idFormat(value);
+    return value;
+  };
+};
+
 export const phoneFormat = (str: string = "") => {
   if (str[0] === "1") return str.substr(1);
 
@@ -57,6 +65,21 @@ export const phoneFormat = (str: string = "") => {
 
   return new AsYouType("US").input(values);
 };
+
+export const rncFormat = (str: string = "") => {
+  const digits = str.replace(/\D/g, "").substr(0, 9);
+  if (digits.length !== 9) {
+    return digits;
+  }
+
+  return str.replace(/^(\d{3})(\d{2})(\d{4})$/g, "$1-$2-$3");
+};
+
+export const isValidDocument = (type: string = "CE") => (str: string = "") =>
+  type === "CE" ? isValidId(str) : str.length >= 6 && str.length < 11;
+
+export const isValidId = (str: string = "") =>
+  str.replace(/\D/g, "").length === 11;
 
 export const idFormat = (str: string = "") => {
   const digits = str.replace(/\D/g, "").substr(0, 11);

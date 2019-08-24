@@ -9,8 +9,14 @@ import {
   setDefaultCondominiumAction,
   setCondominiumToManagerAction
 } from "../../shared-ui/store/actions/manager.action";
+import { bankAccountSelector } from "../../shared-ui/store/selectors/bank-account.selector";
+import { refreshBankAccountsAction } from "../../shared-ui/store/actions/bank-account.actions";
+import { serviceSelector } from "../../shared-ui/store/selectors/service.selector";
+import { loadServicesAction } from "../../shared-ui/store/actions/service.action";
 
+const serviceState = select(serviceSelector);
 const managerState = select(managerSelector);
+const bankAccountState = select(bankAccountSelector);
 
 export default function useManagerCondominium(
   user: User,
@@ -21,12 +27,17 @@ export default function useManagerCondominium(
   const condominiums = useReduxState(managerState("condominiums"));
   const selectedCondo = useReduxState(managerState("condominium"));
 
+  const bankAccounts = useReduxState(bankAccountState("bankAccounts"));
+  const services = useReduxState(serviceState("services"));
+
   const getCondominiumsByManagerId = useReduxAction(
     getCondominiumsByManagerIdAction(id)
   );
 
   const setDefaultCondominium = useReduxAction(setDefaultCondominiumAction(id));
   const setSelectedCondominium = useReduxAction(setCondominiumToManagerAction);
+  const loadBankAccounts = useReduxAction(refreshBankAccountsAction());
+  const loadServices = useReduxAction(loadServicesAction());
 
   const [condominium, setCondominium] = useState<Condominium>(selectedCondo);
 
@@ -46,7 +57,11 @@ export default function useManagerCondominium(
       managerId: user.id
     });
     setSelectedCondominium(condominium);
+    loadBankAccounts({ condominiumId: condominium.id, disabled: false });
+    loadServices({ condominiumId: condominium.id, deprecated: false });
   }, [condominium.id]);
+
+  condominium.isValid = bankAccounts.length > 0 && services.length > 0;
 
   return [condominiums, condominium, setCondominium];
 }

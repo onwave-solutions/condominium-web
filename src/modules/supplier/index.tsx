@@ -17,12 +17,17 @@ import {
 } from "../../shared-ui/store/actions/supplier.action";
 import { Supplier } from "../../shared-ui/models/supplier.model";
 import { appSelector } from "../../shared-ui/store/selectors/app";
+import useSearch from "../../components/hooks/use-table-search";
+import ColumnInputFilter from "../../components/molecules/column-input-filter";
+import ColumnSelectFilter from "../../components/molecules/column-select-filter";
+import { identificationFormat } from "../../shared-ui/utils/input";
 
 const managerState = select(managerSelector);
 const supplierState = select(supplierSelector);
 const appState = select(appSelector);
 
 export default function SupplierView(props: IModule) {
+  const { onFilter, handleSearch, handleReset } = useSearch();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const condominium = useReduxState(managerState("condominium"));
   const suppliers = useReduxState(supplierState("suppliers"));
@@ -34,19 +39,18 @@ export default function SupplierView(props: IModule) {
   const createSupplier = useReduxAction(createSupplierAction(props.id));
   const updateSupplier = useReduxAction(updateSupplierAction(props.id));
   const handleLoadSuppliers = () =>
-    loadSupplierList({ condominiumId: condominium.id });
+    loadSupplierList({ condominiumId: condominium.id, disabled: false });
 
   const handleModalVisibility = (status: boolean) => {
     return () => setModalVisible(status);
   };
 
   const onAction = (supplier: Supplier) => {
+    const cb = () => setModalVisible(false);
     if (supplier.id) {
-      updateSupplier({ ...supplier, condominiumId: condominium.id });
-      setModalVisible(false);
+      updateSupplier({ ...supplier, condominiumId: condominium.id }, cb);
     } else {
-      createSupplier({ ...supplier, condominiumId: condominium.id });
-      setModalVisible(false);
+      createSupplier({ ...supplier, condominiumId: condominium.id }, cb);
     }
   };
 
@@ -80,27 +84,49 @@ export default function SupplierView(props: IModule) {
           <Column
             title="Suplidor"
             dataIndex="description"
+            onFilter={onFilter(record => record.description)}
+            filterDropdown={(filterProps: any) => (
+              <ColumnInputFilter
+                {...filterProps}
+                handleSearch={handleSearch}
+                handleReset={handleReset}
+              />
+            )}
             render={(text: string) => <span>{text}</span>}
           />
           <Column
             title="Tipo de Documento"
             dataIndex="documentId"
+            filterDropdown={(filterProps: any) => (
+              <ColumnSelectFilter
+                {...filterProps}
+                data={keylist.documentTypes}
+                handleSearch={handleSearch}
+                handleReset={handleReset}
+              />
+            )}
+            onFilter={onFilter(record => record.documentId || "")}
             render={(_: string, supplier: Supplier) => (
-              <span>{supplier.documentId}</span>
+              <span>
+                {supplier.documentType ? supplier.documentType!.name : ""}
+              </span>
             )}
           />
           <Column
             title="Documento"
             dataIndex="document"
-            render={(text: string) => <span>{text}</span>}
-          />
-          <Column
-            title="Habilitado"
-            dataIndex="disabled"
-            width="100px"
-            render={(_: string, supplier: Supplier) => (
-              <span>{!supplier.disabled ? "Si" : "No"}</span>
+            onFilter={onFilter(record => record.document)}
+            filterDropdown={(filterProps: any) => (
+              <ColumnInputFilter
+                {...filterProps}
+                handleSearch={handleSearch}
+                handleReset={handleReset}
+              />
             )}
+            render={(_: string, supplier: Supplier) => {
+              const formatID = identificationFormat(supplier.documentId);
+              return <span>{formatID(supplier.document)}</span>;
+            }}
           />
           <Column
             title={"Acciones"}

@@ -1,6 +1,18 @@
 import { Field } from "@rijudev/parseus";
 import { Condominium } from "./condominium";
 import { KeylistType } from "./keylist";
+import { BooleanTransformer } from '../utils/boolean';
+
+export class BankAccountTransfer {
+  @Field()
+  from?: number;
+
+  @Field()
+  to?: number;
+
+  @Field({ type: "decimal" })
+  public balance?: number;
+}
 
 export class BankAccount {
   @Field()
@@ -21,7 +33,7 @@ export class BankAccount {
   @Field()
   public balance?: number;
 
-  @Field()
+  @Field({ transformer: new BooleanTransformer() })
   public disabled?: boolean;
 
   @Field()

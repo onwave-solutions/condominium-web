@@ -5,6 +5,7 @@ import { BankAccount } from "./bank-account";
 import { Invoice } from "./invoice.model";
 import { User } from "./user";
 import { DateTimeTransformer } from "../utils/dates";
+import { BooleanTransformer } from "../utils/boolean";
 
 export class Attachment {
   @Field()
@@ -20,6 +21,9 @@ export class Attachment {
 export class Payment {
   @Field()
   public id?: number;
+
+  @Field({ transformer: new BooleanTransformer() })
+  public isManager?: boolean;
 
   @Field({ transformer: new DateTimeTransformer() })
   public createdAt?: string;
@@ -41,6 +45,12 @@ export class Payment {
 
   @Field()
   public methodTypeId?: string;
+
+  @Field()
+  public reference?: string
+
+  @Field()
+  public description?: string
 
   @Field({ type: "decimal", fixed: 2 })
   public amount?: number;

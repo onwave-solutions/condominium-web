@@ -1,6 +1,8 @@
 import React, { forwardRef } from "react";
 import AntdInput, { InputProps } from "antd/lib/input";
 
+import "./input.css";
+
 import withInputStyle from "../../hoc/with-input-style";
 import withDirection from "../../hoc/with-direction";
 
@@ -16,6 +18,14 @@ export const InputArea = AntdInput.TextArea;
 
 export default class extends React.Component<InputProps, any> {
   render() {
-    return <Input {...this.props} />;
+    const { type: defType, value: defVal = "", ...props } = this.props;
+
+    let value = defVal;
+    let type = defType;
+    if (type === "number") {
+      value = `${defVal || ""}`.replace(/\D/g, "");
+      type = "";
+    }
+    return <Input {...props} type={type} value={value} autoComplete="off" />;
   }
 }

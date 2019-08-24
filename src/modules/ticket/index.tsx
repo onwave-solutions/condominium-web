@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import moment from "moment";
 import _ from "lodash";
 import { Layout } from "antd";
 import TicketWrapper from "../../components/molecules/ticket-wrapper";
@@ -219,6 +220,12 @@ export default function TicketView(props: IModule) {
                       <p>
                         {_.get(ticket, "userCreatedBy.name")}{" "}
                         {_.get(ticket, "userCreatedBy.lastName")}
+                      </p>
+                      <h3>Fecha</h3>
+                      <p>
+                        {moment(_.get(ticket, "createdAt")).format(
+                          "DD/MMM/YYYY hh:mm:ss a"
+                        )}
                       </p>
 
                       {ticket.apartmentId && (

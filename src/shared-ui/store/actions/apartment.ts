@@ -11,7 +11,7 @@ import {
 } from "../../services/apartment";
 import { getErrorResponse, KeyOf } from "../../utils/objects";
 import { loadingWrapper } from "./app";
-import { AdvanceQuery } from '../../models/keylist';
+import { AdvanceQuery } from "../../models/keylist";
 
 export enum ApartmentActions {
   SetApartment = "APARTMENT_SET_APARTMENT",
@@ -28,6 +28,24 @@ export function setApartmentsAction(payload: Apartment[]) {
 
 const service = new ApartmentService();
 
+export function deleteApartmentAction(apartment: Partial<Apartment>) {
+  return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
+    try {
+      await service.delete(apartment.id!);
+      toast.success("Apartamento Eliminado Correctamente");
+      dispatch(
+        refreshApartmentsAction()({
+          buildingId: apartment.buildingId,
+          deprecated: false
+        })
+      );
+    } catch (e) {
+      const error = getErrorResponse(e);
+      toast.error(error.message);
+    }
+  });
+}
+
 export function updateApartmentAction(id?: string) {
   return (apartment: Partial<Apartment>) =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
@@ -37,7 +55,8 @@ export function updateApartmentAction(id?: string) {
         toast.success("Apartamento Actualizado Correctamente");
         dispatch(
           refreshApartmentsAction(id)({
-            buildingId: apartment.buildingId
+            buildingId: apartment.buildingId,
+            deprecated: false
           })
         );
       } catch (e) {
@@ -56,7 +75,8 @@ export function createApartmentAction(id?: string) {
         toast.success("Apartamento Creado Correctamente");
         dispatch(
           refreshApartmentsAction(id)({
-            buildingId: apartment.buildingId
+            buildingId: apartment.buildingId,
+            deprecated: false
           })
         );
       } catch (e) {
