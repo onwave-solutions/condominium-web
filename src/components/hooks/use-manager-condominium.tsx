@@ -27,8 +27,10 @@ export default function useManagerCondominium(
   const condominiums = useReduxState(managerState("condominiums"));
   const selectedCondo = useReduxState(managerState("condominium"));
 
-  const bankAccounts = useReduxState(bankAccountState("bankAccounts"));
-  const services = useReduxState(serviceState("services"));
+  const bankAccounts = useReduxState(
+    bankAccountState(["bankAccounts", "length"])
+  );
+  const services = useReduxState(serviceState(["services", "length"]));
 
   const getCondominiumsByManagerId = useReduxAction(
     getCondominiumsByManagerIdAction(id)
@@ -61,7 +63,7 @@ export default function useManagerCondominium(
     loadServices({ condominiumId: condominium.id, deprecated: false });
   }, [condominium.id]);
 
-  condominium.isValid = bankAccounts.length > 0 && services.length > 0;
+  condominium.isValid = bankAccounts > 0 && services > 0;
 
   return [condominiums, condominium, setCondominium];
 }
