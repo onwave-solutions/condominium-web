@@ -13,7 +13,7 @@ export default function Comment({ resetId, onSend }: IComment) {
     setComment("");
   }, [resetId]);
   const handleSend = () => {
-    if (!comment) return;
+    if (!comment.trim().replace("\n", "")) return;
     onSend(comment);
     setComment("");
   };

@@ -33,15 +33,16 @@ export default function ColumnSelectFilter(props: IColumnSelectFilter) {
         data={data}
         value={selectedKeys![0]}
         onChangeItem={(_: string, value: any) => {
-          setSelectedKeys!(value ? [value] : []);
-          handleSearch!(selectedKeys!, confirm!);
+          const selected = value ? [value] : [];
+          setSelectedKeys!(selected);
+          handleSearch!(selected!, confirm!);
+          console.log(selected);
         }}
         style={{ width: 188, marginBottom: 8, display: "block" }}
-        {...selectProps}
       />
       <Button
         type="primary"
-        onClick={() => handleSearch!(selectedKeys!, confirm!)}
+        onClick={() => confirm!()}
         icon="search"
         size="small"
         style={{ width: 90, marginRight: 8 }}

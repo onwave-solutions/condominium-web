@@ -105,7 +105,7 @@ export default function TicketView(props: IModule) {
   };
 
   const handleUpdateTicket = (newTicket: Ticket) => () => {
-    onUpdateTicket(newTicket, ticket => {
+    onUpdateTicket(newTicket, (ticket: Ticket) => {
       setTicket(ticket);
       loadTickets(queryBuilder(query));
     });

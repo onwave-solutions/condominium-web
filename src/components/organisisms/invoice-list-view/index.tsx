@@ -73,7 +73,7 @@ export default function InvoiceListView({
       .includes(value.toLowerCase());
 
   const handleSearch = (selectedKeys: string[], confirm: Function) => {
-    confirm();
+    //confirm();
     setSearchText(selectedKeys[0]);
   };
 
@@ -219,14 +219,17 @@ export default function InvoiceListView({
               <Column
                 title={"Estado"}
                 dataIndex={"statusType"}
-                filterDropdown={(filterProps: any) => (
-                  <ColumnSelectFilter
-                    {...filterProps}
-                    data={keylist.invoiceStatus}
-                    handleSearch={handleSearch}
-                    handleReset={handleReset}
-                  />
-                )}
+                filterDropdown={(filterProps: any) => {
+                  console.log(filterProps);
+                  return (
+                    <ColumnSelectFilter
+                      {...filterProps}
+                      data={keylist.invoiceStatus}
+                      handleSearch={handleSearch}
+                      handleReset={handleReset}
+                    />
+                  );
+                }}
                 onFilter={onFilter(record => record.statusType || "")}
                 width={"18%"}
                 render={(text: string, invoice: Invoice) => {

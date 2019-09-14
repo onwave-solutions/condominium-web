@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 
 import { Radio, Divider } from "antd";
 import Col from "../../components/atoms/col";
@@ -105,9 +105,19 @@ const PaymentView: React.FC<IModule> = props => {
     lineHeight: "30px"
   };
 
+  const rest = useMemo(() => {
+    if (!invoice.id) return 0;
+    return (
+      (invoice.total || 0) -
+      invoice
+        .payments!.filter(x => x.statusTypeId === "AP")
+        .reduce((acc, item) => acc + (item.amount || 0), 0)
+    );
+  }, [invoice.id]);
+
   useEffect(() => {
     if (paymentType === "1") {
-      setPayment({ ...payment, amount: invoice.total });
+      setPayment({ ...payment, amount: rest });
     } else if (paymentType === "2") {
       setPayment({ ...payment, amount: undefined });
     }
@@ -159,7 +169,7 @@ const PaymentView: React.FC<IModule> = props => {
                       disabled={!["PE", "MO"].includes(invoice.statusType!)}
                       onChange={() => setType("1")}
                     >
-                      {`Pago Total: ${invoice.total || 0}`}
+                      {`Pago Total: ${rest}`}
                     </Radio>
                     <Radio
                       style={radioStyle}

@@ -2,6 +2,7 @@ import { Field } from "@rijudev/parseus";
 import { DateTransformer, DateTimeTransformer } from "../utils/dates";
 import { Apartment } from "./apartment";
 import { KeylistType } from "./keylist";
+import { Payment } from './payment.model';
 
 export class InvoiceDetail {
   @Field()
@@ -51,6 +52,7 @@ export class Invoice {
   @Field({ type: "decimal", fixed: 2 })
   public total?: number;
 
+
   @Field({ type: "decimal", fixed: 2 })
   public subTotal?: number;
 
@@ -67,6 +69,10 @@ export class Invoice {
 
   @Field({ type: "array", factory: InvoiceDetail })
   public invoiceDetails?: InvoiceDetail[];
+
+
+  @Field({type: 'array', factory: Payment})
+  public payments?: Payment[]
 }
 
 export class BulkInvoice {
