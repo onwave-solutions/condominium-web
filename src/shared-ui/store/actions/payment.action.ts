@@ -63,6 +63,7 @@ export function loadPaymentsByQueryAction(
   return loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
     try {
       const data = await service.query(payment, sortBy);
+      console.log(data)
       dispatch(setPaymentsAction(data));
     } catch (e) {
       const error = getErrorResponse(e);
