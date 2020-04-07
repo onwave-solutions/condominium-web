@@ -3,6 +3,7 @@ import { Apartment } from "./apartment";
 import { Company } from "./company.model";
 import { KeylistType } from "./keylist";
 import { Condominium } from "./condominium";
+import { BooleanTransformer } from '../utils/boolean';
 
 export class User {
   @Field()
@@ -43,9 +44,6 @@ export class User {
   dueDay?: number;
 
   @Field()
-  companyId?: number;
-
-  @Field()
   token?: string;
 
   @Field({ type: "array", factory: Apartment })
@@ -62,6 +60,9 @@ export class User {
 
   @Field({ type: "array", factory: Condominium })
   condominiums?: Condominium[];
+
+  @Field({ transformer: new BooleanTransformer() })
+  disabled?: boolean
 }
 
 export interface IAuthorization {

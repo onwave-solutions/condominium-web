@@ -1,44 +1,39 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Condominium Web
 
-## Available Scripts
+Web app para aplicacion de condominios Onwave
 
-In the project directory, you can run:
+Esta aplicación utiliza las siguientes librerias:
 
-### `npm start`
+- React 16.X
+- Typescript 3.X
+- Redux/React Redux
+- Axios
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Quick Start
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+Para correr este proyecto necesita clonar el repositorio e instalar las dependencias.
 
-### `npm test`
+```sh
+git clone git@github.com:OnWaveSolutions/condominium-web.git 
+cd condominium-web
+yarn
+```
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Luego verificar que las variables de entornos necesarias estan en el documentio `.env`
 
-### `npm run build`
+```sh
+REACT_APP_region=us-west-2
+REACT_APP_userPoolId=us-west-2_otgosYwhN
+REACT_APP_userPoolWebClientId=7fa0t94ahke0u4jpfpimg1ipp9
+REACT_APP_bucket_name=vicepresidencia
+REACT_APP_access_key=AKIAJ5DADHZXGJKWQNUA
+REACT_APP_secret_key=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
+```
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```sh
+yarn start
+```
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+## Arquitectura
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+El proyecto utiliza atomic design [https://andela.com/insights/structuring-your-react-application-atomic-design-principles/] para la distribución de carpetas de componentes, para las vistas o modulos cada una esta separada dentro de la carpeta de `src/modules` 

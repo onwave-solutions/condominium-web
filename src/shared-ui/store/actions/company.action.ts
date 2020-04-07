@@ -25,7 +25,7 @@ export function loadCompaniesAction(id?: string) {
   return () =>
     loadingWrapper(async (dispatch: ThunkDispatch<any, any, any>) => {
       try {
-        const data = await service.query({});
+        const data = await service.query({ deprecated: false });
         dispatch(setCompanysAction(data));
       } catch (e) {
         const error = getErrorResponse(e);

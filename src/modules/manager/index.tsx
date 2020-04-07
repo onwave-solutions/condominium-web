@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import _ from "lodash";
 
 import get from "lodash/get";
+import set from "lodash/set";
 
 import { Rifm } from "rifm";
 import { ColDef } from "ag-grid-community";
@@ -80,6 +81,7 @@ export default function Manager(props: IModule) {
   const update = useReduxAction(updateManagerAction(props.id));
   const getManagerById = useReduxAction(setManagerByIdAction);
 
+
   const addCondominiumManager = useReduxAction(
     addCondominiumManagerAction(props.id)
   );
@@ -89,7 +91,8 @@ export default function Manager(props: IModule) {
   );
 
   const onItemSelect = (name: string, value: any) => {
-    setManager!({ ...manager, [name]: value });
+    const newManager = set({ ...manager }, name, value);
+    setManager!(newManager);
   };
 
   useEffect(() => {
@@ -225,13 +228,15 @@ export default function Manager(props: IModule) {
           </FormItem>
           <FormItem label="Compañia" sm={24} md={24}>
             <Select
-              name="companyId"
+              name="company.id"
               data={companies}
               typeName="id"
               renderNode={(data: Company) => {
-                return `${data.name} [${data.documentId}-${data.document}]`;
+                return `${data.name} [${get(data, "documentType.name")}:${
+                  data.document
+                }]`;
               }}
-              value={manager!.companyId}
+              value={get(manager, "company.id")}
               onChangeItem={onItemSelect}
             />
           </FormItem>

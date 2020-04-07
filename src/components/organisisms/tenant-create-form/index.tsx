@@ -113,10 +113,17 @@ export default function TenantCreateForm({
   const formatID = identificationFormat(user.documentId);
   const isDocumentValid = isValidDocument(user.documentId);
   const isValid =
-    validateEmail(getInUser("username", "")) &&
+    getInUser("username", "") &&
     isDocumentValid(getInUser("document")) &&
     getInUser("documentId") &&
     getInUser("name");
+
+  console.log(
+    getInUser("username", ""),
+    isDocumentValid(getInUser("document")),
+    getInUser("documentId"),
+    getInUser("name")
+  );
 
   return (
     <Modal

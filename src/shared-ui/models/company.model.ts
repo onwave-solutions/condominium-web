@@ -1,5 +1,6 @@
 import { Field } from "@rijudev/parseus";
 import { KeylistType } from "./keylist";
+import { BooleanTransformer } from '../utils/boolean';
 
 export class Company {
   @Field()
@@ -14,8 +15,8 @@ export class Company {
   @Field()
   public name?: string;
 
-  @Field()
-  public documentId?: string;
+  @Field({ factory: KeylistType, type: "object" })
+  public documentType?: KeylistType;
 
   @Field()
   public document?: string;
@@ -29,6 +30,6 @@ export class Company {
   @Field()
   public address?: string;
 
-  @Field({ factory: KeylistType, type: "object" })
-  public documentRaw?: KeylistType;
+  @Field({ transformer: new BooleanTransformer() })
+  public deprecated?: boolean;
 }
