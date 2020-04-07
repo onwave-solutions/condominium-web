@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 
 import Table, { Column } from "../../components/atoms/table";
-import Button from "../../components/atoms/button";
+import Button, { ButtonGroup } from "../../components/atoms/button";
 import Modal from "../../components/atoms/modal";
 import Row from "../../components/atoms/row";
 import UserForm from "../../components/organisisms/user-form";
 import BladeTemplate from "../../components/templates/blade-template";
 import Scrollbar from "../../components/atoms/scrollbar";
+import PopConfirm from "../../components/atoms/pop-confirm";
 import { adminSelector } from "../../shared-ui/store/selectors/admin.selector";
 import { select } from "../../shared-ui/store/selectors";
 import { useReduxState, useReduxAction } from "../../shared-ui/store/hooks";
@@ -59,6 +60,8 @@ export default function Admin(props: IModule) {
       await create(admin, cb);
     }
   };
+
+  const deleteUser = (user: User) => update({ ...user, disabled: true });
 
   return (
     <>
@@ -151,13 +154,22 @@ export default function Admin(props: IModule) {
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
-                title="Editar"
+                title="Acciones"
                 dataIndex={"edit"}
                 width={"5%"}
                 render={(_: string, user: User) => (
-                  <>
+                  <ButtonGroup>
                     <Button onClick={handleOpenModal(user)} icon="edit" />
-                  </>
+
+                    <PopConfirm
+                      title="Esta seguro de eliminar esta usuario?"
+                      onConfirm={() =>
+                        deleteUser(user)
+                      }
+                    >
+                      <Button type="danger" size="default" icon="close" />
+                    </PopConfirm>
+                  </ButtonGroup>
                 )}
               />
             </Table>

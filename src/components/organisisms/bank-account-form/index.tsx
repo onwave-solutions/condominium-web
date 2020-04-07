@@ -24,7 +24,7 @@ export default function BankAccountForm(props: IBankAccountForm) {
 
   return (
     <>
-      <FormItem label="Banco" sm={24} md={12}>
+      <FormItem label="Caja" sm={24} md={12}>
         <Select
           name="bankId"
           onChangeItem={onItemSelect}
@@ -32,7 +32,7 @@ export default function BankAccountForm(props: IBankAccountForm) {
           data={keylist!.banks}
         />
       </FormItem>
-      <FormItem label="Caja" sm={24} md={12}>
+      <FormItem label="Número de Referencia" sm={24} md={12}>
         <Input name="account" value={bankAccount.account} onChange={changer} />
       </FormItem>
       <FormItem

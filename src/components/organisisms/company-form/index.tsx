@@ -1,5 +1,8 @@
 import React from "react";
 
+import get from "lodash/get";
+import set from "lodash/set";
+
 import { Rifm } from "rifm";
 import Input from "../../atoms/input";
 import Select from "../../atoms/select";
@@ -23,10 +26,11 @@ export default function CompanyForm(props: ICompanyForm) {
   const { company, companyChange, keylist } = props;
   const changer = changeHandler(company, companyChange!);
   const onItemSelect = (name: string, value: any) => {
-    companyChange!({ ...company, [name]: value });
+    const newCompany = set({ ...company }, name, value);
+    companyChange!(newCompany);
   };
 
-  const formatID = identificationFormat(company!.documentId);
+  const formatID = identificationFormat(get(company, "documentType.type"));
   return (
     <>
       <FormItem label="Nombre" sm={24} md={24}>
@@ -34,9 +38,9 @@ export default function CompanyForm(props: ICompanyForm) {
       </FormItem>
       <FormItem label="Tipo de documento">
         <Select
-          name="documentId"
+          name="documentType.type"
           onChangeItem={onItemSelect}
-          value={company!.documentId}
+          value={get(company, "documentType.type")}
           data={keylist!.documentTypes}
         />
       </FormItem>

@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import Modal from "../../components/atoms/modal";
 import Row from "../../components/atoms/row";
 
+import get from "lodash/get";
+
 import Scrollbar from "../../components/atoms/scrollbar";
 import Table, { Column } from "../../components/atoms/table";
-import Button from "../../components/atoms/button";
+import Button, { ButtonGroup } from "../../components/atoms/button";
+import PopConfirm from "../../components/atoms/pop-confirm";
 import BladeTemplate from "../../components/templates/blade-template";
 import CompanyForm from "../../components/organisisms/company-form";
 import { Wrapper } from "../../components/atoms/body-wrapper";
@@ -62,6 +65,8 @@ export default function CompanyView(props: IModule) {
       await create(company, cb);
     }
   };
+
+  const deleteCompany =  (company:Company) => update(company)
 
   return (
     <>
@@ -123,9 +128,9 @@ export default function CompanyView(props: IModule) {
                     handleReset={handleReset}
                   />
                 )}
-                onFilter={onFilter(record => record.documentId || "")}
+                onFilter={onFilter(record => get(record, "documentType.type"))}
                 render={(_: string, company: Company) => (
-                  <span>{company.documentRaw!.name}</span>
+                  <span>{get(company, "documentType.name")}</span>
                 )}
               />
               <Column
@@ -185,12 +190,20 @@ export default function CompanyView(props: IModule) {
                 render={(text: string) => <span>{text}</span>}
               />
               <Column
-                title="Editar"
+                title="Acciones"
                 dataIndex={"edit"}
                 width={"5%"}
                 render={(_: string, company: Company) => (
                   <>
-                    <Button onClick={handleOpenModal(company)} icon="edit" />
+                    <ButtonGroup>
+                      <Button onClick={handleOpenModal(company)} icon="edit" />
+                      <PopConfirm
+                        title="Esta seguro de eliminar esta compañia?"
+                        onConfirm={() => deleteCompany({...company, deprecated: true})}
+                      >
+                        <Button type="danger" size="default" icon="close" />
+                      </PopConfirm>
+                    </ButtonGroup>
                   </>
                 )}
               />

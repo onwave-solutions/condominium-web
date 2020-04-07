@@ -74,7 +74,7 @@ const PaymentReport: React.FC<IModule> = ({ isTenant, id }) => {
           ..._.get(query, "building", {}),
           condominium: {
             id: condominiumId
-          }
+          },
         }
       },
       { buildingId: "ASC" }
