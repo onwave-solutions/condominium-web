@@ -24,10 +24,10 @@ Luego verificar que las variables de entornos necesarias estan en el documentio 
 ```sh
 REACT_APP_region=us-west-2
 REACT_APP_userPoolId=us-west-2_otgosYwhN
-REACT_APP_userPoolWebClientId=7fa0t94ahke0u4jpfpimg1ipp9
-REACT_APP_bucket_name=vicepresidencia
-REACT_APP_access_key=AKIAJ5DADHZXGJKWQNUA
-REACT_APP_secret_key=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
+REACT_APP_userPoolWebClientId=
+REACT_APP_bucket_name=
+REACT_APP_access_key=
+REACT_APP_secret_key=
 ```
 
 ```sh

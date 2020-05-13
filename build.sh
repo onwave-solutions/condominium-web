@@ -5,7 +5,7 @@ echo "Running Build"
 date +"%Y-%m-%d %H:%M:%S - Executing ${BASH_SOURCE}"
 
 LOCATION=$(pwd)
-IMAGE="166452032555.dkr.ecr.us-east-2.amazonaws.com/building-web"
+IMAGE="664639368720.dkr.ecr.us-east-2.amazonaws.com/frontend"
 TAG="latest"
 CONTAINER=""
 

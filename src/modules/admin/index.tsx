@@ -122,7 +122,7 @@ export default function Admin(props: IModule) {
                 )}
                 onFilter={onFilter(record => record.status || "")}
                 render={(_: string, user: User) => (
-                  <span>{user.statusRaw!.name}</span>
+                  <span>{user && user.statusRaw && user.statusRaw.name}</span>
                 )}
               />
               <Column
@@ -160,15 +160,6 @@ export default function Admin(props: IModule) {
                 render={(_: string, user: User) => (
                   <ButtonGroup>
                     <Button onClick={handleOpenModal(user)} icon="edit" />
-
-                    <PopConfirm
-                      title="Esta seguro de eliminar esta usuario?"
-                      onConfirm={() =>
-                        deleteUser(user)
-                      }
-                    >
-                      <Button type="danger" size="default" icon="close" />
-                    </PopConfirm>
                   </ButtonGroup>
                 )}
               />
